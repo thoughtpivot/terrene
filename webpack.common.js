@@ -25,7 +25,7 @@ module.exports = {
         enforce: "pre",
       },
       {
-        test: /\.tsx?$/,
+        test: /\.ts$/,
         use: "ts-loader",
         exclude: /node_modules/,
       },
@@ -53,6 +53,6 @@ module.exports = {
     new HtmlWebPackPlugin({
       title: "@thoughtpivot/terrene",
     }),
-    new CopyPlugin({ patterns: [{ from: "./src/modules", to: "./modules"}, {from: "./src/assets", to: "./assets"}]})
+    new CopyPlugin({  patterns: [{ from: "src/**/*",  to: "[name][ext]]" }]})
   ],
 };

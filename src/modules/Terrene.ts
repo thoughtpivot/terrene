@@ -15,9 +15,7 @@ import {
 
 import { TiledMapResource } from "@excaliburjs/plugin-tiled";
 
-// import tiledMap from "./cities/Craydon/Craydon.tmx";
-
-const tiledMapResource = new TiledMapResource("./cities/Craydon/Craydon.tmx");
+// const tiledMapResource = new TiledMapResource("./cities/Craydon/Craydon.json");
 
 import Navosah, {
     Resources as NovosahResources,
@@ -50,13 +48,14 @@ class Terrene extends Engine {
             maxFps: 45,
             pointerScope: Input.PointerScope.Canvas,
             antialiasing: false,
+            backgroundColor: Color.Black,
         });
     }
 
     initialize() {
         this.start(
             new Loader([
-                tiledMapResource,
+                // tiledMapResource,
                 NovosahResources.Image,
                 OldManSamResources.Image,
                 SallyResources.Image,
@@ -71,69 +70,63 @@ class Terrene extends Engine {
             ])
         ).then(() => {
             this.addScene("craydon", new Craydon());
-            tiledMapResource.addTiledMapToScene(this.currentScene);
-            // this.goToScene("craydon");
+            //
+            this.goToScene("craydon");
 
-            let score = 10;
-            const scoreLabel = new Label({
-                text: "Score: " + score,
-                pos: new Vector(20, 30),
-                font: new Font({
-                    quality: 3,
-                    size: 30,
-                    unit: FontUnit.Px,
-                    family: "Termianl",
-                    color: Color.Cyan,
-                }),
-            });
+            // let score = 10;
+            // const scoreLabel = new Label({
+            //     text: "Score: " + score,
+            //     pos: new Vector(20, 30),
+            //     font: new Font({
+            //         quality: 3,
+            //         size: 30,
+            //         unit: FontUnit.Px,
+            //         family: "Termianl",
+            //         color: Color.Cyan,
+            //     }),
+            // });
 
-            const manaLabel = new Label({
-                text: "Mana: " + 100,
-                pos: new Vector(100, 50),
-            });
+            // const manaLabel = new Label({
+            //     text: "Mana: " + 100,
+            //     pos: new Vector(100, 50),
+            // });
 
-            this.add(scoreLabel);
-            this.add(manaLabel);
+            // this.add(scoreLabel);
+            // this.add(manaLabel);
 
             const you = new You();
             this.add(you);
 
-            const oldManSam = new OldManSam();
-            this.add(oldManSam);
-
-            const sally = new Sally();
-            this.add(sally);
-
-            sally.actions.repeatForever((action) => {
-                action.meet(you, 100).die();
-            });
-
-            oldManSam.actions.follow(sally, 100);
-
-            const navosah = new Navosah();
-            this.add(navosah);
-
-            navosah.actions.follow(sally, 500);
-
-            const horus1 = new Horus();
-            const horus2 = new Horus();
-
-            this.add(horus1);
-            this.add(horus2);
-
-            const gianuah = new Gianuah();
-            this.add(gianuah);
-
+            // const oldManSam = new OldManSam();
             // this.add(oldManSam);
-            // this.add(navosah);
+
+            // const sally = new Sally();
             // this.add(sally);
+
+            // sally.actions.repeatForever((action) => {
+            //     action.meet(you, 100).die();
+            // });
+
+            // oldManSam.actions.follow(sally, 100);
+
+            // const navosah = new Navosah();
+            // this.add(navosah);
+
+            // navosah.actions.follow(sally, 500);
+
+            // const horus1 = new Horus();
+            // const horus2 = new Horus();
+
             // this.add(horus1);
             // this.add(horus2);
+
+            // const gianuah = new Gianuah();
             // this.add(gianuah);
-            // this.add(you);
-            // if (YouResources.Sound.isLoaded()) {
-            //     YouResources.Sound.play(0.5);
-            // }
+            this.currentScene.camera.zoom = 6;
+
+            this.currentScene.camera.strategy.elasticToActor(you, 0.8, 0.9);
+
+            // tiledMapResource.addTiledMapToScene(this.currentScene);
         });
     }
 }

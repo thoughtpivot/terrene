@@ -7,7 +7,7 @@
     "scripts": {
         "test": "npm run build:prod && node ./test/test.js",
         "webpack": "webpack",
-        "dev": "npx tsc -p tsconfig.json && webpack serve --config webpack.development.js",
+        "dev": "npx tsc -p tsconfig.json && webpack serve --config webpack.development.js --open",
         "start": "npm run dev",
         "desktop": "npx electron .",
         "build:dev": "webpack --config webpack.development.js",
