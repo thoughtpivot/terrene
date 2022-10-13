@@ -1,23 +1,4 @@
-import {
-    Engine,
-    Scene,
-    Loader,
-    Label,
-    Vector,
-    FontUnit,
-    Color,
-    Font,
-    Sound,
-    vec,
-    Polygon,
-    Circle,
-    SpriteSheet,
-    ImageSource,
-    TileMap,
-    Tile,
-    ExcaliburGraphicsContext2DCanvas,
-    NativeSoundProcessedEvent,
-} from "excalibur";
+import { Engine, Scene, Loader, Sound } from "excalibur";
 import { TiledMapResource } from "@excaliburjs/plugin-tiled";
 
 const tiledMapResource = new TiledMapResource(
@@ -30,16 +11,21 @@ const tiledMapResource = new TiledMapResource(
 const craydonThemeSong = new Sound("./modules/cities/Craydon/Craydon.mp3");
 
 export default class Craydon extends Scene {
-    onInitialize(_engine: Engine): void {
+    onInitialize(engine: Engine): void {
         const loader = new Loader([tiledMapResource, craydonThemeSong]);
 
-        _engine.start(loader).then(() => {
+        engine.start(loader).then(() => {
             craydonThemeSong.play();
 
-            setTimeout(() => {
-                craydonThemeSong.volume = 0.2;
+            craydonThemeSong.on("playbackstart", () => {
                 craydonThemeSong.loop = true;
             });
+
+            // // TODO we really shouldn't have to do this.
+            // setTimeout(() => {
+            //     craydonThemeSong.volume = 0.2;
+            //     craydonThemeSong.loop = true;
+            // });
 
             tiledMapResource.addTiledMapToScene(this);
         });
