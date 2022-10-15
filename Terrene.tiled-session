@@ -3,13 +3,13 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "src/modules/cities/Craydon/Newbie.tmx",
+    "activeFile": "",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "": {
-            "scaleInDock": 2.0213,
+            "scaleInDock": 1,
             "scaleInEditor": 3.99
         },
         "#roguelikeCity_transparent": {
@@ -103,8 +103,8 @@
             "scale": 0.664,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 1785.3915662650602,
-                "y": -24.09638554216872
+                "x": 1201.0542168674697,
+                "y": 936.7469879518072
             }
         },
         "src/modules/cities/Craydon/Craydon.tmx#Kenny RPG Urban Pack": {
@@ -144,8 +144,9 @@
     "last.imagePath": "/Users/danstephenson/Projects/thoughtpivot/terrene/src/assets/kenney_piratepack/Spritesheet",
     "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
     "map.lastUsedFormat": "tmx",
-    "map.tileHeight": 16,
-    "map.tileWidth": 16,
+    "map.layerDataFormat": null,
+    "map.tileHeight": 32,
+    "map.tileWidth": 32,
     "openFiles": [
         "src/modules/cities/Craydon/Craydon.tmx",
         "src/modules/cities/Craydon/Newbie.tmx"
@@ -167,5 +168,5 @@
         "height": 16,
         "width": 16
     },
-    "tileset.type": 0
+    "tileset.type": 1
 }

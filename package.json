@@ -7,11 +7,12 @@
     "scripts": {
         "test": "npm run build:prod && node ./test/test.js",
         "webpack": "webpack",
-        "dev": "npx tsc -p tsconfig.json && webpack serve --config webpack.development.js --open",
+        "dev": "npx tsc -p tsconfig.json && webpack serve --config webpack.development.js",
         "start": "npm run dev",
         "desktop": "npx electron .",
         "build:dev": "webpack --config webpack.development.js",
-        "build:prod": "webpack --config webpack.production.js"
+        "build:prod": "webpack --config webpack.production.js",
+        "asperite": "../aseprite/build/bin/aseprite"
     },
     "author": "The Boys and Dad.",
     "license": "MIT",

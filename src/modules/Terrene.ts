@@ -11,6 +11,7 @@ import {
     Font,
     Transform,
     Input,
+    Scene,
 } from "excalibur";
 
 import { TiledMapResource } from "@excaliburjs/plugin-tiled";
@@ -40,37 +41,40 @@ import Gianuah, {
 } from "./characters/npc/Giaunah/Giaunah";
 
 import You, { Resources as YouResources } from "./characters/player/You/You";
+class MainMenu extends Scene {
+    onInitialize(_engine: Engine): void {}
+}
 
 class Terrene extends Engine {
     constructor() {
         super({
             displayMode: DisplayMode.FillScreen,
-            maxFps: 45,
+            maxFps: 30,
             pointerScope: Input.PointerScope.Canvas,
             antialiasing: false,
             backgroundColor: Color.Black,
+            suppressPlayButton: false,
         });
     }
 
     initialize() {
-        this.start(
-            new Loader([
-                // tiledMapResource,
-                NovosahResources.Image,
-                OldManSamResources.Image,
-                SallyResources.Image,
-                GianuahResources.Image,
-                GianuahResources.AsepriteResource,
-                GianuahResources.Sound,
-                YouResources.Image,
-                YouResources.AsepriteResource,
-                YouResources.Sound,
-                HorusResources.Image,
-                HorusResources.AsepriteResource,
-            ])
-        ).then(() => {
+        const loader = new Loader([
+            // tiledMapResource,
+            NovosahResources.Image,
+            OldManSamResources.Image,
+            SallyResources.Image,
+            GianuahResources.Image,
+            GianuahResources.AsepriteResource,
+            GianuahResources.Sound,
+            YouResources.Image,
+            YouResources.AsepriteResource,
+            YouResources.Sound,
+            HorusResources.Image,
+            HorusResources.AsepriteResource,
+        ]);
+
+        this.start(loader).then(() => {
             this.addScene("craydon", new Craydon());
-            //
             this.goToScene("craydon");
 
             // let score = 10;
