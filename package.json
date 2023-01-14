@@ -12,7 +12,8 @@
         "desktop": "npx electron .",
         "build:dev": "webpack --config webpack.development.js",
         "build:prod": "webpack --config webpack.production.js",
-        "asperite": "../aseprite/build/bin/aseprite"
+        "asperite": "../aseprite/build/bin/aseprite",
+        "tiled": "../tiled/default/install-root/usr/local/Tiled.app/Contents/MacOS/Tiled"
     },
     "author": "The Boys and Dad.",
     "license": "MIT",
