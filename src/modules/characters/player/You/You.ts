@@ -42,12 +42,35 @@ export default class You extends Actor {
                     this.pos.x = this.pos.x - 2;
                     sound.loop = true;
                     sound.play(1.0);
-
                     break;
                 case Input.Keys.Right:
                 case Input.Keys.D:
                     this.pos.x = this.pos.x + 2;
                     break;
+            }
+        });
+
+        engine.input.keyboard.on("press", (press) => {
+            if (press.key === Input.Keys.Space) {
+                // Get current movement direction from held keys
+                const isMovingUp =
+                    engine.input.keyboard.isHeld(Input.Keys.Up) ||
+                    engine.input.keyboard.isHeld(Input.Keys.W);
+                const isMovingDown =
+                    engine.input.keyboard.isHeld(Input.Keys.Down) ||
+                    engine.input.keyboard.isHeld(Input.Keys.S);
+                const isMovingLeft =
+                    engine.input.keyboard.isHeld(Input.Keys.Left) ||
+                    engine.input.keyboard.isHeld(Input.Keys.A);
+                const isMovingRight =
+                    engine.input.keyboard.isHeld(Input.Keys.Right) ||
+                    engine.input.keyboard.isHeld(Input.Keys.D);
+
+                // Skip in the direction of movement
+                if (isMovingUp) this.pos.y -= 20;
+                if (isMovingDown) this.pos.y += 20;
+                if (isMovingLeft) this.pos.x -= 20;
+                if (isMovingRight) this.pos.x += 20;
             }
         });
     }
