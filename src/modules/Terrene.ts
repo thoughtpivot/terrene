@@ -22,7 +22,9 @@ import Navosah, {
     Resources as NovosahResources,
 } from "./characters/npc/WanderingMerchant/Navosah/Navosah";
 // import MainMenu from "./scenes/MainMenu";
+import CitySelectionMenu from "./scenes/CitySelectionMenu";
 import Craydon from "./cities/Craydon/Craydon";
+import Solic from "./cities/Solic/Solic";
 
 import Sally, {
     Resources as SallyResources,
@@ -41,6 +43,7 @@ import Gianuah, {
 } from "./characters/npc/Giaunah/Giaunah";
 
 import You, { Resources as YouResources } from "./characters/player/You/You";
+import { Resources as SwordResources } from "./items/weapons/Sword";
 class MainMenu extends Scene {
     onInitialize(_engine: Engine): void {}
 }
@@ -73,11 +76,16 @@ class Terrene extends Engine {
             YouResources.Sound,
             HorusResources.Image,
             HorusResources.AsepriteResource,
+            SwordResources.Image,
+            SwordResources.AsepriteResource,
+            SwordResources.Sound,
         ]);
 
         this.start(loader).then(() => {
+            this.addScene("menu", new CitySelectionMenu());
             this.addScene("craydon", new Craydon());
-            this.goToScene("craydon");
+            this.addScene("solic", new Solic());
+            this.goToScene("menu");
 
             // let score = 10;
             // const scoreLabel = new Label({
@@ -100,8 +108,7 @@ class Terrene extends Engine {
             // this.add(scoreLabel);
             // this.add(manaLabel);
 
-            const you = new You();
-            this.add(you);
+            // Player will be added to individual scenes instead of globally
 
             // const oldManSam = new OldManSam();
             // this.add(oldManSam);
@@ -128,9 +135,6 @@ class Terrene extends Engine {
 
             // const gianuah = new Gianuah();
             // this.add(gianuah);
-            this.currentScene.camera.zoom = 6;
-
-            this.currentScene.camera.strategy.elasticToActor(you, 0.8, 0.9);
 
             // tiledMapResource.addTiledMapToScene(this.currentScene);
         });
