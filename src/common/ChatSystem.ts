@@ -38,42 +38,57 @@ export class ChatSystem {
     private isInteractive: boolean = false;
     private inputField: Actor | null = null;
     private inputText: Text | null = null;
+    private inputTextActor: Actor | null = null; // Keep reference to the text actor
     private userInput: string = "";
     private onUserMessage: ((message: string) => Promise<void>) | null = null;
     private isWaitingForResponse: boolean = false;
+    private updateDisplayTimeout: number | null = null;
+    private lastKeyEventTime: number = 0;
+    private keyEventThrottle: number = 100; // Minimum 100ms between key events (more aggressive)
+    private keyboardHandler: ((evt: any) => void) | null = null;
 
     constructor(engine: Engine) {
         this.engine = engine;
-        this.setupKeyboardHandlers();
+        // Don't setup keyboard handlers in constructor - do it when needed
     }
 
     private setupKeyboardHandlers(): void {
-        this.engine.input.keyboard.on("press", (evt) => {
-            console.log(
-                "ChatSystem keyboard event:",
-                evt.key,
-                "isActive:",
-                this.isActive,
-                "isInteractive:",
-                this.isInteractive
-            );
+        // Remove existing handler if present
+        this.removeKeyboardHandlers();
 
+        // Create the handler function
+        this.keyboardHandler = (evt) => {
             if (!this.isActive || !this.isInteractive) {
-                console.log(
-                    "ChatSystem: Ignoring keyboard event - not active or not interactive"
-                );
                 return;
             }
 
-            console.log("ChatSystem: Processing keyboard event:", evt.key);
+            // Throttle key events to prevent overwhelming the system
+            const currentTime = Date.now();
+            if (currentTime - this.lastKeyEventTime < this.keyEventThrottle) {
+                return;
+            }
+            this.lastKeyEventTime = currentTime;
+
+            // Add more debugging to understand what's happening
+            console.log(
+                "ChatSystem: Key event:",
+                evt.key,
+                "User input length:",
+                this.userInput.length,
+                "Waiting:",
+                this.isWaitingForResponse
+            );
 
             if (evt.key === Input.Keys.Enter) {
                 console.log("ChatSystem: Enter key pressed, sending message");
                 this.sendUserMessage();
+                return;
             } else if (evt.key === Input.Keys.Backspace) {
-                console.log("ChatSystem: Backspace pressed");
-                this.userInput = this.userInput.slice(0, -1);
-                this.updateInputDisplay();
+                if (!this.isWaitingForResponse) {
+                    this.userInput = this.userInput.slice(0, -1);
+                    this.throttledUpdateDisplay();
+                }
+                return;
             } else {
                 // Handle character input - extract character from key names like "KeyF" -> "F"
                 let char = "";
@@ -93,13 +108,47 @@ export class ChatSystem {
                     char = evt.key;
                 }
 
-                if (char) {
-                    console.log("ChatSystem: Adding character:", char);
-                    this.userInput += char;
-                    this.updateInputDisplay();
+                if (
+                    char &&
+                    !this.isWaitingForResponse &&
+                    this.userInput.length < 100
+                ) {
+                    console.log(
+                        "ChatSystem: Adding character:",
+                        char,
+                        "to input:",
+                        this.userInput
+                    );
+                    try {
+                        this.userInput += char;
+                        // Throttle display updates to avoid performance issues
+                        this.throttledUpdateDisplay();
+                    } catch (error) {
+                        console.error(
+                            "ChatSystem: Error adding character:",
+                            error
+                        );
+                    }
+                } else if (char) {
+                    console.log(
+                        "ChatSystem: Blocked character input - waiting:",
+                        this.isWaitingForResponse,
+                        "length:",
+                        this.userInput.length
+                    );
                 }
             }
-        });
+        };
+
+        // Add the handler to the keyboard input
+        this.engine.input.keyboard.on("press", this.keyboardHandler);
+    }
+
+    private removeKeyboardHandlers(): void {
+        if (this.keyboardHandler) {
+            this.engine.input.keyboard.off("press", this.keyboardHandler);
+            this.keyboardHandler = null;
+        }
     }
 
     public startChat(messages: ChatMessage[], onComplete?: () => void): void {
@@ -154,6 +203,7 @@ export class ChatSystem {
         console.log("Chat system: Creating chat UI and input field");
         this.createChatUI();
         this.createInputField();
+        this.setupKeyboardHandlers(); // Set up keyboard handlers for interactive mode
 
         console.log("Chat system: Interactive chat setup complete");
         console.log("Chat system: isActive =", this.isActive);
@@ -254,11 +304,25 @@ export class ChatSystem {
         console.log("ChatSystem: Input field creation complete");
     }
 
+    private throttledUpdateDisplay(): void {
+        // Cancel any pending update
+        if (this.updateDisplayTimeout) {
+            clearTimeout(this.updateDisplayTimeout);
+            this.updateDisplayTimeout = null;
+        }
+
+        // Update immediately instead of using setTimeout to avoid accumulation issues
+        try {
+            this.updateInputDisplay();
+        } catch (error) {
+            console.error("ChatSystem: Error updating input display:", error);
+        }
+    }
+
     private updateInputDisplay(): void {
-        console.log("ChatSystem: Updating input display");
-        if (!this.inputText || !this.inputField) {
+        if (!this.inputField) {
             console.log(
-                "ChatSystem: Missing inputText or inputField for display update"
+                "ChatSystem: Cannot update display - missing inputField"
             );
             return;
         }
@@ -268,11 +332,24 @@ export class ChatSystem {
             ? "Waiting for response..."
             : this.userInput + "_";
 
-        console.log("ChatSystem: Setting display text to:", displayText);
-        this.inputText.text = displayText;
+        console.log("ChatSystem: Updating display with text:", displayText);
 
-        // Position the input text
-        const inputTextActor = new Actor({
+        // Recreate text and actor each time to ensure it displays correctly
+        if (this.inputTextActor && !this.inputTextActor.isKilled()) {
+            this.inputTextActor.kill();
+        }
+
+        this.inputText = new Text({
+            text: displayText,
+            color: Color.fromHex("#F5F5F5"),
+            font: new Font({
+                family: "Arial, sans-serif",
+                size: 14,
+                unit: FontUnit.Px,
+            }),
+        });
+
+        this.inputTextActor = new Actor({
             pos: new Vector(
                 this.inputField.pos.x - this.inputField.width / 2 + 10,
                 this.inputField.pos.y
@@ -281,16 +358,8 @@ export class ChatSystem {
             coordPlane: CoordPlane.Screen,
         });
 
-        // Remove old input text actor if it exists
-        if (this.inputField.scene) {
-            const oldActors = this.inputField.scene.actors.filter(
-                (actor) => actor.graphics.current[0]?.graphic === this.inputText
-            );
-            oldActors.forEach((actor) => actor.kill());
-        }
-
-        inputTextActor.graphics.use(this.inputText);
-        this.engine.currentScene.add(inputTextActor);
+        this.inputTextActor.graphics.use(this.inputText);
+        this.engine.currentScene.add(this.inputTextActor);
     }
 
     private async sendUserMessage(): Promise<void> {
@@ -330,9 +399,14 @@ export class ChatSystem {
     }
 
     public addNPCResponse(message: ChatMessage): void {
+        console.log("ChatSystem: Adding NPC response:", message);
         this.allMessages.push(message);
         this.currentMessageIndex = this.allMessages.length - 1;
         this.showCurrentMessage();
+        console.log(
+            "ChatSystem: NPC response added, message count:",
+            this.allMessages.length
+        );
     }
 
     private showCurrentMessage(): void {
@@ -615,6 +689,15 @@ export class ChatSystem {
     }
 
     private endChat(): void {
+        // Clean up any pending timeouts
+        if (this.updateDisplayTimeout) {
+            clearTimeout(this.updateDisplayTimeout);
+            this.updateDisplayTimeout = null;
+        }
+
+        // Remove keyboard handlers
+        this.removeKeyboardHandlers();
+
         // Clean up current message actors
         if (this.currentSpeakerActor) {
             this.currentSpeakerActor.kill();
@@ -637,6 +720,12 @@ export class ChatSystem {
             this.inputField = null;
         }
 
+        // Clean up input text actor
+        if (this.inputTextActor) {
+            this.inputTextActor.kill();
+            this.inputTextActor = null;
+        }
+
         // Clean up timer
         if (this.messageTimer) {
             this.messageTimer.stop();
@@ -653,6 +742,7 @@ export class ChatSystem {
         this.speakerText = null;
         this.messageText = null;
         this.inputText = null;
+        this.inputTextActor = null;
         this.userInput = "";
         this.onUserMessage = null;
         this.isWaitingForResponse = false;
@@ -741,6 +831,15 @@ export class ChatSystem {
     public forceReset(): void {
         console.log("Chat system: Force resetting...");
 
+        // Clean up any pending timeouts
+        if (this.updateDisplayTimeout) {
+            clearTimeout(this.updateDisplayTimeout);
+            this.updateDisplayTimeout = null;
+        }
+
+        // Remove keyboard handlers
+        this.removeKeyboardHandlers();
+
         // Clean up current message actors
         if (this.currentSpeakerActor) {
             this.currentSpeakerActor.kill();
@@ -763,6 +862,12 @@ export class ChatSystem {
             this.inputField = null;
         }
 
+        // Clean up input text actor
+        if (this.inputTextActor) {
+            this.inputTextActor.kill();
+            this.inputTextActor = null;
+        }
+
         // Clean up timer
         if (this.messageTimer) {
             this.messageTimer.stop();
@@ -779,6 +884,7 @@ export class ChatSystem {
         this.speakerText = null;
         this.messageText = null;
         this.inputText = null;
+        this.inputTextActor = null;
         this.userInput = "";
         this.onUserMessage = null;
         this.isWaitingForResponse = false;

@@ -80,16 +80,35 @@ async function generateInteractiveResponse(
 
         const userInput = `${conversationContext}The player just said: "${userMessage}"\n\nPlease respond as ${bio.name} would, staying true to their character. Give a natural, conversational response that acknowledges what the player said. Keep it concise (1-2 sentences).`;
 
+        console.log("🔄 Backend: Calling Claude API with:");
+        console.log(
+            "🔄 Backend: Instructions:",
+            prompt.substring(0, 200) + "..."
+        );
+        console.log("🔄 Backend: User input:", userInput);
+
         const response = await Claude({
             version: ClaudeVersion.Claude_3_5_Sonnet_20240620_V10,
             instructions: prompt,
             inputText: userInput,
         });
 
+        console.log("🎯 Backend: RAW Claude response:");
+        console.log("🎯 Backend:", JSON.stringify(response, null, 2));
+        console.log("🎯 Backend: Claude response type:", typeof response);
+        console.log(
+            "🎯 Backend: Claude response length:",
+            response?.length || 0
+        );
+
         // Clean up Claude's response
         const cleanedResponse = response.trim().replace(/^["']|["']$/g, "");
 
-        console.log(`✅ Generated interactive response with Claude for Sally`);
+        console.log("🧹 Backend: CLEANED Claude response:");
+        console.log("🧹 Backend:", JSON.stringify(cleanedResponse, null, 2));
+        console.log(
+            `✅ Backend: Generated interactive response with Claude for Sally`
+        );
         return cleanedResponse;
     } catch (error) {
         console.error(
@@ -306,12 +325,15 @@ router.post("/api/sally/regenerate", async (ctx) => {
  * Handle interactive dialogue with Sally (simplified for now)
  */
 router.get("/api/sally/chat", async (ctx) => {
-    console.log("💬 Backend: Interactive chat with Sally...");
+    console.log("💬 Backend: Interactive chat with Sally - ROUTE HIT!");
+    console.log("💬 Backend: Query params:", ctx.query);
 
     try {
         const userMessage = ctx.query.message as string;
+        console.log("💬 Backend: Extracted user message:", userMessage);
 
         if (!userMessage || typeof userMessage !== "string") {
+            console.log("💬 Backend: Invalid or missing user message");
             ctx.status = 400;
             ctx.body = {
                 success: false,
@@ -320,32 +342,38 @@ router.get("/api/sally/chat", async (ctx) => {
             return;
         }
 
-        console.log("👤 User message:", userMessage);
+        console.log("👤 Backend: Processing user message:", userMessage);
 
         // Load character bio
+        console.log("📖 Backend: Loading character bio...");
         const bio = await loadCharacterBio();
+        console.log("📖 Backend: Bio loaded:", bio.name);
 
         // Generate response using Claude
         let sallyResponse;
         let usedFallback = false;
 
+        console.log("🤖 Backend: Attempting to call Claude...");
         try {
             sallyResponse = await generateInteractiveResponse(
                 bio,
                 userMessage,
                 []
             );
-            console.log("✅ Claude response generated successfully!");
+            console.log("✅ Backend: Claude response generated successfully!");
+            console.log("✅ Backend: Claude response:", sallyResponse);
         } catch (claudeError) {
             console.warn(
-                "❌ Claude generation failed, using fallback:",
+                "❌ Backend: Claude generation failed, using fallback:",
                 claudeError.message
             );
+            console.warn("❌ Backend: Claude error details:", claudeError);
             sallyResponse = generateFallbackResponse(userMessage, bio);
             usedFallback = true;
+            console.log("⚠️ Backend: Using fallback response:", sallyResponse);
         }
 
-        ctx.body = {
+        const responseBody = {
             success: true,
             response: {
                 speaker: bio.name,
@@ -354,10 +382,22 @@ router.get("/api/sally/chat", async (ctx) => {
             },
             fallback: usedFallback,
         };
-    } catch (error) {
-        console.error("❌ Error in Sally interactive chat:", error);
 
-        ctx.body = {
+        console.log("📤 Backend: Sending response to frontend:");
+        console.log(
+            "📤 Backend: Response body:",
+            JSON.stringify(responseBody, null, 2)
+        );
+
+        ctx.body = responseBody;
+    } catch (error) {
+        console.error("❌ Backend: MAJOR ERROR in Sally interactive chat:");
+        console.error("❌ Backend: Error type:", typeof error);
+        console.error("❌ Backend: Error message:", error.message);
+        console.error("❌ Backend: Full error:", error);
+        console.error("❌ Backend: Error stack:", error.stack);
+
+        const errorResponse = {
             success: false,
             error: error.message,
             response: {
@@ -366,6 +406,12 @@ router.get("/api/sally/chat", async (ctx) => {
                 duration: 3000,
             },
         };
+
+        console.log(
+            "❌ Backend: Sending error response:",
+            JSON.stringify(errorResponse, null, 2)
+        );
+        ctx.body = errorResponse;
     }
 });
 

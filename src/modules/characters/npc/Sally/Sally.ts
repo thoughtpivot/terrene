@@ -267,7 +267,8 @@ export default class Sally extends Actor implements DialogueNPC {
             // Show loading indicator
             this.showLoadingIndicator();
 
-            console.log("📡 Sending message to Sally backend...");
+            console.log("📡 Sally: Sending message to backend:", userMessage);
+            console.log("📡 Sally: API URL:", API_BASE_URL + "/chat");
 
             const response = await axios.get(API_BASE_URL + "/chat", {
                 params: {
@@ -278,6 +279,12 @@ export default class Sally extends Actor implements DialogueNPC {
                 },
                 timeout: 10000, // 10 second timeout for interactive responses
             });
+
+            console.log(
+                "📡 Sally: Backend response received:",
+                response.status
+            );
+            console.log("📡 Sally: Response data:", response.data);
 
             // Hide loading indicator
             this.hideLoadingIndicator();
