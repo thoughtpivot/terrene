@@ -17,11 +17,15 @@ import {
     EasingFunctions,
 } from "excalibur";
 import You from "../../characters/player/You/You";
+import Sally from "../../characters/npc/Sally/Sally";
+import OldManSam from "../../characters/npc/OldManSam/OldManSam";
 
 export default class Solic extends Scene {
     private beachBounds!: Actor;
     private trails: Actor[] = [];
     private player!: You;
+    private sally!: Sally;
+    private oldManSam!: OldManSam;
     private ocean!: Actor;
     private waveAnimations: Actor[] = [];
     private fishSpawnTimer!: Timer;
@@ -238,42 +242,352 @@ export default class Solic extends Scene {
         this.add(leaves2);
 
         // Add some rocks on the beach - positioned in walkable beach area
-        const rock1 = new Actor({
-            pos: new Vector(480, 300),
-            width: 15,
-            height: 12,
-            collisionType: CollisionType.Fixed,
-        });
-        rock1.graphics.use(
-            new Rectangle({
-                width: 15,
-                height: 12,
-                color: Color.fromHex("#696969"), // Gray rock
-            })
-        );
-        this.add(rock1);
+        this.createRock(480, 300, 15, 12);
+        this.createRock(380, 180, 12, 10);
 
-        const rock2 = new Actor({
-            pos: new Vector(380, 180),
-            width: 12,
-            height: 10,
+        // Add some additional rocks for variety
+        this.createRock(520, 200, 10, 8, "#5a5a5a"); // Darker rock
+        this.createRock(420, 350, 14, 11, "#7d7d7d"); // Lighter rock
+
+        // Add 10 more scattered rocks with varying sizes and gray shades
+        const grayShades = [
+            "#4a4a4a", // Dark gray
+            "#5a5a5a", // Medium dark gray
+            "#696969", // Medium gray (default)
+            "#7d7d7d", // Medium light gray
+            "#8c8c8c", // Light gray
+            "#999999", // Lighter gray
+            "#a6a6a6", // Very light gray
+        ];
+
+        for (let i = 0; i < 10; i++) {
+            // Random position within the walkable beach area (320x480 centered at 480,240)
+            // Beach area bounds: x: 320-640, y: 0-480
+            const x = randomInRange(340, 620); // Slightly inset from edges
+            const y = randomInRange(20, 460); // Slightly inset from edges
+
+            // Random size variations
+            const width = randomInRange(8, 18);
+            const height = randomInRange(6, 16);
+
+            // Random gray shade
+            const randomShade =
+                grayShades[Math.floor(Math.random() * grayShades.length)];
+
+            this.createRock(x, y, width, height, randomShade);
+        }
+    }
+
+    private createRock(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        color: string = "#696969"
+    ): Actor {
+        const rock = new Actor({
+            pos: new Vector(x, y),
+            width: width,
+            height: height,
             collisionType: CollisionType.Fixed,
         });
-        rock2.graphics.use(
-            new Rectangle({
-                width: 12,
-                height: 10,
-                color: Color.fromHex("#696969"), // Gray rock
-            })
-        );
-        this.add(rock2);
+
+        // N64-style color palette with more variation
+        const baseColor = Color.fromHex(color);
+        const rockPalette = {
+            darkest: baseColor.darken(0.4), // Deep shadows
+            darker: baseColor.darken(0.25), // Primary shadows
+            base: baseColor, // Main rock color
+            lighter: baseColor.lighten(0.2), // Mid highlights
+            lightest: baseColor.lighten(0.35), // Bright highlights
+            accent: baseColor.darken(0.15), // Detail color
+        };
+
+        // Create geometric rock base with angular shape (N64 style)
+        const rockShapes = [
+            // Main rock body - slightly irregular rectangle
+            { w: width, h: height, x: 0, y: 0, color: rockPalette.base },
+            // Angular top section
+            {
+                w: width * 0.8,
+                h: height * 0.3,
+                x: width * 0.1,
+                y: -height * 0.1,
+                color: rockPalette.lighter,
+            },
+            // Left edge shadow
+            {
+                w: width * 0.15,
+                h: height * 0.9,
+                x: -width * 0.05,
+                y: height * 0.05,
+                color: rockPalette.darker,
+            },
+            // Bottom shadow
+            {
+                w: width * 0.9,
+                h: height * 0.2,
+                x: width * 0.05,
+                y: height * 0.4,
+                color: rockPalette.darkest,
+            },
+        ];
+
+        // Build main rock geometry
+        rockShapes.forEach((shape, index) => {
+            const section = new Actor({
+                pos: new Vector(x + shape.x, y + shape.y),
+                width: shape.w,
+                height: shape.h,
+                z: index * 0.1,
+            });
+            section.graphics.use(
+                new Rectangle({
+                    width: shape.w,
+                    height: shape.h,
+                    color: shape.color,
+                })
+            );
+            this.add(section);
+        });
+
+        // Add N64-style pixelated rock texture layers
+        this.addRockTextureLayer(x, y, width, height, rockPalette);
+
+        // Add geometric surface details (cracks, chips, facets)
+        this.addRockSurfaceDetails(x, y, width, height, rockPalette);
+
+        // Add N64-style dithered shading
+        this.addRockDithering(x, y, width, height, rockPalette);
+
+        // Add mineral veins/streaks (common in N64 rock textures)
+        this.addMineralVeins(x, y, width, height, rockPalette);
+
+        this.add(rock);
+        return rock;
+    }
+
+    private addRockTextureLayer(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        palette: any
+    ): void {
+        // Create pixel-perfect texture details like N64 games
+        const textureCount = Math.floor((width * height) / 25); // Density based on size
+
+        for (let i = 0; i < textureCount; i++) {
+            const pixelSize = randomInRange(1, 3);
+            const texel = new Actor({
+                pos: new Vector(
+                    x + randomInRange(-width * 0.4, width * 0.4),
+                    y + randomInRange(-height * 0.4, height * 0.4)
+                ),
+                width: pixelSize,
+                height: pixelSize,
+                z: 0.5,
+            });
+
+            // N64-style limited color selection for texture
+            const textureColors = [
+                palette.darker,
+                palette.accent,
+                palette.base,
+            ];
+            const pixelColor =
+                textureColors[Math.floor(Math.random() * textureColors.length)];
+
+            texel.graphics.use(
+                new Rectangle({
+                    width: pixelSize,
+                    height: pixelSize,
+                    color: pixelColor,
+                })
+            );
+            this.add(texel);
+        }
+    }
+
+    private addRockSurfaceDetails(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        palette: any
+    ): void {
+        // Angular cracks (N64 rocks had geometric, not organic shapes)
+        const crackCount = randomInRange(2, 4);
+        for (let i = 0; i < crackCount; i++) {
+            const crackLength = randomInRange(width * 0.3, width * 0.7);
+            const crackWidth = randomInRange(1, 2);
+
+            const crack = new Actor({
+                pos: new Vector(
+                    x + randomInRange(-width * 0.3, width * 0.3),
+                    y + randomInRange(-height * 0.3, height * 0.3)
+                ),
+                width: crackLength,
+                height: crackWidth,
+                z: 0.7,
+            });
+            crack.graphics.use(
+                new Rectangle({
+                    width: crackLength,
+                    height: crackWidth,
+                    color: palette.darkest,
+                })
+            );
+            this.add(crack);
+        }
+
+        // Rock chips and angular facets
+        const chipCount = randomInRange(3, 6);
+        for (let i = 0; i < chipCount; i++) {
+            const chipSize = randomInRange(2, 4);
+            const chip = new Actor({
+                pos: new Vector(
+                    x + randomInRange(-width * 0.4, width * 0.4),
+                    y + randomInRange(-height * 0.4, height * 0.4)
+                ),
+                width: chipSize,
+                height: chipSize,
+                z: 0.6,
+            });
+            chip.graphics.use(
+                new Rectangle({
+                    width: chipSize,
+                    height: chipSize,
+                    color: palette.lighter,
+                })
+            );
+            this.add(chip);
+        }
+    }
+
+    private addRockDithering(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        palette: any
+    ): void {
+        // N64-style dithering pattern for gradients
+        const ditherPixels = Math.floor((width * height) / 20);
+
+        for (let i = 0; i < ditherPixels; i++) {
+            const ditherX =
+                x + (i % Math.floor(width / 2)) * 2 + randomInRange(-1, 1);
+            const ditherY =
+                y +
+                Math.floor(i / Math.floor(width / 2)) * 2 +
+                randomInRange(-1, 1);
+
+            // Skip if outside rock bounds
+            if (
+                Math.abs(ditherX - x) > width / 2 ||
+                Math.abs(ditherY - y) > height / 2
+            )
+                continue;
+
+            const ditherPixel = new Actor({
+                pos: new Vector(ditherX, ditherY),
+                width: 1,
+                height: 1,
+                z: 0.3,
+            });
+
+            // Alternating dither pattern
+            const isDarkDither =
+                (Math.floor(ditherX) + Math.floor(ditherY)) % 2 === 0;
+            const ditherColor = isDarkDither ? palette.darker : palette.lighter;
+
+            ditherPixel.graphics.use(
+                new Rectangle({
+                    width: 1,
+                    height: 1,
+                    color: ditherColor,
+                })
+            );
+            this.add(ditherPixel);
+        }
+    }
+
+    private addMineralVeins(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        palette: any
+    ): void {
+        // Add mineral veins/streaks like N64 rock textures
+        const veinCount = randomInRange(1, 3);
+
+        for (let i = 0; i < veinCount; i++) {
+            const veinLength = randomInRange(width * 0.4, width * 0.8);
+            const veinSegments = Math.floor(veinLength / 3);
+
+            const startX = x + randomInRange(-width * 0.3, width * 0.3);
+            const startY = y + randomInRange(-height * 0.3, height * 0.3);
+            const angle = randomInRange(0, Math.PI * 2);
+
+            for (let j = 0; j < veinSegments; j++) {
+                const segmentX = startX + Math.cos(angle) * j * 3;
+                const segmentY = startY + Math.sin(angle) * j * 3;
+
+                const veinSegment = new Actor({
+                    pos: new Vector(segmentX, segmentY),
+                    width: randomInRange(1, 2),
+                    height: randomInRange(1, 2),
+                    z: 0.4,
+                });
+
+                // Mineral colors - slightly different from main rock
+                const mineralColors = [palette.lightest, palette.accent];
+                const mineralColor =
+                    mineralColors[
+                        Math.floor(Math.random() * mineralColors.length)
+                    ];
+
+                veinSegment.graphics.use(
+                    new Rectangle({
+                        width: veinSegment.width,
+                        height: veinSegment.height,
+                        color: mineralColor,
+                    })
+                );
+                this.add(veinSegment);
+            }
+        }
     }
 
     private setupPlayer(engine: Engine): void {
         // Create and add player character
+        console.log("*** CREATING PLAYER CHARACTER ***");
         this.player = new You();
         this.player.pos = new Vector(480, 240); // Start player in center of beach
         this.add(this.player);
+        console.log("*** PLAYER CHARACTER ADDED TO SCENE ***", this.player);
+
+        // Create and add Sally NPC with beach area bounds
+        this.sally = new Sally({
+            minX: 340,
+            maxX: 620,
+            minY: 20,
+            maxY: 460,
+        });
+        this.sally.pos = new Vector(400, 300); // Start Sally in a different part of the beach
+        this.add(this.sally);
+        console.log("Solic scene: Added Sally at position:", this.sally.pos);
+
+        // Create and add Old Man Sam NPC who will chase the player
+        this.oldManSam = new OldManSam();
+        this.oldManSam.pos = new Vector(350, 100); // Start him away from the player
+        this.add(this.oldManSam);
+        console.log(
+            "Solic scene: Added Old Man Sam at position:",
+            this.oldManSam.pos
+        );
 
         // Setup camera to follow player
         this.camera.strategy.elasticToActor(this.player, 0.8, 0.9);
