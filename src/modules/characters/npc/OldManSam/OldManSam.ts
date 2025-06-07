@@ -7,10 +7,10 @@ import {
     Engine,
     Timer,
 } from "excalibur";
+import axios from "axios";
 import OldManSamImage from "./OldManSam.png";
 import { ChatMessage } from "../../../../common/ChatSystem";
 import { DialogueNPC } from "../../../../common/DialogueNPC";
-import { Claude, ClaudeVersion } from "../../../../common/amazon";
 import {
     CharacterFileReader,
     CharacterBio,
@@ -18,15 +18,15 @@ import {
 // @ts-ignore
 import oldManSamBio from "!!raw-loader!./OldManSam.md";
 
+// API configuration
+const API_BASE_URL = "http://localhost:3000/api/oldmansam";
+
 export default class OldManSam extends Actor implements DialogueNPC {
     private player: Actor | null = null;
     private chaseSpeed: number = 25; // pixels per second
     private isChasing: boolean = true;
     private interactionRange: number = 30; // Range for T key interaction
     private characterBio: CharacterBio | null = null;
-    private lastMessageGeneration: number = 0;
-    private messageCache: ChatMessage[] = [];
-    private cacheDuration: number = 300000; // 5 minutes in milliseconds
 
     constructor() {
         super({
@@ -40,11 +40,14 @@ export default class OldManSam extends Actor implements DialogueNPC {
 
     onInitialize(engine: Engine) {
         this.graphics.add(Resources.Image.toSprite());
-        console.log("Old Man Sam initialized at position:", this.pos);
+        console.log("🧙 Old Man Sam initialized at position:", this.pos);
         console.log(
-            "Old Man Sam implements DialogueNPC:",
+            "🧙 Old Man Sam implements DialogueNPC:",
             this instanceof Object && "getDialogue" in this
         );
+        console.log("🧙 Has getDialogue:", "getDialogue" in this);
+        console.log("🧙 Has isInRange:", "isInRange" in this);
+        console.log("🧙 Has getNPCName:", "getNPCName" in this);
 
         // Load character bio
         this.loadCharacterBio();
@@ -116,111 +119,88 @@ export default class OldManSam extends Actor implements DialogueNPC {
         console.log(`Loaded character bio for ${this.characterBio.name}`);
     }
 
-    // DialogueNPC interface implementation - powered by Claude reading from .md file
+    // DialogueNPC interface implementation - powered by backend API
     public async getDialogue(): Promise<ChatMessage[]> {
-        // Check if we have cached messages that are still fresh
-        const now = Date.now();
-        if (
-            this.messageCache.length > 0 &&
-            now - this.lastMessageGeneration < this.cacheDuration
-        ) {
-            console.log("Using cached dialogue for Old Man Sam");
-            return this.messageCache;
+        console.log("🎭 getDialogue() called on Old Man Sam!");
+
+        try {
+            console.log("📡 Calling backend API for dialogue...");
+
+            const response = await axios.get(API_BASE_URL + "/dialogue", {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                timeout: 5000, // 5 second timeout
+            });
+
+            if (!response.data.success) {
+                throw new Error(`Backend API failed: ${response.data.error}`);
+            }
+
+            console.log(
+                `✅ Got ${response.data.messages.length} messages from backend API`,
+                response.data.cached ? "(cached)" : "(fresh)"
+            );
+
+            if (response.data.fallback) {
+                console.log("⚠️ Backend used fallback messages");
+            }
+
+            return response.data.messages;
+        } catch (error) {
+            let errorMessage = "Unknown error";
+
+            if (axios.isAxiosError(error)) {
+                if (error.code === "ECONNREFUSED") {
+                    errorMessage = "Backend server is not running";
+                } else if (error.code === "ECONNABORTED") {
+                    errorMessage = "Request timeout";
+                } else if (error.response) {
+                    errorMessage = `Backend returned ${error.response.status}: ${error.response.statusText}`;
+                } else if (error.request) {
+                    errorMessage = "No response from backend server";
+                } else {
+                    errorMessage = error.message;
+                }
+            } else {
+                errorMessage = String(error);
+            }
+
+            console.error(
+                "🚨 Backend API call failed, using emergency fallback:",
+                errorMessage
+            );
+
+            // Emergency fallback if backend is down
+            const emergencyMessages: ChatMessage[] = [
+                {
+                    speaker: "Old Man Sam",
+                    text: "Arr, the winds be blowin' strange today...",
+                    duration: 3000,
+                },
+                {
+                    speaker: "Old Man Sam",
+                    text: "Me old bones be creakin' somethin' fierce!",
+                    duration: 3500,
+                },
+                {
+                    speaker: "Old Man Sam",
+                    text: "Best ye be on yer way, lad!",
+                    duration: 3000,
+                },
+            ];
+
+            return emergencyMessages;
         }
-
-        // Ensure character bio is loaded
-        if (!this.characterBio) {
-            this.loadCharacterBio();
-        }
-
-        console.log("Generating new dialogue for Old Man Sam using Claude...");
-
-        const characterPrompt = CharacterFileReader.createCharacterPrompt(
-            this.characterBio!
-        );
-
-        const claudeInstructions = `${characterPrompt}
-
-Your task is to generate exactly 3 authentic dialogue messages that this character might say to a player who approaches them.
-
-IMPORTANT: Return your response as a valid JavaScript array of objects in this exact format:
-[
-    {"speaker": "Old Man Sam", "text": "First message here", "duration": 4000},
-    {"speaker": "Old Man Sam", "text": "Second message here", "duration": 4500},
-    {"speaker": "Old Man Sam", "text": "Third message here", "duration": 3500}
-]
-
-Requirements:
-- Each message should be a complete thought or statement
-- Stay true to the character's personality and speaking style from the bio
-- Messages should feel natural and varied
-- Don't repeat the exact same phrases from the bio examples
-- Keep each message under 80 characters for chat display
-- Use duration values between 3000-5000ms based on message length
-- Return ONLY the JavaScript array, no other text or formatting`;
-
-        const response = await Claude({
-            version: ClaudeVersion.Claude_3_5_Sonnet_20240620_V10,
-            instructions: claudeInstructions,
-            inputText:
-                "Generate dialogue messages for a player who just approached you while you were chasing them on the beach.",
-        });
-
-        console.log("Claude response:", response);
-
-        // Parse the response as a JavaScript array
-        const messages = this.parseClaudeResponse(response);
-
-        // Cache the generated messages
-        this.messageCache = messages;
-        this.lastMessageGeneration = now;
-
-        console.log(`Generated ${messages.length} messages for Old Man Sam`);
-        return messages;
-    }
-
-    /**
-     * Parses Claude's response to extract the dialogue array with ChatMessage objects
-     */
-    private parseClaudeResponse(response: string): ChatMessage[] {
-        // Clean up the response to extract just the array
-        let cleanedResponse = response.trim();
-
-        // Look for array pattern
-        const arrayMatch = cleanedResponse.match(/\[[\s\S]*\]/);
-        if (arrayMatch) {
-            cleanedResponse = arrayMatch[0];
-        }
-
-        // Parse as JSON
-        const parsedArray = JSON.parse(cleanedResponse);
-
-        // Validate and convert to ChatMessage format
-        return parsedArray
-            .filter(
-                (item: any) =>
-                    item &&
-                    typeof item === "object" &&
-                    typeof item.speaker === "string" &&
-                    typeof item.text === "string" &&
-                    item.text.trim().length > 0
-            )
-            .map((item: any) => ({
-                speaker: item.speaker,
-                text: item.text,
-                duration:
-                    typeof item.duration === "number" ? item.duration : 4000,
-            }));
     }
 
     public isInRange(playerPos: Vector): boolean {
         const distance = this.pos.distance(playerPos);
+        const inRange = distance <= this.interactionRange;
         console.log(
             `🔍 Old Man Sam isInRange check: distance=${distance.toFixed(
                 1
-            )}, range=${this.interactionRange}, inRange=${
-                distance <= this.interactionRange
-            }`
+            )}, range=${this.interactionRange}, inRange=${inRange}`
         );
         console.log(
             `🔍 Sam pos: (${this.pos.x.toFixed(1)}, ${this.pos.y.toFixed(1)})`
@@ -230,7 +210,14 @@ Requirements:
                 1
             )})`
         );
-        return distance <= this.interactionRange;
+
+        if (inRange) {
+            console.log("✅ Old Man Sam IS IN RANGE - should trigger chat!");
+        } else {
+            console.log("❌ Old Man Sam is OUT OF RANGE");
+        }
+
+        return inRange;
     }
 
     public getNPCName(): string {
@@ -249,11 +236,50 @@ Requirements:
     }
 
     /**
-     * Force regeneration of dialogue (clears cache)
+     * Force regeneration of dialogue (clears backend cache)
      */
-    public regenerateDialogue(): void {
-        this.messageCache = [];
-        this.lastMessageGeneration = 0;
+    public async regenerateDialogue(): Promise<void> {
+        try {
+            const response = await axios.post(
+                API_BASE_URL + "/regenerate",
+                {},
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    timeout: 5000, // 5 second timeout
+                }
+            );
+
+            if (response.data.success) {
+                console.log("✅ Backend dialogue cache cleared");
+            } else {
+                console.warn(
+                    "⚠️ Failed to clear backend cache:",
+                    response.data.error
+                );
+            }
+        } catch (error) {
+            let errorMessage = "Unknown error";
+
+            if (axios.isAxiosError(error)) {
+                if (error.code === "ECONNREFUSED") {
+                    errorMessage = "Backend server is not running";
+                } else if (error.code === "ECONNABORTED") {
+                    errorMessage = "Request timeout";
+                } else if (error.response) {
+                    errorMessage = `Backend returned ${error.response.status}: ${error.response.statusText}`;
+                } else if (error.request) {
+                    errorMessage = "No response from backend server";
+                } else {
+                    errorMessage = error.message;
+                }
+            } else {
+                errorMessage = String(error);
+            }
+
+            console.error("❌ Error clearing backend cache:", errorMessage);
+        }
     }
 
     /**

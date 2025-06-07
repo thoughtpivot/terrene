@@ -2,6 +2,7 @@ const path = require("path");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   entry: "./src/index.ts",
@@ -53,6 +54,11 @@ module.exports = {
     new HtmlWebPackPlugin({
       title: "@thoughtpivot/terrene",
     }),
-    new CopyPlugin({  patterns: [{ from: "src/**/*",  to: "[name][ext]]" }]})
+    new CopyPlugin({  patterns: [{ from: "src/**/*",  to: "[name][ext]]" }]}),
+    new webpack.DefinePlugin({
+      'process.env.AWS_REGION': JSON.stringify(process.env.AWS_REGION || 'us-east-1'),
+      'process.env.AWS_ACCESS_KEY_ID': JSON.stringify(process.env.AWS_ACCESS_KEY_ID),
+      'process.env.AWS_SECRET_ACCESS_KEY': JSON.stringify(process.env.AWS_SECRET_ACCESS_KEY),
+    }),
   ],
 };

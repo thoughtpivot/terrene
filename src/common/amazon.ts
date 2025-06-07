@@ -86,7 +86,9 @@ export async function Claude(params: {
     shortTermMemory?: ConversationEntry[];
 }): Promise<string> {
     const client = new BedrockRuntimeClient({
-        region: process.env.AWS_REGION || "us-east-1",
+        region:
+            (typeof process !== "undefined" && process.env?.AWS_REGION) ||
+            "us-east-1",
     });
 
     if (!params.version) {
@@ -156,7 +158,9 @@ export async function ClaudeWithFunctionCalling(params: {
     shortTermMemory?: ConversationEntry[];
 }): Promise<ContentBlock[] | undefined> {
     const client = new BedrockRuntimeClient({
-        region: process.env.AWS_REGION || "us-east-1",
+        region:
+            (typeof process !== "undefined" && process.env?.AWS_REGION) ||
+            "us-east-1",
     });
 
     const version =
@@ -226,7 +230,9 @@ export async function ClaudeWithStreaming(params: {
     shortTermMemory?: ConversationEntry[];
 }): Promise<ReadableStream> {
     const client = new BedrockRuntimeClient({
-        region: process.env.AWS_REGION || "us-east-1",
+        region:
+            (typeof process !== "undefined" && process.env?.AWS_REGION) ||
+            "us-east-1",
     });
 
     if (!params.version) {
