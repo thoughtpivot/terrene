@@ -35,10 +35,12 @@
         "webpack-merge": "5.8.0"
     },
     "dependencies": {
+        "@aws-sdk/client-bedrock-runtime": "^3.650.0",
         "@excaliburjs/excalibur-tiled": "^2.3.1",
         "@excaliburjs/plugin-aseprite": "^0.27.0",
         "@excaliburjs/plugin-tiled": "^0.27.0",
         "copy-webpack-plugin": "^11.0.0",
+        "dotenv": "^16.3.1",
         "electron": "^20.2.0",
         "excalibur": "0.27.0",
         "file-loader": "^6.2.0",

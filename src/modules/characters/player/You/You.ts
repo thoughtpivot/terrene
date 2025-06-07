@@ -279,29 +279,72 @@ export default class You extends Actor {
 
                     // Get the chat system and start dialogue
                     const chatSystem = getChatSystem(engine);
-                    const dialogue = npc.getDialogue();
+                    const dialogueResult = npc.getDialogue();
 
-                    console.log(
-                        `Starting dialogue with ${npc.getNPCName()}, ${
-                            dialogue.length
-                        } messages:`,
-                        dialogue
-                    );
+                    // Handle both sync and async dialogue
+                    if (dialogueResult instanceof Promise) {
+                        console.log(
+                            `Getting async dialogue from ${npc.getNPCName()}...`
+                        );
 
-                    chatSystem.startChat(dialogue, () => {
-                        console.log(`Finished talking to ${npc.getNPCName()}`);
+                        dialogueResult
+                            .then((dialogue) => {
+                                console.log(
+                                    `Starting dialogue with ${npc.getNPCName()}, ${
+                                        dialogue.length
+                                    } messages:`,
+                                    dialogue
+                                );
 
-                        // Resume Old Man Sam's chasing when chat ends
-                        if (
-                            npc.getNPCName() === "Old Man Sam" &&
-                            "resumeChasing" in actor
-                        ) {
+                                chatSystem.startChat(dialogue, () => {
+                                    console.log(
+                                        `Finished talking to ${npc.getNPCName()}`
+                                    );
+
+                                    // Resume Old Man Sam's chasing when chat ends
+                                    if (
+                                        npc.getNPCName() === "Old Man Sam" &&
+                                        "resumeChasing" in actor
+                                    ) {
+                                        console.log(
+                                            "Resuming Old Man Sam's chasing after chat"
+                                        );
+                                        (actor as any).resumeChasing();
+                                    }
+                                });
+                            })
+                            .catch((error) => {
+                                console.error(
+                                    `Error getting dialogue from ${npc.getNPCName()}:`,
+                                    error
+                                );
+                            });
+                    } else {
+                        // Synchronous dialogue
+                        console.log(
+                            `Starting dialogue with ${npc.getNPCName()}, ${
+                                dialogueResult.length
+                            } messages:`,
+                            dialogueResult
+                        );
+
+                        chatSystem.startChat(dialogueResult, () => {
                             console.log(
-                                "Resuming Old Man Sam's chasing after chat"
+                                `Finished talking to ${npc.getNPCName()}`
                             );
-                            (actor as any).resumeChasing();
-                        }
-                    });
+
+                            // Resume Old Man Sam's chasing when chat ends
+                            if (
+                                npc.getNPCName() === "Old Man Sam" &&
+                                "resumeChasing" in actor
+                            ) {
+                                console.log(
+                                    "Resuming Old Man Sam's chasing after chat"
+                                );
+                                (actor as any).resumeChasing();
+                            }
+                        });
+                    }
 
                     return; // Only talk to one NPC at a time
                 } else {

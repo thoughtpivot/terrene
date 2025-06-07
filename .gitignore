@@ -1,6 +1,6 @@
 # Generated files
 dist/
-
+.env
 # Logs
 logs
 *.log
