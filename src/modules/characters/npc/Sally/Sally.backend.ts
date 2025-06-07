@@ -148,21 +148,7 @@ router.get("/api/sally/dialogue", async (ctx) => {
     console.log("🎭 Backend: Generating dialogue for Sally...");
 
     try {
-        // Check cache first
-        if (isCacheValid()) {
-            console.log("💾 Returning cached dialogue for Sally");
-            ctx.body = {
-                success: true,
-                messages: dialogueCache.messages,
-                cached: true,
-                fallback: false,
-            };
-            return;
-        }
-
-        console.log(
-            "🔄 Cache invalid or empty, generating fresh dialogue for Sally..."
-        );
+        console.log("🔄 Generating fresh dialogue for Sally (no caching)...");
 
         // Load character bio
         console.log("📖 Loading character bio for Sally...");
@@ -192,13 +178,6 @@ router.get("/api/sally/dialogue", async (ctx) => {
             messages = getFallbackMessages(bio);
             usedFallback = true;
         }
-
-        // Cache the results
-        dialogueCache = {
-            messages: messages,
-            timestamp: Date.now(),
-            duration: dialogueCache.duration,
-        };
 
         ctx.body = {
             success: true,

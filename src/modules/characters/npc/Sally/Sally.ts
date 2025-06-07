@@ -200,26 +200,26 @@ export default class Sally extends Actor implements DialogueNPC {
                 errorMessage
             );
 
-            // Emergency fallback if backend is down
-            const emergencyMessages: ChatMessage[] = [
-                {
-                    speaker: "Sally",
-                    text: "Oh my, another visitor! How delightful!",
-                    duration: 3000,
-                },
-                {
-                    speaker: "Sally",
-                    text: "The beach is so peaceful this time of day, don't you think?",
-                    duration: 3500,
-                },
-                {
-                    speaker: "Sally",
-                    text: "I love collecting seashells - each one tells its own story.",
-                    duration: 3000,
-                },
-            ];
+            // // Emergency fallback if backend is down
+            // const emergencyMessages: ChatMessage[] = [
+            //     {
+            //         speaker: "Sally",
+            //         text: "Oh my, another visitor! How delightful!",
+            //         duration: 3000,
+            //     },
+            //     {
+            //         speaker: "Sally",
+            //         text: "The beach is so peaceful this time of day, don't you think?",
+            //         duration: 3500,
+            //     },
+            //     {
+            //         speaker: "Sally",
+            //         text: "I love collecting seashells - each one tells its own story.",
+            //         duration: 3000,
+            //     },
+            // ];
 
-            return emergencyMessages;
+            // return emergencyMessages;
         }
     }
 
