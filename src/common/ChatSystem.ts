@@ -9,6 +9,8 @@ import {
     FontUnit,
     Timer,
     CoordPlane,
+    GraphicsGroup,
+    Input,
 } from "excalibur";
 
 export interface ChatMessage {
@@ -32,8 +34,72 @@ export class ChatSystem {
     private allMessages: ChatMessage[] = []; // Store all messages for navigation
     private currentMessageIndex: number = -1; // Track current position
 
+    // Interactive dialogue properties
+    private isInteractive: boolean = false;
+    private inputField: Actor | null = null;
+    private inputText: Text | null = null;
+    private userInput: string = "";
+    private onUserMessage: ((message: string) => Promise<void>) | null = null;
+    private isWaitingForResponse: boolean = false;
+
     constructor(engine: Engine) {
         this.engine = engine;
+        this.setupKeyboardHandlers();
+    }
+
+    private setupKeyboardHandlers(): void {
+        this.engine.input.keyboard.on("press", (evt) => {
+            console.log(
+                "ChatSystem keyboard event:",
+                evt.key,
+                "isActive:",
+                this.isActive,
+                "isInteractive:",
+                this.isInteractive
+            );
+
+            if (!this.isActive || !this.isInteractive) {
+                console.log(
+                    "ChatSystem: Ignoring keyboard event - not active or not interactive"
+                );
+                return;
+            }
+
+            console.log("ChatSystem: Processing keyboard event:", evt.key);
+
+            if (evt.key === Input.Keys.Enter) {
+                console.log("ChatSystem: Enter key pressed, sending message");
+                this.sendUserMessage();
+            } else if (evt.key === Input.Keys.Backspace) {
+                console.log("ChatSystem: Backspace pressed");
+                this.userInput = this.userInput.slice(0, -1);
+                this.updateInputDisplay();
+            } else {
+                // Handle character input - extract character from key names like "KeyF" -> "F"
+                let char = "";
+                if (evt.key.startsWith("Key") && evt.key.length === 4) {
+                    // Handle keys like "KeyF", "KeyA", etc.
+                    char = evt.key.substring(3).toLowerCase();
+                } else if (
+                    evt.key.startsWith("Digit") &&
+                    evt.key.length === 6
+                ) {
+                    // Handle keys like "Digit1", "Digit2", etc.
+                    char = evt.key.substring(5);
+                } else if (evt.key === Input.Keys.Space) {
+                    char = " ";
+                } else if (evt.key.length === 1) {
+                    // Handle direct character keys
+                    char = evt.key;
+                }
+
+                if (char) {
+                    console.log("ChatSystem: Adding character:", char);
+                    this.userInput += char;
+                    this.updateInputDisplay();
+                }
+            }
+        });
     }
 
     public startChat(messages: ChatMessage[], onComplete?: () => void): void {
@@ -57,6 +123,7 @@ export class ChatSystem {
         this.currentMessageIndex = -1; // Reset index
         this.onComplete = onComplete || null;
         this.isActive = true;
+        this.isInteractive = false; // Default to non-interactive
 
         console.log("Chat system: Creating chat UI");
         // Create chat UI
@@ -67,18 +134,297 @@ export class ChatSystem {
         this.showNextMessage();
     }
 
+    public startInteractiveChat(
+        initialMessages: ChatMessage[],
+        onUserMessage: (message: string) => Promise<void>,
+        onComplete?: () => void
+    ): void {
+        console.log("Chat system: Starting interactive chat");
+        console.log("Chat system: Setting isActive=true, isInteractive=true");
+
+        this.messageQueue = [...initialMessages];
+        this.allMessages = [...initialMessages];
+        this.currentMessageIndex = -1;
+        this.onComplete = onComplete || null;
+        this.onUserMessage = onUserMessage;
+        this.isActive = true;
+        this.isInteractive = true;
+        this.userInput = "";
+
+        console.log("Chat system: Creating chat UI and input field");
+        this.createChatUI();
+        this.createInputField();
+
+        console.log("Chat system: Interactive chat setup complete");
+        console.log("Chat system: isActive =", this.isActive);
+        console.log("Chat system: isInteractive =", this.isInteractive);
+
+        if (initialMessages.length > 0) {
+            this.showNextMessage();
+        } else {
+            this.showInputField();
+        }
+    }
+
+    private createInputField(): void {
+        console.log("ChatSystem: Creating input field");
+        if (!this.chatUI) {
+            console.log(
+                "ChatSystem: No chatUI found, cannot create input field"
+            );
+            return;
+        }
+
+        const inputWidth = this.chatUI.width - 40;
+        const inputHeight = 30;
+
+        console.log(
+            "ChatSystem: Input field dimensions:",
+            inputWidth,
+            "x",
+            inputHeight
+        );
+        console.log(
+            "ChatSystem: Input field position:",
+            this.chatUI.pos.x,
+            this.chatUI.pos.y + 60
+        );
+
+        // Create input field background
+        this.inputField = new Actor({
+            pos: new Vector(
+                this.chatUI.pos.x,
+                this.chatUI.pos.y + 60 // Position below the chat area
+            ),
+            width: inputWidth,
+            height: inputHeight,
+            z: 1001,
+            coordPlane: CoordPlane.Screen,
+        });
+
+        const inputGraphics = new GraphicsGroup({
+            members: [
+                // Input field background
+                {
+                    graphic: new Rectangle({
+                        width: inputWidth,
+                        height: inputHeight,
+                        color: Color.fromHex("#2a2a2a"),
+                    }),
+                    pos: Vector.Zero,
+                },
+                // Input field border
+                {
+                    graphic: new Rectangle({
+                        width: inputWidth,
+                        height: inputHeight,
+                        color: Color.fromHex("#4A90E2"),
+                    }),
+                    pos: Vector.Zero,
+                },
+                // Inner input area
+                {
+                    graphic: new Rectangle({
+                        width: inputWidth - 4,
+                        height: inputHeight - 4,
+                        color: Color.fromHex("#1a1a1a"),
+                    }),
+                    pos: Vector.Zero,
+                },
+            ],
+        });
+
+        this.inputField.graphics.use(inputGraphics);
+        this.engine.currentScene.add(this.inputField);
+        console.log("ChatSystem: Input field added to scene");
+
+        // Create input text
+        this.inputText = new Text({
+            text: "",
+            color: Color.fromHex("#F5F5F5"),
+            font: new Font({
+                family: "Arial, sans-serif",
+                size: 14,
+                unit: FontUnit.Px,
+            }),
+        });
+
+        console.log("ChatSystem: Input text created, updating display");
+        this.updateInputDisplay();
+        console.log("ChatSystem: Input field creation complete");
+    }
+
+    private updateInputDisplay(): void {
+        console.log("ChatSystem: Updating input display");
+        if (!this.inputText || !this.inputField) {
+            console.log(
+                "ChatSystem: Missing inputText or inputField for display update"
+            );
+            return;
+        }
+
+        // Show user input with cursor
+        const displayText = this.isWaitingForResponse
+            ? "Waiting for response..."
+            : this.userInput + "_";
+
+        console.log("ChatSystem: Setting display text to:", displayText);
+        this.inputText.text = displayText;
+
+        // Position the input text
+        const inputTextActor = new Actor({
+            pos: new Vector(
+                this.inputField.pos.x - this.inputField.width / 2 + 10,
+                this.inputField.pos.y
+            ),
+            z: 1002,
+            coordPlane: CoordPlane.Screen,
+        });
+
+        // Remove old input text actor if it exists
+        if (this.inputField.scene) {
+            const oldActors = this.inputField.scene.actors.filter(
+                (actor) => actor.graphics.current[0]?.graphic === this.inputText
+            );
+            oldActors.forEach((actor) => actor.kill());
+        }
+
+        inputTextActor.graphics.use(this.inputText);
+        this.engine.currentScene.add(inputTextActor);
+    }
+
+    private async sendUserMessage(): Promise<void> {
+        if (
+            !this.userInput.trim() ||
+            this.isWaitingForResponse ||
+            !this.onUserMessage
+        ) {
+            return;
+        }
+
+        const message = this.userInput.trim();
+        this.userInput = "";
+        this.isWaitingForResponse = true;
+        this.updateInputDisplay();
+
+        // Add user message to the conversation
+        const userMessage: ChatMessage = {
+            speaker: "You",
+            text: message,
+            duration: 2000,
+        };
+
+        this.allMessages.push(userMessage);
+        this.currentMessageIndex = this.allMessages.length - 1;
+        this.showCurrentMessage();
+
+        try {
+            // Send message to the backend handler
+            await this.onUserMessage(message);
+        } catch (error) {
+            console.error("Error sending user message:", error);
+        }
+
+        this.isWaitingForResponse = false;
+        this.updateInputDisplay();
+    }
+
+    public addNPCResponse(message: ChatMessage): void {
+        this.allMessages.push(message);
+        this.currentMessageIndex = this.allMessages.length - 1;
+        this.showCurrentMessage();
+    }
+
+    private showCurrentMessage(): void {
+        if (
+            this.currentMessageIndex < 0 ||
+            this.currentMessageIndex >= this.allMessages.length
+        ) {
+            return;
+        }
+
+        this.currentMessage = this.allMessages[this.currentMessageIndex];
+
+        // Clean up previous message actors
+        if (this.currentSpeakerActor) {
+            this.currentSpeakerActor.kill();
+            this.currentSpeakerActor = null;
+        }
+        if (this.currentMessageActor) {
+            this.currentMessageActor.kill();
+            this.currentMessageActor = null;
+        }
+
+        if (this.speakerText && this.messageText && this.chatUI) {
+            this.speakerText.text = this.currentMessage.speaker + ":";
+            this.messageText.text = this.currentMessage.text;
+
+            // Position speaker text
+            this.currentSpeakerActor = new Actor({
+                pos: new Vector(
+                    this.chatUI.pos.x - this.chatUI.width / 2 + 50,
+                    this.chatUI.pos.y - 30
+                ),
+                z: 1001,
+                coordPlane: CoordPlane.Screen,
+            });
+            this.currentSpeakerActor.graphics.use(this.speakerText);
+            this.engine.currentScene.add(this.currentSpeakerActor);
+
+            // Position message text
+            this.currentMessageActor = new Actor({
+                pos: new Vector(
+                    this.chatUI.pos.x - this.chatUI.width / 2 + 50,
+                    this.chatUI.pos.y + 15
+                ),
+                z: 1001,
+                coordPlane: CoordPlane.Screen,
+            });
+            this.currentMessageActor.graphics.use(this.messageText);
+            this.engine.currentScene.add(this.currentMessageActor);
+        }
+
+        if (this.isInteractive) {
+            console.log(
+                "ChatSystem: Interactive mode - ensuring input field is shown"
+            );
+            this.showInputField();
+        }
+    }
+
+    private showInputField(): void {
+        console.log("ChatSystem: showInputField called");
+        if (!this.inputField || this.inputField.isKilled()) {
+            console.log(
+                "ChatSystem: Input field missing or killed, recreating"
+            );
+            this.createInputField();
+        } else {
+            console.log(
+                "ChatSystem: Input field already exists, ensuring it's displayed"
+            );
+            // Make sure the input display is updated
+            this.updateInputDisplay();
+        }
+    }
+
     private createChatUI(): void {
         console.log("Chat system: Creating chat UI");
         console.log("Screen resolution:", this.engine.screen.resolution);
+
+        const chatWidth = this.engine.screen.resolution.width - 80; // Even more padding for better proportions
+        const chatHeight = 120; // Taller for better text spacing
+        const borderWidth = 4; // Thicker border for more prominence
+        const cornerRadius = 12;
 
         // Create chat background box
         this.chatUI = new Actor({
             pos: new Vector(
                 this.engine.screen.resolution.width / 2,
-                this.engine.screen.resolution.height - 120
+                this.engine.screen.resolution.height - 140 // More spacing from bottom
             ),
-            width: this.engine.screen.resolution.width - 40,
-            height: 100,
+            width: chatWidth,
+            height: chatHeight,
             z: 1000, // High z-index to appear above everything
             coordPlane: CoordPlane.Screen, // Use screen coordinates for UI
         });
@@ -91,15 +437,52 @@ export class ChatSystem {
             this.chatUI.height
         );
 
-        // Dark semi-transparent background
-        const chatBackground = new Rectangle({
-            width: this.engine.screen.resolution.width - 40,
-            height: 100,
-            color: Color.fromHex("#000000"),
+        // Create layered graphics for the chat box
+        const chatGraphics = new GraphicsGroup({
+            members: [
+                // Outer shadow effect (largest rectangle with shadow color)
+                {
+                    graphic: new Rectangle({
+                        width: chatWidth + 6,
+                        height: chatHeight + 6,
+                        color: Color.fromHex("#000000"), // Black shadow
+                    }),
+                    pos: new Vector(2, 2), // Offset for shadow effect
+                },
+                // Main border (larger rectangle with border color)
+                {
+                    graphic: new Rectangle({
+                        width: chatWidth,
+                        height: chatHeight,
+                        color: Color.fromHex("#4A90E2"), // Nice blue border
+                    }),
+                    pos: Vector.Zero,
+                },
+                // Inner highlight border (creates depth)
+                {
+                    graphic: new Rectangle({
+                        width: chatWidth - borderWidth * 2 + 1,
+                        height: chatHeight - borderWidth * 2 + 1,
+                        color: Color.fromHex("#87CEEB"), // Sky blue highlight
+                    }),
+                    pos: Vector.Zero,
+                },
+                // Inner background (main content area)
+                {
+                    graphic: new Rectangle({
+                        width: chatWidth - borderWidth * 2,
+                        height: chatHeight - borderWidth * 2,
+                        color: Color.fromHex("#1a1a1a"), // Dark charcoal background
+                    }),
+                    pos: Vector.Zero,
+                },
+            ],
         });
-        chatBackground.opacity = 0.8;
 
-        this.chatUI.graphics.use(chatBackground);
+        // Set opacity for subtle transparency (shadow will be more transparent)
+        chatGraphics.opacity = 0.92;
+
+        this.chatUI.graphics.use(chatGraphics);
 
         // Add to current scene
         console.log("Adding chat UI to scene");
@@ -110,13 +493,13 @@ export class ChatSystem {
             console.error("Error adding chat UI to scene:", error);
         }
 
-        // Create text objects (will be positioned relative to chat box)
+        // Create text objects with enhanced styling
         this.speakerText = new Text({
             text: "",
-            color: Color.Yellow,
+            color: Color.fromHex("#FFD700"), // Gold color for speaker names
             font: new Font({
-                family: "Arial",
-                size: 16,
+                family: "Arial, sans-serif",
+                size: 18, // Slightly larger for better prominence
                 unit: FontUnit.Px,
                 bold: true,
             }),
@@ -124,10 +507,10 @@ export class ChatSystem {
 
         this.messageText = new Text({
             text: "",
-            color: Color.White,
+            color: Color.fromHex("#F5F5F5"), // Brighter white for better contrast
             font: new Font({
-                family: "Arial",
-                size: 14,
+                family: "Arial, sans-serif",
+                size: 15, // Slightly larger for better readability
                 unit: FontUnit.Px,
             }),
         });
@@ -143,9 +526,19 @@ export class ChatSystem {
         this.currentMessageIndex++;
 
         if (this.currentMessageIndex >= this.allMessages.length) {
-            console.log("Chat system: No more messages, ending chat");
-            this.endChat();
-            return;
+            console.log("Chat system: No more messages");
+            if (this.isInteractive) {
+                console.log(
+                    "Chat system: Interactive mode - showing input field instead of ending"
+                );
+                // Don't end chat in interactive mode, just show input field
+                this.showInputField();
+                return;
+            } else {
+                console.log("Chat system: Non-interactive mode - ending chat");
+                this.endChat();
+                return;
+            }
         }
 
         // Get current message
@@ -172,11 +565,11 @@ export class ChatSystem {
             this.speakerText.text = this.currentMessage.speaker + ":";
             this.messageText.text = this.currentMessage.text;
 
-            // Position speaker text at top of chat box with much more left margin
+            // Position speaker text in the upper portion of the chat box, well inside the border
             this.currentSpeakerActor = new Actor({
                 pos: new Vector(
-                    this.chatUI.pos.x - this.chatUI.width / 2 + 60, // Much larger left margin
-                    this.chatUI.pos.y - 30
+                    this.chatUI.pos.x - this.chatUI.width / 2 + 50, // Much more padding to ensure it's inside the border
+                    this.chatUI.pos.y - 30 // Position in upper portion with better spacing
                 ),
                 z: 1001,
                 coordPlane: CoordPlane.Screen, // Use screen coordinates
@@ -184,11 +577,11 @@ export class ChatSystem {
             this.currentSpeakerActor.graphics.use(this.speakerText);
             this.engine.currentScene.add(this.currentSpeakerActor);
 
-            // Position message text below speaker with much more left margin
+            // Position message text in the lower portion of the chat box, well inside the border
             this.currentMessageActor = new Actor({
                 pos: new Vector(
-                    this.chatUI.pos.x - this.chatUI.width / 2 + 60, // Much larger left margin
-                    this.chatUI.pos.y - 5
+                    this.chatUI.pos.x - this.chatUI.width / 2 + 50, // Much more padding to ensure it's inside the border
+                    this.chatUI.pos.y + 15 // Position in lower portion with good spacing from speaker text
                 ),
                 z: 1001,
                 coordPlane: CoordPlane.Screen, // Use screen coordinates
@@ -238,6 +631,12 @@ export class ChatSystem {
             this.chatUI = null;
         }
 
+        // Clean up input field
+        if (this.inputField) {
+            this.inputField.kill();
+            this.inputField = null;
+        }
+
         // Clean up timer
         if (this.messageTimer) {
             this.messageTimer.stop();
@@ -246,12 +645,17 @@ export class ChatSystem {
 
         // Reset state
         this.isActive = false;
+        this.isInteractive = false;
         this.currentMessage = null;
         this.messageQueue = [];
         this.allMessages = [];
         this.currentMessageIndex = -1;
         this.speakerText = null;
         this.messageText = null;
+        this.inputText = null;
+        this.userInput = "";
+        this.onUserMessage = null;
+        this.isWaitingForResponse = false;
 
         // Call completion callback
         if (this.onComplete) {
@@ -353,6 +757,12 @@ export class ChatSystem {
             this.chatUI = null;
         }
 
+        // Clean up input field
+        if (this.inputField) {
+            this.inputField.kill();
+            this.inputField = null;
+        }
+
         // Clean up timer
         if (this.messageTimer) {
             this.messageTimer.stop();
@@ -361,12 +771,17 @@ export class ChatSystem {
 
         // Reset state
         this.isActive = false;
+        this.isInteractive = false;
         this.currentMessage = null;
         this.messageQueue = [];
         this.allMessages = [];
         this.currentMessageIndex = -1;
         this.speakerText = null;
         this.messageText = null;
+        this.inputText = null;
+        this.userInput = "";
+        this.onUserMessage = null;
+        this.isWaitingForResponse = false;
         this.onComplete = null;
 
         console.log("Chat system: Force reset complete");

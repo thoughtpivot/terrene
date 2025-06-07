@@ -277,6 +277,18 @@ export default class You extends Actor {
                         (actor as any).stopChasing();
                     }
 
+                    // Check if this NPC supports interactive dialogue
+                    if (
+                        npc.getNPCName() === "Sally" &&
+                        "startInteractiveDialogue" in actor
+                    ) {
+                        console.log(
+                            "🎭 Starting interactive dialogue with Sally!"
+                        );
+                        (actor as any).startInteractiveDialogue();
+                        return; // Exit early for interactive NPCs
+                    }
+
                     // Get the chat system and start dialogue
                     const chatSystem = getChatSystem(engine);
                     const dialogueResult = npc.getDialogue();

@@ -56,6 +56,85 @@ function isCacheValid(): boolean {
 }
 
 /**
+ * Generate interactive response using Claude API
+ */
+async function generateInteractiveResponse(
+    bio: CharacterBio,
+    userMessage: string,
+    conversationHistory: any[] = []
+) {
+    console.log("🤖 Generating interactive response with Claude for Sally...");
+
+    try {
+        const prompt = CharacterFileReader.createCharacterPrompt(bio);
+
+        // Build conversation context
+        let conversationContext = "";
+        if (conversationHistory && conversationHistory.length > 0) {
+            conversationContext = "Previous conversation:\n";
+            conversationHistory.slice(-6).forEach((msg: any) => {
+                conversationContext += `${msg.speaker}: ${msg.text}\n`;
+            });
+            conversationContext += "\n";
+        }
+
+        const userInput = `${conversationContext}The player just said: "${userMessage}"\n\nPlease respond as ${bio.name} would, staying true to their character. Give a natural, conversational response that acknowledges what the player said. Keep it concise (1-2 sentences).`;
+
+        const response = await Claude({
+            version: ClaudeVersion.Claude_3_5_Sonnet_20240620_V10,
+            instructions: prompt,
+            inputText: userInput,
+        });
+
+        // Clean up Claude's response
+        const cleanedResponse = response.trim().replace(/^["']|["']$/g, "");
+
+        console.log(`✅ Generated interactive response with Claude for Sally`);
+        return cleanedResponse;
+    } catch (error) {
+        console.error(
+            "❌ Error generating interactive response with Claude for Sally:",
+            error
+        );
+        throw error;
+    }
+}
+
+/**
+ * Generate fallback response for interactive dialogue
+ */
+function generateFallbackResponse(
+    userMessage: string,
+    bio: CharacterBio
+): string {
+    console.log("⚠️ Using fallback interactive response for Sally");
+
+    // Simple keyword-based responses
+    const message = userMessage.toLowerCase();
+
+    if (message.includes("hello") || message.includes("hi")) {
+        return "Hello there! It's lovely to meet you!";
+    } else if (message.includes("beach") || message.includes("sand")) {
+        return "Oh, the beach is absolutely wonderful today, isn't it?";
+    } else if (message.includes("shell") || message.includes("seashell")) {
+        return "I do love collecting seashells! Each one has its own story to tell.";
+    } else if (message.includes("how") && message.includes("you")) {
+        return "I'm doing wonderfully, thank you for asking! How are you enjoying your visit?";
+    } else if (message.includes("goodbye") || message.includes("bye")) {
+        return "It was lovely chatting with you! Come back and visit again soon!";
+    } else {
+        // Generic responses based on character
+        const responses = [
+            "That's quite interesting! I love meeting new people here on the beach.",
+            "How fascinating! There's always something new to discover by the sea.",
+            "Oh my, that reminds me of something I found while walking the shore earlier!",
+            "The ocean brings all sorts of wonderful stories and people together, doesn't it?",
+        ];
+        return responses[Math.floor(Math.random() * responses.length)];
+    }
+}
+
+/**
  * Generate dialogue using Claude API
  */
 async function generateDialogueWithClaude(bio: CharacterBio) {
@@ -220,6 +299,74 @@ router.post("/api/sally/regenerate", async (ctx) => {
         message:
             "Sally dialogue cache cleared - next request will generate fresh dialogue",
     };
+});
+
+/**
+ * GET /api/sally/chat
+ * Handle interactive dialogue with Sally (simplified for now)
+ */
+router.get("/api/sally/chat", async (ctx) => {
+    console.log("💬 Backend: Interactive chat with Sally...");
+
+    try {
+        const userMessage = ctx.query.message as string;
+
+        if (!userMessage || typeof userMessage !== "string") {
+            ctx.status = 400;
+            ctx.body = {
+                success: false,
+                error: "User message is required",
+            };
+            return;
+        }
+
+        console.log("👤 User message:", userMessage);
+
+        // Load character bio
+        const bio = await loadCharacterBio();
+
+        // Generate response using Claude
+        let sallyResponse;
+        let usedFallback = false;
+
+        try {
+            sallyResponse = await generateInteractiveResponse(
+                bio,
+                userMessage,
+                []
+            );
+            console.log("✅ Claude response generated successfully!");
+        } catch (claudeError) {
+            console.warn(
+                "❌ Claude generation failed, using fallback:",
+                claudeError.message
+            );
+            sallyResponse = generateFallbackResponse(userMessage, bio);
+            usedFallback = true;
+        }
+
+        ctx.body = {
+            success: true,
+            response: {
+                speaker: bio.name,
+                text: sallyResponse,
+                duration: 3000,
+            },
+            fallback: usedFallback,
+        };
+    } catch (error) {
+        console.error("❌ Error in Sally interactive chat:", error);
+
+        ctx.body = {
+            success: false,
+            error: error.message,
+            response: {
+                speaker: "Sally",
+                text: "I'm sorry, I seem to be having trouble understanding. Could you try again?",
+                duration: 3000,
+            },
+        };
+    }
 });
 
 /**
