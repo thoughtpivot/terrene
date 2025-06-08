@@ -1,15 +1,15 @@
 import { AsepriteResource } from "@excaliburjs/plugin-aseprite";
 import { Actor, Die, ImageSource, vec } from "excalibur";
 import Goblin from "../Goblin";
-import HorusImage from "./Horus.png";
+import AnemoImage from "./Horus.png";
 
-class Horus extends Goblin {
+export default class Anemo extends Goblin {
     constructor() {
         super({
             pos: vec(245, 245),
             width: 100,
             height: 100,
-            scale: vec(4, 4),
+            scale: vec(128, 128),
         });
     }
 
@@ -23,12 +23,10 @@ class Horus extends Goblin {
 }
 
 const Resources = {
-    Image: new ImageSource(HorusImage),
+    Image: new ImageSource(AnemoImage),
     AsepriteResource: new AsepriteResource(
-        "./modules/characters/npc/Goblin/Horus/Horus.json"
+        "./components/characters/npc/Goblin/Anemo/Anemo.json"
     ),
 };
 
 export { Resources };
-
-export default Horus;

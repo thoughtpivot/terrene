@@ -1,4 +1,4 @@
-import Terrene from "./modules/Terrene";
+import Terrene from "./components/Terrene";
 
 const game = new Terrene();
 game.start().then(() => {

@@ -24,9 +24,9 @@ export default class Gianuah extends Actor {
 const Resources = {
     Image: new ImageSource(GiaunahImage),
     AsepriteResource: new AsepriteResource(
-        "./modules/characters/npc/Gianuah/Gianuah.json"
+        "./components/characters/npc/Gianuah/Gianuah.json"
     ),
-    Sound: new Sound("./modules/characters/npc/Gianuah/Gianuah.mp3"),
+    Sound: new Sound("./components/characters/npc/Gianuah/Gianuah.mp3"),
 };
 
 export { Resources };
