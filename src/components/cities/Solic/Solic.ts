@@ -80,7 +80,7 @@ export default class Solic extends Scene {
                 new Rectangle({
                     width: engine.screen.resolution.width,
                     height: engine.screen.resolution.height,
-                    color: Color.fromHex("#f4e4bc"), // Sandy beach color
+                    color: Color.fromHex("#F8D878"), // NES NTSC sandy beach color
                 })
             );
 
@@ -98,7 +98,7 @@ export default class Solic extends Scene {
                 new Rectangle({
                     width: 320,
                     height: 600,
-                    color: Color.fromHex("#1e6091"), // Deep blue ocean
+                    color: Color.fromHex("#0078F8"), // NES NTSC deep blue ocean
                 })
             );
             this.ocean.z = -2;
@@ -118,7 +118,7 @@ export default class Solic extends Scene {
                 new Rectangle({
                     width: 320,
                     height: 600,
-                    color: Color.fromHex("#4a4a4a"), // Dark gray mountains
+                    color: Color.fromHex("#787878"), // NES NTSC gray mountains
                 })
             );
             mountains.z = -2;
@@ -166,7 +166,7 @@ export default class Solic extends Scene {
             new Rectangle({
                 width: 60,
                 height: 40,
-                color: Color.fromHex("#8b7355"), // Brown trail color
+                color: Color.fromHex("#AC7C00"), // NES NTSC brown trail color
             })
         );
         trail1.z = -1;
@@ -184,7 +184,7 @@ export default class Solic extends Scene {
             new Rectangle({
                 width: 50,
                 height: 35,
-                color: Color.fromHex("#8b7355"), // Brown trail color
+                color: Color.fromHex("#AC7C00"), // NES NTSC brown trail color
             })
         );
         trail2.z = -1;
@@ -202,7 +202,7 @@ export default class Solic extends Scene {
             new Rectangle({
                 width: 55,
                 height: 30,
-                color: Color.fromHex("#8b7355"), // Brown trail color
+                color: Color.fromHex("#AC7C00"), // NES NTSC brown trail color
             })
         );
         trail3.z = -1;
@@ -222,7 +222,7 @@ export default class Solic extends Scene {
             new Rectangle({
                 width: 8,
                 height: 40,
-                color: Color.fromHex("#8b4513"), // Brown trunk
+                color: Color.fromHex("#881400"), // NES NTSC brown trunk
             })
         );
         this.add(palmTree1);
@@ -238,7 +238,7 @@ export default class Solic extends Scene {
             new Rectangle({
                 width: 20,
                 height: 15,
-                color: Color.fromHex("#228b22"), // Green leaves
+                color: Color.fromHex("#00B800"), // NES NTSC green leaves
             })
         );
         this.add(leaves1);
@@ -254,7 +254,7 @@ export default class Solic extends Scene {
             new Rectangle({
                 width: 8,
                 height: 35,
-                color: Color.fromHex("#8b4513"), // Brown trunk
+                color: Color.fromHex("#881400"), // NES NTSC brown trunk
             })
         );
         this.add(palmTree2);
@@ -269,7 +269,7 @@ export default class Solic extends Scene {
             new Rectangle({
                 width: 18,
                 height: 12,
-                color: Color.fromHex("#228b22"), // Green leaves
+                color: Color.fromHex("#00B800"), // NES NTSC green leaves
             })
         );
         this.add(leaves2);
@@ -282,15 +282,15 @@ export default class Solic extends Scene {
         this.createRock(520, 200, 10, 8, "#5a5a5a"); // Darker rock
         this.createRock(420, 350, 14, 11, "#7d7d7d"); // Lighter rock
 
-        // Add 10 more scattered rocks with varying sizes and gray shades
+        // Add 10 more scattered rocks with varying sizes and NES NTSC gray shades
         const grayShades = [
-            "#4a4a4a", // Dark gray
-            "#5a5a5a", // Medium dark gray
-            "#696969", // Medium gray (default)
-            "#7d7d7d", // Medium light gray
-            "#8c8c8c", // Light gray
-            "#999999", // Lighter gray
-            "#a6a6a6", // Very light gray
+            "#000000", // Black
+            "#787878", // Medium gray
+            "#BCBCBC", // Light gray
+            "#881400", // Brown
+            "#503000", // Dark brown
+            "#AC7C00", // Brown-orange
+            "#F8F8F8", // Very light gray
         ];
 
         for (let i = 0; i < 10; i++) {
@@ -316,7 +316,7 @@ export default class Solic extends Scene {
         y: number,
         width: number,
         height: number,
-        color: string = "#696969"
+        color: string = "#787878"
     ): Actor {
         const rock = new Actor({
             pos: new Vector(x, y),
@@ -636,11 +636,11 @@ export default class Solic extends Scene {
     private create16BitOceanLayers(engine: Engine): void {
         // Create 16-bit style ocean gradient layers (deep to shallow)
         const oceanLayers = [
-            { color: "#0f3460", depth: 0, alpha: 1.0 }, // Deepest blue
-            { color: "#16537e", depth: 20, alpha: 0.9 }, // Deep blue
-            { color: "#1e6091", depth: 40, alpha: 0.8 }, // Medium deep
-            { color: "#2980b9", depth: 60, alpha: 0.7 }, // Medium blue
-            { color: "#3498db", depth: 80, alpha: 0.6 }, // Light blue
+            { color: "#004058", depth: 0, alpha: 1.0 }, // Deepest NES blue
+            { color: "#0058F8", depth: 20, alpha: 0.9 }, // Deep NES blue
+            { color: "#0078F8", depth: 40, alpha: 0.8 }, // Medium NES blue
+            { color: "#3CBCFC", depth: 60, alpha: 0.7 }, // Light NES blue
+            { color: "#A4E4FC", depth: 80, alpha: 0.6 }, // Lightest NES blue
         ];
 
         oceanLayers.forEach((layer, index) => {
@@ -687,12 +687,12 @@ export default class Solic extends Scene {
                     z: -1.8 + row * 0.01,
                 });
 
-                // 16-bit wave pattern colors (alternating for wave effect)
+                // NES NTSC wave pattern colors (alternating for wave effect)
                 const wavePatterns = [
-                    "#5dade2", // Light wave crest
-                    "#3498db", // Medium wave
-                    "#2980b9", // Dark wave trough
-                    "#1e6091", // Deep trough
+                    "#A4E4FC", // Light NES wave crest
+                    "#3CBCFC", // Medium NES wave
+                    "#0078F8", // Dark NES wave trough
+                    "#0058F8", // Deep NES trough
                 ];
 
                 const patternIndex =
@@ -756,8 +756,8 @@ export default class Solic extends Scene {
                 z: -1.5,
             });
 
-            // 16-bit foam colors with dithering effect
-            const foamColors = ["#ffffff", "#ecf0f1", "#d5dbdb", "#bdc3c7"];
+            // NES NTSC foam colors with dithering effect
+            const foamColors = ["#FCFCFC", "#F8F8F8", "#BCBCBC", "#787878"];
             const foamColor = foamColors[i % foamColors.length];
 
             foam.graphics.use(
