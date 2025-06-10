@@ -101,17 +101,17 @@ export default class Vitosha extends Scene {
     private setupRandomLorcItems(engine: Engine): void {
         console.log("*** CREATING RANDOM LORC RPG ITEMS IN VITOSHA ***");
 
-        // Get available icons and select 3 random ones
-        const availableIcons = LorcRPG.getAvailableIcons();
-        const iconNames = Object.keys(availableIcons);
+        // Get total available icons (now all 789!)
+        const totalIcons = LorcRPG.getTotalIconCount();
 
-        console.log(`Available icons: ${iconNames.length} total`);
+        console.log(
+            `Available icons: ${totalIcons} total (all 789 Lorc icons!)`
+        );
 
         // Create 3 random items
         for (let i = 0; i < 3; i++) {
-            // Get random icon name
-            const randomIconName =
-                iconNames[Math.floor(Math.random() * iconNames.length)];
+            // Get random icon ID from full range
+            const randomIconId = LorcRPG.getRandomIconId();
 
             // Generate random position around the central area
             // Central area is around (480, 240), spread items in a 300px radius
@@ -123,9 +123,9 @@ export default class Vitosha extends Scene {
             const randomX = centerX + Math.cos(angle) * distance;
             const randomY = centerY + Math.sin(angle) * distance;
 
-            // Create the LorcRPG item
+            // Create the LorcRPG item using required itemId
             const lorcItem = new LorcRPG({
-                itemName: randomIconName,
+                itemId: randomIconId,
                 pos: new Vector(randomX, randomY),
                 scale: 1.5,
             });
@@ -143,7 +143,7 @@ export default class Vitosha extends Scene {
             console.log(
                 `*** ADDED LORC ITEM #${
                     i + 1
-                }: ${randomIconName} at (${randomX.toFixed(
+                }: ID ${randomIconId} at (${randomX.toFixed(
                     0
                 )}, ${randomY.toFixed(0)}) with z-index: ${lorcItem.z} ***`
             );

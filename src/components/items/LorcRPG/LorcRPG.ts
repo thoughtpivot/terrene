@@ -3,22 +3,22 @@ import { Actor, ImageSource, vec, Sound, Sprite, ActorArgs } from "excalibur";
 import LorcRPGImage from "./LorcRPG.png";
 import LorcRPGJson from "./LorcRPG.json";
 import {
-    ICON_MAPPINGS,
-    ICON_MAPPINGS_BY_ID,
     IconMapping,
-} from "./IconMappings";
+    getIconMappingById,
+    getAllAvailableIcons,
+    SPRITE_CONFIG,
+} from "./LorcRPG.config";
 
 export interface LorcRPGOptions extends Omit<ActorArgs, "scale"> {
-    itemName?: string; // e.g., "Sword", "Health_Potion"
-    itemId?: number; // e.g., 0, 100, 200
+    itemId: number; // ID from 0-788 for all icons
     scale?: number; // Default scaling
 }
 
 export default class LorcRPG extends Actor {
     private currentIcon: IconMapping | null = null;
 
-    constructor(options: LorcRPGOptions = {}) {
-        const { itemName, itemId, scale = 2, ...actorArgs } = options;
+    constructor(options: LorcRPGOptions) {
+        const { itemId, scale = 2, ...actorArgs } = options;
 
         super({
             width: 64,
@@ -27,17 +27,12 @@ export default class LorcRPG extends Actor {
             ...actorArgs,
         });
 
-        // Determine which icon to display
-        if (itemName && ICON_MAPPINGS[itemName]) {
-            this.currentIcon = ICON_MAPPINGS[itemName];
-        } else if (itemId !== undefined && ICON_MAPPINGS_BY_ID[itemId]) {
-            this.currentIcon = ICON_MAPPINGS_BY_ID[itemId];
-        } else {
-            // Default to first sword if no valid icon specified
-            this.currentIcon = ICON_MAPPINGS["Sword"];
-            console.warn(
-                `LorcRPG: Invalid item specified (name: ${itemName}, id: ${itemId}). Using default Sword.`
-            );
+        // Get icon by ID
+        try {
+            this.currentIcon = getIconMappingById(itemId);
+        } catch (error) {
+            console.error(`LorcRPG: ${error}`);
+            this.currentIcon = getIconMappingById(0); // Default to first icon
         }
     }
 
@@ -53,48 +48,39 @@ export default class LorcRPG extends Actor {
             sourceView: {
                 x: this.currentIcon.x,
                 y: this.currentIcon.y,
-                width: 64, // Each icon is 64x64 pixels
-                height: 64,
+                width: SPRITE_CONFIG.ICON_SIZE,
+                height: SPRITE_CONFIG.ICON_SIZE,
             },
         });
 
         this.graphics.use(iconSprite);
 
         console.log(
-            `LorcRPG initialized: ${this.currentIcon.name} at (${this.currentIcon.x}, ${this.currentIcon.y})`
+            `LorcRPG initialized: ID ${this.currentIcon.id} at (${this.currentIcon.x}, ${this.currentIcon.y})`
         );
     }
 
     // Method to change the displayed icon dynamically
-    changeIcon(itemName?: string, itemId?: number) {
-        let newIcon: IconMapping | null = null;
-
-        if (itemName && ICON_MAPPINGS[itemName]) {
-            newIcon = ICON_MAPPINGS[itemName];
-        } else if (itemId !== undefined && ICON_MAPPINGS_BY_ID[itemId]) {
-            newIcon = ICON_MAPPINGS_BY_ID[itemId];
+    changeIcon(itemId: number) {
+        try {
+            this.currentIcon = getIconMappingById(itemId);
+        } catch (error) {
+            console.error(`LorcRPG: ${error}`);
+            return;
         }
 
-        if (newIcon) {
-            this.currentIcon = newIcon;
+        const iconSprite = new Sprite({
+            image: Resources.Image,
+            sourceView: {
+                x: this.currentIcon.x,
+                y: this.currentIcon.y,
+                width: SPRITE_CONFIG.ICON_SIZE,
+                height: SPRITE_CONFIG.ICON_SIZE,
+            },
+        });
 
-            const iconSprite = new Sprite({
-                image: Resources.Image,
-                sourceView: {
-                    x: this.currentIcon.x,
-                    y: this.currentIcon.y,
-                    width: 64,
-                    height: 64,
-                },
-            });
-
-            this.graphics.use(iconSprite);
-            console.log(`LorcRPG changed to: ${this.currentIcon.name}`);
-        } else {
-            console.warn(
-                `LorcRPG: Cannot change to invalid item (name: ${itemName}, id: ${itemId})`
-            );
-        }
+        this.graphics.use(iconSprite);
+        console.log(`LorcRPG changed to: ID ${this.currentIcon.id}`);
     }
 
     // Get current icon info
@@ -102,19 +88,29 @@ export default class LorcRPG extends Actor {
         return this.currentIcon;
     }
 
-    // Static method to get all available icons
+    // Static method to get all available icons (all 789!)
     static getAvailableIcons(): { [key: string]: IconMapping } {
-        return { ...ICON_MAPPINGS };
+        return getAllAvailableIcons();
     }
 
-    // Static method to get icon by name
-    static getIconByName(name: string): IconMapping | null {
-        return ICON_MAPPINGS[name] || null;
-    }
-
-    // Static method to get icon by ID
+    // Static method to get icon by ID (supports all 789 icons)
     static getIconById(id: number): IconMapping | null {
-        return ICON_MAPPINGS_BY_ID[id] || null;
+        try {
+            return getIconMappingById(id);
+        } catch (error) {
+            console.error(`LorcRPG.getIconById: ${error}`);
+            return null;
+        }
+    }
+
+    // Static method to get total number of available icons
+    static getTotalIconCount(): number {
+        return SPRITE_CONFIG.TOTAL_ICONS;
+    }
+
+    // Static method to get random icon ID
+    static getRandomIconId(): number {
+        return Math.floor(Math.random() * SPRITE_CONFIG.TOTAL_ICONS);
     }
 }
 
@@ -124,5 +120,5 @@ const Resources = {
     Sound: new Sound("./LorcRPG.mp3"),
 };
 
-export { Resources, ICON_MAPPINGS, ICON_MAPPINGS_BY_ID };
+export { Resources };
 export type { IconMapping };
