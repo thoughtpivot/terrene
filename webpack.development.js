@@ -10,5 +10,12 @@ module.exports = merge(common, {
     },
     compress: true,
     port: 9000,
+    client: {
+      logging: 'warn',
+      overlay: false,
+      progress: false,
+    },
+    hot: true,
+    liveReload: true,
   }
 });

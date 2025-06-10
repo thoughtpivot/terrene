@@ -392,9 +392,11 @@ export default class You extends Actor {
 
 const Resources = {
     Image: new ImageSource(YouImage, true),
-    AsepriteResource: new AsepriteResource("./You.json"),
-    Sound: new Sound("./You.mp3"),
-    SwordSwingSound: new Sound("./modules/characters/player/You/You.mp3"), // Using existing sound for now
+    AsepriteResource: new AsepriteResource(
+        "./components/characters/player/You/You.json"
+    ),
+    Sound: new Sound("./components/characters/player/You/You.mp3"),
+    SwordSwingSound: new Sound("./components/characters/player/You/You.mp3"), // Using existing sound for now
 };
 
 export { Resources };

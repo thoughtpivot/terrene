@@ -11,7 +11,7 @@ import { TiledMapResource } from "@excaliburjs/plugin-tiled";
 import You from "../../characters/player/You/You";
 
 const tiledMapResource = new TiledMapResource(
-    "./modules/cities/Craydon/Craydon.tmx",
+    "./components/cities/Craydon/Craydon.tmx",
     {
         startingLayerZIndex: -2,
     }
@@ -26,8 +26,8 @@ export default class Craydon extends Scene {
     onInitialize(engine: Engine): void {
         const loader = new Loader([tiledMapResource, craydonThemeSong]);
 
-        loader.loadingBarColor = Color.DarkGray;
-        loader.playButtonText = "Enter the city of Craydon";
+        // loader.loadingBarColor = Color.DarkGray;
+        // loader.playButtonText = "Enter the city of Craydon";
 
         engine.start(loader).then(() => {
             craydonThemeSong.play();

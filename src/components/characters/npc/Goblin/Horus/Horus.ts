@@ -24,9 +24,6 @@ class Horus extends Goblin {
 
 const Resources = {
     Image: new ImageSource(HorusImage),
-    AsepriteResource: new AsepriteResource(
-        "./components/characters/npc/Goblin/Horus/Horus.json"
-    ),
 };
 
 export { Resources };

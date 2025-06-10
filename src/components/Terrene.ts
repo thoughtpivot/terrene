@@ -12,6 +12,7 @@ import {
     Transform,
     Input,
     Scene,
+    PointerScope,
 } from "excalibur";
 
 import { TiledMapResource } from "@excaliburjs/plugin-tiled";
@@ -22,7 +23,6 @@ import Navosah, {
     Resources as NovosahResources,
 } from "./characters/npc/WanderingMerchant/Navosah/Navosah";
 // import MainMenu from "./scenes/MainMenu";
-import CitySelectionMenu from "./scenes/CitySelectionMenu";
 import Craydon from "./cities/Craydon/Craydon";
 import Solic from "./cities/Solic/Solic";
 
@@ -38,12 +38,9 @@ import Horus, {
     Resources as HorusResources,
 } from "./characters/npc/Goblin/Horus/Horus";
 
-import Gianuah, {
-    Resources as GianuahResources,
-} from "./characters/npc/Giaunah/Giaunah";
-
 import You, { Resources as YouResources } from "./characters/player/You/You";
 import { Resources as SwordResources } from "./items/weapons/Sword";
+
 class MainMenu extends Scene {
     onInitialize(_engine: Engine): void {}
 }
@@ -53,90 +50,54 @@ class Terrene extends Engine {
         super({
             displayMode: DisplayMode.FitScreenAndFill,
             maxFps: 30,
-            pointerScope: Input.PointerScope.Canvas,
+            pointerScope: PointerScope.Canvas,
             antialiasing: false,
             backgroundColor: Color.Black,
-            suppressPlayButton: false,
+            suppressPlayButton: true,
+            suppressConsoleBootMessage: true,
+            suppressHiDPIScaling: false,
             width: 960,
             height: 480,
         });
     }
 
     initialize() {
+        // Temporarily suppress audio context warnings during initialization
+        const originalWarn = console.warn;
+        console.warn = (...args: any[]) => {
+            const message = args.join(" ");
+            if (
+                message.includes("AudioContext") ||
+                message.includes("audio context") ||
+                message.includes("unlock")
+            ) {
+                return; // Suppress audio context warnings
+            }
+            originalWarn.apply(console, args);
+        };
+
         const loader = new Loader([
             // tiledMapResource,
             NovosahResources.Image,
             OldManSamResources.Image,
             SallyResources.Image,
-            GianuahResources.Image,
-            GianuahResources.AsepriteResource,
-            GianuahResources.Sound,
             YouResources.Image,
             YouResources.AsepriteResource,
             YouResources.Sound,
             HorusResources.Image,
-            HorusResources.AsepriteResource,
             SwordResources.Image,
             SwordResources.AsepriteResource,
             SwordResources.Sound,
         ]);
 
         this.start(loader).then(() => {
-            this.addScene("menu", new CitySelectionMenu());
-            this.addScene("craydon", new Craydon());
-            this.addScene("solic", new Solic());
+            this.addScene("menu", new Solic());
             this.goToScene("menu");
 
-            // let score = 10;
-            // const scoreLabel = new Label({
-            //     text: "Score: " + score,
-            //     pos: new Vector(20, 30),
-            //     font: new Font({
-            //         quality: 3,
-            //         size: 30,
-            //         unit: FontUnit.Px,
-            //         family: "Termianl",
-            //         color: Color.Cyan,
-            //     }),
-            // });
-
-            // const manaLabel = new Label({
-            //     text: "Mana: " + 100,
-            //     pos: new Vector(100, 50),
-            // });
-
-            // this.add(scoreLabel);
-            // this.add(manaLabel);
-
-            // Player will be added to individual scenes instead of globally
-
-            // const oldManSam = new OldManSam();
-            // this.add(oldManSam);
-
-            // const sally = new Sally();
-            // this.add(sally);
-
-            // sally.actions.repeatForever((action) => {
-            //     action.meet(you, 100).die();
-            // });
-
-            // oldManSam.actions.follow(sally, 100);
-
-            // const navosah = new Navosah();
-            // this.add(navosah);
-
-            // navosah.actions.follow(sally, 500);
-
-            // const horus1 = new Horus();
-            // const horus2 = new Horus();
-
-            // this.add(horus1);
-            // this.add(horus2);
-
-            // const gianuah = new Gianuah();
-            // this.add(gianuah);
-
-            // tiledMapResource.addTiledMapToScene(this.currentScene);
+            // Restore original console.warn after initialization
+            setTimeout(() => {
+                console.warn = originalWarn;
+            }, 1000);
         });
     }
 }

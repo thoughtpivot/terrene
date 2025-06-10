@@ -92,8 +92,10 @@ export default class Sword extends Actor {
 
 const Resources = {
     Image: new ImageSource(SwordImage, true),
-    AsepriteResource: new AsepriteResource("./Sword.json"),
-    Sound: new Sound("./sword_swing.mp3"),
+    AsepriteResource: new AsepriteResource(
+        "./components/items/weapons/Sword.json"
+    ),
+    Sound: new Sound("./components/items/weapons/sword_swing.mp3"),
 };
 
 export { Resources };

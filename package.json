@@ -38,15 +38,15 @@
     "dependencies": {
         "@aws-sdk/client-bedrock-runtime": "^3.650.0",
         "@excaliburjs/excalibur-tiled": "^2.3.1",
-        "@excaliburjs/plugin-aseprite": "^0.27.0",
-        "@excaliburjs/plugin-tiled": "^0.27.0",
+        "@excaliburjs/plugin-aseprite": "^0.28.2",
+        "@excaliburjs/plugin-tiled": "^0.28.0",
         "@koa/router": "^13.1.0",
         "@spytech/flight": "^1.0.5",
         "axios": "^1.9.0",
         "copy-webpack-plugin": "^11.0.0",
         "dotenv": "^16.3.1",
         "electron": "^20.2.0",
-        "excalibur": "0.27.0",
+        "excalibur": "^0.28.5",
         "file-loader": "^6.2.0",
         "ioredis": "^5.6.1",
         "raw-loader": "^4.0.2"

@@ -1,6 +1,8 @@
 import {
     Engine,
     Scene,
+    Loader,
+    Sound,
     SceneActivationContext,
     Color,
     Actor,
@@ -20,6 +22,10 @@ import You from "../../characters/player/You/You";
 import Sally from "../../characters/npc/Sally/Sally";
 import OldManSam from "../../characters/npc/OldManSam/OldManSam";
 
+const solicThemeSong = new Sound(
+    "./components/cities/Solic/Solic_theme_track.mp3"
+);
+
 export default class Solic extends Scene {
     private beachBounds!: Actor;
     private trails: Actor[] = [];
@@ -31,94 +37,121 @@ export default class Solic extends Scene {
     private fishSpawnTimer!: Timer;
 
     onInitialize(engine: Engine): void {
-        // Set camera zoom for beach scene
-        this.camera.zoom = 2.5;
+        const loader = new Loader([solicThemeSong]);
 
-        // Create sandy beach background
-        const beachBackground = new Actor({
-            pos: new Vector(
-                engine.screen.resolution.width / 2,
-                engine.screen.resolution.height / 2
-            ),
-            width: engine.screen.resolution.width,
-            height: engine.screen.resolution.height,
-        });
+        engine.start(loader).then(() => {
+            console.log("Solic scene loaded, setting up theme song...");
 
-        beachBackground.graphics.use(
-            new Rectangle({
+            // Set up sound properties
+            solicThemeSong.volume = 0.3;
+            solicThemeSong.loop = true;
+
+            // Try to play immediately, but handle browser audio policy
+            this.attemptToPlayMusic();
+
+            // Set up event listeners for when audio actually starts
+            solicThemeSong.on("playbackstart", () => {
+                console.log(
+                    "Solic theme song playback started - Loop is:",
+                    solicThemeSong.loop
+                );
+            });
+
+            solicThemeSong.on("playbackend", () => {
+                console.log(
+                    "Solic theme song ended - should restart if looping"
+                );
+            });
+
+            // Set camera zoom for beach scene
+            this.camera.zoom = 2.5;
+
+            // Create sandy beach background
+            const beachBackground = new Actor({
+                pos: new Vector(
+                    engine.screen.resolution.width / 2,
+                    engine.screen.resolution.height / 2
+                ),
                 width: engine.screen.resolution.width,
                 height: engine.screen.resolution.height,
-                color: Color.fromHex("#f4e4bc"), // Sandy beach color
-            })
-        );
+            });
 
-        beachBackground.z = -3; // Bottom layer
-        this.add(beachBackground);
+            beachBackground.graphics.use(
+                new Rectangle({
+                    width: engine.screen.resolution.width,
+                    height: engine.screen.resolution.height,
+                    color: Color.fromHex("#f4e4bc"), // Sandy beach color
+                })
+            );
 
-        // Create ocean on the right side (non-walkable) - visible blue water area
-        this.ocean = new Actor({
-            pos: new Vector(800, 240), // Position within the 960x480 screen
-            width: 320,
-            height: 600,
-            collisionType: CollisionType.Fixed, // Prevent entry
-        });
-        this.ocean.graphics.use(
-            new Rectangle({
+            beachBackground.z = -3; // Bottom layer
+            this.add(beachBackground);
+
+            // Create ocean on the right side (non-walkable) - visible blue water area
+            this.ocean = new Actor({
+                pos: new Vector(800, 240), // Position within the 960x480 screen
                 width: 320,
                 height: 600,
-                color: Color.fromHex("#1e6091"), // Deep blue ocean
-            })
-        );
-        this.ocean.z = -2;
-        this.add(this.ocean);
+                collisionType: CollisionType.Fixed, // Prevent entry
+            });
+            this.ocean.graphics.use(
+                new Rectangle({
+                    width: 320,
+                    height: 600,
+                    color: Color.fromHex("#1e6091"), // Deep blue ocean
+                })
+            );
+            this.ocean.z = -2;
+            this.add(this.ocean);
 
-        // Add animated water waves
-        this.createWaveAnimations(engine);
+            // Add animated water waves
+            this.createWaveAnimations(engine);
 
-        // Create mountains on the left side (non-walkable base) - visible gray mountain area
-        const mountains = new Actor({
-            pos: new Vector(160, 240), // Position within the 960x480 screen
-            width: 320,
-            height: 600,
-            collisionType: CollisionType.Fixed,
-        });
-        mountains.graphics.use(
-            new Rectangle({
+            // Create mountains on the left side (non-walkable base) - visible gray mountain area
+            const mountains = new Actor({
+                pos: new Vector(160, 240), // Position within the 960x480 screen
                 width: 320,
                 height: 600,
-                color: Color.fromHex("#4a4a4a"), // Dark gray mountains
-            })
-        );
-        mountains.z = -2;
-        this.add(mountains);
+                collisionType: CollisionType.Fixed,
+            });
+            mountains.graphics.use(
+                new Rectangle({
+                    width: 320,
+                    height: 600,
+                    color: Color.fromHex("#4a4a4a"), // Dark gray mountains
+                })
+            );
+            mountains.z = -2;
+            this.add(mountains);
 
-        // Create walkable beach area (main area) - center beach area between mountains and ocean
-        this.beachBounds = new Actor({
-            pos: new Vector(480, 240), // Center of screen
-            width: 320, // Beach area between mountains and ocean
-            height: 480,
-            collisionType: CollisionType.Passive, // Walkable area
-        });
-        this.beachBounds.graphics.use(
-            new Rectangle({
-                width: 320,
+            // Create walkable beach area (main area) - center beach area between mountains and ocean
+            this.beachBounds = new Actor({
+                pos: new Vector(480, 240), // Center of screen
+                width: 320, // Beach area between mountains and ocean
                 height: 480,
-                color: Color.Transparent, // Invisible walkable zone
-            })
-        );
-        this.add(this.beachBounds);
+                collisionType: CollisionType.Passive, // Walkable area
+            });
+            this.beachBounds.graphics.use(
+                new Rectangle({
+                    width: 320,
+                    height: 480,
+                    color: Color.Transparent, // Invisible walkable zone
+                })
+            );
+            this.add(this.beachBounds);
 
-        // Create walkable mountain trails
-        this.createMountainTrails(engine);
+            // Create walkable mountain trails
+            this.createMountainTrails(engine);
 
-        // Add some visual beach elements
-        this.addBeachElements(engine);
+            // Add some visual beach elements
+            this.addBeachElements(engine);
 
-        // Add and setup player character
-        this.setupPlayer(engine);
+            // Add and setup player character
+            this.setupPlayer(engine);
 
-        // Setup fish spawning
-        this.setupFishSpawning(engine);
+            // Setup fish spawning
+            this.setupFishSpawning(engine);
+        });
     }
 
     private createMountainTrails(engine: Engine): void {
@@ -945,6 +978,48 @@ export default class Solic extends Scene {
 
             this.add(splashDrop);
         }
+    }
+
+    private attemptToPlayMusic(): void {
+        console.log("Attempting to play Solic theme song...");
+        solicThemeSong
+            .play()
+            .then(() => {
+                console.log("Solic theme song started playing successfully");
+            })
+            .catch((error) => {
+                console.log(
+                    "Audio blocked by browser policy, waiting for user interaction..."
+                );
+                console.log("Click anywhere on the screen to start music");
+
+                // Set up one-time click listener to start music after user interaction
+                const startMusicOnClick = () => {
+                    console.log("User clicked, attempting to start music...");
+                    solicThemeSong
+                        .play()
+                        .then(() => {
+                            console.log(
+                                "Solic theme song started after user interaction"
+                            );
+                        })
+                        .catch((err) => {
+                            console.error("Still couldn't play music:", err);
+                        });
+
+                    // Remove the event listener after first use
+                    document.removeEventListener("click", startMusicOnClick);
+                    document.removeEventListener("keydown", startMusicOnClick);
+                };
+
+                // Listen for any user interaction
+                document.addEventListener("click", startMusicOnClick, {
+                    once: true,
+                });
+                document.addEventListener("keydown", startMusicOnClick, {
+                    once: true,
+                });
+            });
     }
 
     onDeactivate(_context: SceneActivationContext<undefined>): void {

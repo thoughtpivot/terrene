@@ -1,5 +1,5 @@
 { "frames": {
-   "You.aseprite": {
+   "OldManSam.aseprite": {
     "frame": { "x": 0, "y": 0, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
@@ -11,7 +11,7 @@
  "meta": {
   "app": "https://www.aseprite.org/",
   "version": "1.3.13-arm64",
-  "image": "You.png",
+  "image": "OldManSam.png",
   "format": "RGBA8888",
   "size": { "w": 24, "h": 24 },
   "scale": "1",
