@@ -38,6 +38,8 @@ import Horus, {
 
 import You, { Resources as YouResources } from "./characters/player/You/You";
 import { Resources as SwordResources } from "./items/weapons/Sword";
+import { Resources as DonutResources } from "./items/food/Donut/Donut";
+import { Resources as LorcRPGResources } from "./items/LorcRPG/LorcRPG";
 
 class MainMenu extends Scene {
     onInitialize(_engine: Engine): void {}
@@ -86,6 +88,12 @@ class Terrene extends Engine {
             SwordResources.Image,
             SwordResources.AsepriteResource,
             SwordResources.Sound,
+            DonutResources.Image,
+            DonutResources.AsepriteResource,
+            DonutResources.Sound,
+            LorcRPGResources.Image,
+            LorcRPGResources.AsepriteResource,
+            LorcRPGResources.Sound,
         ]);
 
         this.start(loader).then(() => {

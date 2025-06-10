@@ -1,6 +1,15 @@
 import { AsepriteResource } from "@excaliburjs/plugin-aseprite";
-import { Actor, Die, ImageSource, vec, Sound } from "excalibur";
+import {
+    Actor,
+    Die,
+    ImageSource,
+    vec,
+    Sound,
+    Sprite,
+    Rectangle,
+} from "excalibur";
 import DonutImage from "./Donut.png";
+import DonutJson from "./Donut.json";
 
 export default class Donut extends Actor {
     constructor() {
@@ -13,7 +22,22 @@ export default class Donut extends Actor {
     }
 
     onInitialize() {
-        this.graphics.use(Resources.Image.toSprite());
+        // Create a sprite that shows only the first donut (top donut only)
+        const firstDonutSprite = new Sprite({
+            image: Resources.Image,
+            sourceView: {
+                x: 0, // Start from left edge
+                y: 0, // Start from top edge
+                width: 16, // 16px wide
+                height: 16, // Show only top donut - cut off at 15px to avoid the second donut
+            },
+        });
+
+        this.graphics.use(firstDonutSprite);
+
+        console.log(
+            "Donut initialized - showing single donut only (16x15 from 96x32 sprite sheet)"
+        );
 
         this.actions
             .delay(5000)

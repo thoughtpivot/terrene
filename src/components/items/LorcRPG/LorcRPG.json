@@ -1,0 +1,26 @@
+{ "frames": {
+   "lorc_rpg_icons_spritesheet.png": {
+    "frame": { "x": 0, "y": 0, "w": 1856, "h": 1792 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 1856, "h": 1792 },
+    "sourceSize": { "w": 1856, "h": 1792 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.13-arm64",
+  "image": "lorc_rpg_icons_spritesheet-sheet.png",
+  "format": "RGBA8888",
+  "size": { "w": 1856, "h": 1792 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "Layer", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}
