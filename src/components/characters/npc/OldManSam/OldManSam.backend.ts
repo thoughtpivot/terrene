@@ -9,6 +9,7 @@ import {
 } from "@aws-sdk/client-bedrock-runtime";
 
 import Router from "@koa/router";
+import { ClaudeVersion } from "../../../../common/amazon";
 
 dotenv.config({ path: path.join(__dirname, "../../../../../.env") });
 
@@ -24,13 +25,7 @@ let dialogueCache = {
 // Cache for character bio
 let characterBio = null;
 
-// Claude model versions
-const ClaudeVersion = {
-    Claude_3_5_Sonnet_20240620_V10: "anthropic.claude-3-5-sonnet-20240620-v1:0",
-    Claude_3_Sonnet_20240229_V10: "anthropic.claude-3-sonnet-20240229-v1:0",
-    Claude_3_Haiku_20240307_V10: "anthropic.claude-3-haiku-20240307-v1:0",
-};
-
+// TODO: this entire file needs to be updated to use the claude api in common/amazon.ts
 /**
  * Simple Claude API call
  */
