@@ -1,13 +1,5 @@
 import { AsepriteResource } from "@excaliburjs/plugin-aseprite";
-import {
-    Actor,
-    Die,
-    ImageSource,
-    vec,
-    Sound,
-    Sprite,
-    Rectangle,
-} from "excalibur";
+import { Actor, Die, ImageSource, vec, Sprite, Rectangle } from "excalibur";
 import DonutImage from "./Donut.png";
 
 export default class Donut extends Actor {
@@ -46,8 +38,10 @@ export default class Donut extends Actor {
 
 const Resources = {
     Image: new ImageSource(DonutImage),
-    AsepriteResource: new AsepriteResource("./Donut.json"),
-    Sound: new Sound("./Donut.mp3"),
+    AsepriteResource: new AsepriteResource(
+        "./components/items/food/Donut/Donut.json"
+    ),
+    // Sound: new Sound("./components/items/food/Donut/Donut.mp3"), // Missing file
 };
 
 export { Resources };

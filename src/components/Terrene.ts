@@ -91,10 +91,8 @@ class Terrene extends Engine {
             SwordResources.Sound,
             DonutResources.Image,
             DonutResources.AsepriteResource,
-            DonutResources.Sound,
             LorcRPGResources.Image,
             LorcRPGResources.AsepriteResource,
-            LorcRPGResources.Sound,
             BreazeResources.Image,
             BreazeResources.AsepriteResource,
         ]);

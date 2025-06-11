@@ -19,7 +19,7 @@
   ],
   "layers": [
    { "name": "Backdrop", "opacity": 255, "blendMode": "normal" },
-   { "name": "Collision", "opacity": 64, "blendMode": "normal" }
+   { "name": "Collision", "opacity": 36, "blendMode": "normal" }
   ],
   "slices": [
   ]

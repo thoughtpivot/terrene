@@ -1,5 +1,5 @@
 import { AsepriteResource } from "@excaliburjs/plugin-aseprite";
-import { Actor, ImageSource, vec, Sound, Sprite, ActorArgs } from "excalibur";
+import { Actor, ImageSource, vec, Sprite, ActorArgs } from "excalibur";
 import LorcRPGImage from "./LorcRPG.png";
 import LorcRPGJson from "./LorcRPG.json";
 import {
@@ -116,8 +116,10 @@ export default class LorcRPG extends Actor {
 
 const Resources = {
     Image: new ImageSource(LorcRPGImage),
-    AsepriteResource: new AsepriteResource("./LorcRPG.json"),
-    Sound: new Sound("./LorcRPG.mp3"),
+    AsepriteResource: new AsepriteResource(
+        "./components/items/LorcRPG/LorcRPG.json"
+    ),
+    // Sound: new Sound("./components/items/LorcRPG/LorcRPG.mp3"), // Missing file
 };
 
 export { Resources };
