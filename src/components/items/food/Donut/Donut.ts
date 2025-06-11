@@ -9,7 +9,6 @@ import {
     Rectangle,
 } from "excalibur";
 import DonutImage from "./Donut.png";
-import DonutJson from "./Donut.json";
 
 export default class Donut extends Actor {
     constructor() {

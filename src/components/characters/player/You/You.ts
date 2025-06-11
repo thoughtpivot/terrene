@@ -24,6 +24,7 @@ export default class You extends Actor {
     private targetPosition: Vector | null = null;
     private isMovingToTarget: boolean = false;
     private moveSpeed: number = 2;
+    private movementSound: Sound | null = null; // Track movement sound
 
     constructor() {
         super({
@@ -39,7 +40,9 @@ export default class You extends Actor {
         console.log("*** YOU CHARACTER INITIALIZING ***");
         this.graphics.add(Resources.Image.toSprite());
 
-        const sound = new Sound("./modules/characters/player/You/You.mp3");
+        this.movementSound = new Sound(
+            "./modules/characters/player/You/You.mp3"
+        );
         this.swordSwingSound = Resources.SwordSwingSound;
 
         console.log("*** SETTING UP KEYBOARD INPUT ***");
@@ -77,8 +80,10 @@ export default class You extends Actor {
                 case Input.Keys.Left:
                 case Input.Keys.A:
                     this.pos.x = this.pos.x - this.moveSpeed;
-                    sound.loop = true;
-                    sound.play(1.0);
+                    if (this.movementSound) {
+                        this.movementSound.loop = true;
+                        this.movementSound.play(1.0);
+                    }
                     break;
                 case Input.Keys.Right:
                 case Input.Keys.D:
@@ -156,9 +161,9 @@ export default class You extends Actor {
             // Return to city selection menu on Escape key
             if (press.key === Input.Keys.Escape) {
                 console.log(
-                    "Escape key pressed - returning to city selection menu"
+                    "Escape key pressed - fading out audio and returning to city selection menu"
                 );
-                engine.goToScene("menu");
+                this.fadeOutAudioAndChangeScene(engine);
             }
         });
 
@@ -387,6 +392,54 @@ export default class You extends Actor {
             `Total NPCs found: ${npcCount}, DialogueNPCs found: ${dialogueNPCCount}`
         );
         console.log("No NPCs in range to talk to");
+    }
+
+    private async fadeOutAudioAndChangeScene(engine: Engine): Promise<void> {
+        const fadeOutPromises: Promise<void>[] = [];
+
+        // Fade out movement sound if playing
+        if (this.movementSound && this.movementSound.isPlaying()) {
+            fadeOutPromises.push(this.fadeOutSound(this.movementSound));
+        }
+
+        // Fade out sword swing sound if playing
+        if (this.swordSwingSound && this.swordSwingSound.isPlaying()) {
+            fadeOutPromises.push(this.fadeOutSound(this.swordSwingSound));
+        }
+
+        // Wait for all sounds to fade out
+        if (fadeOutPromises.length > 0) {
+            await Promise.all(fadeOutPromises);
+        }
+
+        // Now change the scene
+        engine.goToScene("menu");
+    }
+
+    private fadeOutSound(sound: Sound, duration: number = 1000): Promise<void> {
+        return new Promise((resolve) => {
+            const startVolume = sound.volume;
+            const fadeInterval = 16; // ~60fps
+            const fadeSteps = duration / fadeInterval;
+            const volumeStep = startVolume / fadeSteps;
+            let currentStep = 0;
+
+            const fadeTimer = setInterval(() => {
+                currentStep++;
+                const newVolume = Math.max(
+                    0,
+                    startVolume - volumeStep * currentStep
+                );
+                sound.volume = newVolume;
+
+                if (newVolume <= 0 || currentStep >= fadeSteps) {
+                    clearInterval(fadeTimer);
+                    sound.stop();
+                    sound.volume = startVolume; // Reset volume for next time
+                    resolve();
+                }
+            }, fadeInterval);
+        });
     }
 }
 

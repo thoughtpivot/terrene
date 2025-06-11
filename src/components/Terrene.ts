@@ -23,7 +23,8 @@ import Navosah, {
 import Craydon from "./cities/Craydon/Craydon";
 import Solic from "./cities/Solic/Solic";
 import Vitosha from "./cities/Vitosha/Vitosha";
-
+import Breaze from "./cities/Breeze/Breaze";
+import { BreazeResources } from "./cities/Breeze/Breaze";
 import Sally, {
     Resources as SallyResources,
 } from "./characters/npc/Sally/Sally";
@@ -94,6 +95,8 @@ class Terrene extends Engine {
             LorcRPGResources.Image,
             LorcRPGResources.AsepriteResource,
             LorcRPGResources.Sound,
+            BreazeResources.Image,
+            BreazeResources.AsepriteResource,
         ]);
 
         this.start(loader).then(() => {
@@ -163,6 +166,7 @@ class Terrene extends Engine {
             const cities = [
                 { name: "Vitosha", scene: new Vitosha() },
                 { name: "Solic", scene: new Solic() },
+                { name: "Breaze", scene: new Breaze() },
             ];
 
             cities.forEach((city, index) => {
