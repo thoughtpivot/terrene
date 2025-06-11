@@ -21,6 +21,7 @@ import {
 import { AsepriteResource } from "@excaliburjs/plugin-aseprite";
 import You from "../../characters/player/You/You";
 import Sally from "../../characters/npc/Sally/Sally";
+import Birdee from "../../creatures/Birdee/Birdee";
 // import Donut from "../../items/food/Donut/Donut";
 // import LorcRPG from "../../items/LorcRPG/LorcRPG";
 import BreazeImage from "./Breaze.png";
@@ -95,6 +96,9 @@ export default class Breaze extends Scene {
             this.player = new You();
             this.player.pos = vec(768, 512); // Temporary position, will be corrected
             this.add(this.player);
+
+            // Create a flock of birds flying from right to left
+            this.createBirdFlock();
 
             // Set up movement tracking for footsteps
             this.setupFootstepSystem();
@@ -1505,6 +1509,55 @@ export default class Breaze extends Scene {
         } catch (error) {
             console.error("Error stopping footsteps:", error);
         }
+    }
+
+    private createBirdFlock(): void {
+        // Create a flock of 6-8 birds flying quickly from right to left
+        const flockSize = 6 + Math.floor(Math.random() * 3); // 6-8 birds
+        const flightSpeed = 120; // Fast flight speed
+        const baseHeight = 200; // Base height above ground
+
+        for (let i = 0; i < flockSize; i++) {
+            // Stagger the start times so birds don't all appear at once
+            const startDelay = i * (300 + Math.random() * 200); // 300-500ms between each bird
+
+            // Create timer for delayed bird spawning
+            const spawnTimer = new Timer({
+                fcn: () => {
+                    const bird = new Birdee({
+                        direction: "left", // Flying right to left
+                        speed: flightSpeed + (Math.random() * 40 - 20), // Speed variation ±20
+                        wingFlapSpeed: 100 + Math.random() * 50, // Quick wing flapping
+                        flightBounds: { left: -200, right: 1750 }, // Wider bounds for scene
+                    });
+
+                    // Position birds at different heights and starting positions for flock formation
+                    const heightVariation = (Math.random() - 0.5) * 150; // ±75px height variation
+                    const lateralOffset = (Math.random() - 0.5) * 80; // ±40px lateral spacing
+                    const startX = 1600 + Math.random() * 100; // Start off-screen right
+
+                    bird.pos = vec(
+                        startX + lateralOffset,
+                        baseHeight + heightVariation
+                    );
+
+                    this.add(bird);
+                    console.log(
+                        `Bird ${i + 1} spawned at position (${bird.pos.x}, ${
+                            bird.pos.y
+                        })`
+                    );
+                },
+                interval: startDelay,
+                repeats: false,
+            });
+
+            this.add(spawnTimer);
+        }
+
+        console.log(
+            `Bird flock of ${flockSize} birds initialized for Breaze scene`
+        );
     }
 }
 

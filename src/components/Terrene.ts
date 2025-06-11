@@ -41,6 +41,7 @@ import You, { Resources as YouResources } from "./characters/player/You/You";
 import { Resources as SwordResources } from "./items/weapons/Sword";
 import { Resources as DonutResources } from "./items/food/Donut/Donut";
 import { Resources as LorcRPGResources } from "./items/LorcRPG/LorcRPG";
+import Baston from "./cities/Baston/Baston";
 
 class MainMenu extends Scene {
     onInitialize(_engine: Engine): void {}
@@ -165,6 +166,7 @@ class Terrene extends Engine {
                 { name: "Vitosha", scene: new Vitosha() },
                 { name: "Solic", scene: new Solic() },
                 { name: "Breaze", scene: new Breaze() },
+                { name: "Baston", scene: new Baston() },
             ];
 
             cities.forEach((city, index) => {
