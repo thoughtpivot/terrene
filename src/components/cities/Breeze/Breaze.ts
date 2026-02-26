@@ -946,7 +946,7 @@ export default class Breaze extends Scene {
     }
 
     private setupMovementValidation(walkableMap: boolean[][]): void {
-        console.log("*** SETTING UP MOVEMENT VALIDATION SYSTEM ***");
+        console.log("*** SETTING UP UNIVERSAL MOVEMENT VALIDATION SYSTEM ***");
 
         // Store the walkable map for runtime validation
         this.walkableMap = walkableMap;
@@ -954,12 +954,17 @@ export default class Breaze extends Scene {
         // Position player in center of walkable area
         this.positionPlayerInWalkableArea(walkableMap);
 
-        // Set up a timer to validate player position every frame
+        // Track last valid positions for all actors
+        const lastValidPositions = new Map<Actor, Vector>();
+
+        // Set up universal movement validation for all actors
         this.on("postupdate", () => {
-            this.validatePlayerPosition();
+            this.validateAllActorPositions(lastValidPositions);
         });
 
-        console.log("Movement validation system active");
+        console.log(
+            "Universal movement validation system active - all actors respect boundaries"
+        );
     }
 
     private positionPlayerInWalkableArea(walkableMap: boolean[][]): void {
@@ -1083,52 +1088,89 @@ export default class Breaze extends Scene {
         return bestPosition;
     }
 
-    private validatePlayerPosition(): void {
+    private validateAllActorPositions(
+        lastValidPositions: Map<Actor, Vector>
+    ): void {
         if (this.walkableMap.length === 0) return;
 
-        // Validate player position
-        if (this.player) {
-            const playerPos = this.player.pos;
-            const x = Math.floor(playerPos.x);
-            const y = Math.floor(playerPos.y);
+        // Get all actors in the scene
+        const actors = this.actors.filter((actor) =>
+            this.shouldValidateActor(actor)
+        );
 
-            // Check if player is in bounds
-            if (x < 0 || x >= 1536 || y < 0 || y >= 1024) {
-                this.correctPlayerPosition(playerPos);
-                return;
+        for (const actor of actors) {
+            const currentPos = actor.pos;
+
+            // Initialize last valid position if not exists
+            if (!lastValidPositions.has(actor)) {
+                lastValidPositions.set(actor, currentPos.clone());
+                continue;
             }
 
+            const lastValidPos = lastValidPositions.get(actor)!;
+
             // Check if current position is walkable
-            if (!this.isPositionWalkable(x, y)) {
-                this.correctPlayerPosition(playerPos);
+            if (this.isPositionWalkable(currentPos.x, currentPos.y)) {
+                // Position is valid, update our reference
+                lastValidPositions.set(actor, currentPos.clone());
+            } else {
+                // Position is invalid - immediately revert and stop movement
+                actor.pos = lastValidPos.clone();
+                actor.vel = vec(0, 0); // Stop all velocity/momentum
+
+                // Handle special actor-specific movement stopping
+                this.stopActorSpecificMovement(actor);
+
+                // Optional: Log movement blocking for debugging
+                // console.log(`${actor.constructor.name} movement blocked - reverted to valid position`);
             }
         }
+    }
 
-        // Validate Sally position
-        if (this.sally) {
-            const sallyPos = this.sally.pos;
-            const x = Math.floor(sallyPos.x);
-            const y = Math.floor(sallyPos.y);
+    private shouldValidateActor(actor: Actor): boolean {
+        // Only validate moveable actors, not static collision objects
+        return (
+            (!actor.body || actor.body.collisionType !== CollisionType.Fixed) &&
+            actor.name !== "collision" && // Skip collision boundary actors
+            !actor.name?.includes("wall") && // Skip wall actors
+            !actor.name?.includes("building") && // Skip building collision actors
+            actor.width > 0 &&
+            actor.height > 0 // Skip zero-size actors
+        );
+    }
 
-            // Check if Sally is in bounds
-            if (x < 0 || x >= 1536 || y < 0 || y >= 1024) {
-                this.correctSallyPosition(sallyPos);
-                return;
-            }
+    private stopActorSpecificMovement(actor: Actor): void {
+        // Handle specific movement patterns for different actor types
 
-            // Check if current position is walkable
-            if (!this.isPositionWalkable(x, y)) {
-                this.correctSallyPosition(sallyPos);
-            }
+        // Stop point-and-click movement for player
+        if (actor === this.player && "targetPosition" in actor) {
+            (actor as any).targetPosition = null;
+            (actor as any).isMovingToTarget = false;
+        }
+
+        // Stop any NPC-specific movement patterns
+        if (
+            "stopMovement" in actor &&
+            typeof (actor as any).stopMovement === "function"
+        ) {
+            (actor as any).stopMovement();
+        }
+
+        // Stop any pathfinding or AI movement
+        if (
+            "clearPath" in actor &&
+            typeof (actor as any).clearPath === "function"
+        ) {
+            (actor as any).clearPath();
         }
     }
 
     private isPositionWalkable(x: number, y: number): boolean {
         // Check a small area around the player position for collision
-        const checkRadius = 8; // Player collision radius
+        const checkRadius = 6; // Slightly smaller radius for more responsive boundary detection
 
-        for (let dy = -checkRadius; dy <= checkRadius; dy += 4) {
-            for (let dx = -checkRadius; dx <= checkRadius; dx += 4) {
+        for (let dy = -checkRadius; dy <= checkRadius; dy += 2) {
+            for (let dx = -checkRadius; dx <= checkRadius; dx += 2) {
                 const checkX = Math.floor(x + dx);
                 const checkY = Math.floor(y + dy);
 
@@ -1149,43 +1191,6 @@ export default class Breaze extends Scene {
         }
 
         return true;
-    }
-
-    private correctPlayerPosition(currentPos: Vector): void {
-        // Find the nearest walkable position
-        const nearestWalkable = this.findNearestWalkablePosition(currentPos);
-        if (nearestWalkable) {
-            this.player.pos = nearestWalkable;
-            this.player.vel = vec(0, 0); // Stop movement
-        }
-    }
-
-    private findNearestWalkablePosition(fromPos: Vector): Vector | null {
-        const searchRadius = 50;
-        let bestDistance = Infinity;
-        let bestPosition: Vector | null = null;
-
-        for (
-            let y = Math.max(0, fromPos.y - searchRadius);
-            y < Math.min(1024, fromPos.y + searchRadius);
-            y += 4
-        ) {
-            for (
-                let x = Math.max(0, fromPos.x - searchRadius);
-                x < Math.min(1536, fromPos.x + searchRadius);
-                x += 4
-            ) {
-                if (this.isPositionWalkable(x, y)) {
-                    const distance = fromPos.distance(vec(x, y));
-                    if (distance < bestDistance) {
-                        bestDistance = distance;
-                        bestPosition = vec(x, y);
-                    }
-                }
-            }
-        }
-
-        return bestPosition;
     }
 
     private createPolygonBasedCollision(walkableMap: boolean[][]): void {
@@ -1372,68 +1377,73 @@ export default class Breaze extends Scene {
         const width = walkableMap[0]?.length || 1536;
         const height = walkableMap.length;
 
-        // Find the bounds of the walkable area for Sally's movement
-        let minX = width,
-            maxX = 0,
-            minY = height,
-            maxY = 0;
-        let walkableFound = false;
+        // Find the center of the largest walkable area using the existing method
+        const largestWalkableCenter = this.findMostWalkableCenter(
+            walkableMap,
+            width,
+            height
+        );
 
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-                if (walkableMap[y] && walkableMap[y][x]) {
-                    walkableFound = true;
-                    minX = Math.min(minX, x);
-                    maxX = Math.max(maxX, x);
-                    minY = Math.min(minY, y);
-                    maxY = Math.max(maxY, y);
+        if (largestWalkableCenter) {
+            // Find the bounds of the walkable area for Sally's movement
+            let minX = width,
+                maxX = 0,
+                minY = height,
+                maxY = 0;
+            let walkableFound = false;
+
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    if (walkableMap[y] && walkableMap[y][x]) {
+                        walkableFound = true;
+                        minX = Math.min(minX, x);
+                        maxX = Math.max(maxX, x);
+                        minY = Math.min(minY, y);
+                        maxY = Math.max(maxY, y);
+                    }
                 }
             }
-        }
 
-        if (walkableFound) {
-            // Add some padding to keep Sally away from collision boundaries
-            const padding = 40;
-            const sallyMinX = Math.max(0, minX + padding);
-            const sallyMaxX = Math.min(width, maxX - padding);
-            const sallyMinY = Math.max(0, minY + padding);
-            const sallyMaxY = Math.min(height, maxY - padding);
+            if (walkableFound) {
+                // Add some padding to keep Sally away from collision boundaries
+                const padding = 40;
+                const sallyMinX = Math.max(0, minX + padding);
+                const sallyMaxX = Math.min(width, maxX - padding);
+                const sallyMinY = Math.max(0, minY + padding);
+                const sallyMaxY = Math.min(height, maxY - padding);
 
-            // Create Sally with movement bounds
-            this.sally = new Sally({
-                minX: sallyMinX,
-                maxX: sallyMaxX,
-                minY: sallyMinY,
-                maxY: sallyMaxY,
-            });
+                // Create Sally with movement bounds
+                this.sally = new Sally({
+                    minX: sallyMinX,
+                    maxX: sallyMaxX,
+                    minY: sallyMinY,
+                    maxY: sallyMaxY,
+                });
 
-            // Position Sally in a different area from the player
-            // Find a good spot that's not too close to the player's optimal position
-            const sallyX = sallyMinX + (sallyMaxX - sallyMinX) * 0.3; // 30% across walkable area
-            const sallyY = sallyMinY + (sallyMaxY - sallyMinY) * 0.7; // 70% down walkable area
+                // Position Sally in the center of the largest walkable area
+                this.sally.pos = vec(
+                    largestWalkableCenter.x,
+                    largestWalkableCenter.y
+                );
+                this.add(this.sally);
 
-            this.sally.pos = vec(sallyX, sallyY);
-            this.add(this.sally);
-
-            console.log(
-                `Sally NPC added to Breaze scene at position: (${Math.floor(
-                    sallyX
-                )}, ${Math.floor(sallyY)})`
-            );
-            console.log(
-                `Sally movement bounds: (${sallyMinX}, ${sallyMinY}) to (${sallyMaxX}, ${sallyMaxY})`
-            );
+                console.log(
+                    `Sally NPC positioned in center of largest walkable area at: (${Math.floor(
+                        largestWalkableCenter.x
+                    )}, ${Math.floor(largestWalkableCenter.y)}) with density ${
+                        largestWalkableCenter.density
+                    }`
+                );
+                console.log(
+                    `Sally movement bounds: (${sallyMinX}, ${sallyMinY}) to (${sallyMaxX}, ${sallyMaxY})`
+                );
+            } else {
+                console.warn("No walkable area found for Sally NPC placement");
+            }
         } else {
-            console.warn("No walkable area found for Sally NPC placement");
-        }
-    }
-
-    private correctSallyPosition(currentPos: Vector): void {
-        // Find the nearest walkable position for Sally
-        const nearestWalkable = this.findNearestWalkablePosition(currentPos);
-        if (nearestWalkable && this.sally) {
-            this.sally.pos = nearestWalkable;
-            // Note: We don't stop Sally's velocity as she has her own movement patterns
+            console.warn(
+                "Could not find center of largest walkable area for Sally placement"
+            );
         }
     }
 
@@ -1512,51 +1522,48 @@ export default class Breaze extends Scene {
     }
 
     private createBirdFlock(): void {
-        // Create a flock of 6-8 birds flying quickly from right to left
+        // Create a flock of 6-8 birds positioned around (720, 556) where user wants to see them
         const flockSize = 6 + Math.floor(Math.random() * 3); // 6-8 birds
-        const flightSpeed = 120; // Fast flight speed
-        const baseHeight = 200; // Base height above ground
+        const centerX = 720; // User-specified X position
+        const centerY = 556; // User-specified Y position
+
+        console.log(
+            `🐦 Creating bird flock of ${flockSize} birds at center (${centerX}, ${centerY})`
+        );
 
         for (let i = 0; i < flockSize; i++) {
-            // Stagger the start times so birds don't all appear at once
-            const startDelay = i * (300 + Math.random() * 200); // 300-500ms between each bird
-
-            // Create timer for delayed bird spawning
-            const spawnTimer = new Timer({
-                fcn: () => {
-                    const bird = new Birdee({
-                        direction: "left", // Flying right to left
-                        speed: flightSpeed + (Math.random() * 40 - 20), // Speed variation ±20
-                        wingFlapSpeed: 100 + Math.random() * 50, // Quick wing flapping
-                        flightBounds: { left: -200, right: 1750 }, // Wider bounds for scene
-                    });
-
-                    // Position birds at different heights and starting positions for flock formation
-                    const heightVariation = (Math.random() - 0.5) * 150; // ±75px height variation
-                    const lateralOffset = (Math.random() - 0.5) * 80; // ±40px lateral spacing
-                    const startX = 1600 + Math.random() * 100; // Start off-screen right
-
-                    bird.pos = vec(
-                        startX + lateralOffset,
-                        baseHeight + heightVariation
-                    );
-
-                    this.add(bird);
-                    console.log(
-                        `Bird ${i + 1} spawned at position (${bird.pos.x}, ${
-                            bird.pos.y
-                        })`
-                    );
-                },
-                interval: startDelay,
-                repeats: false,
+            // Create stationary birds for visibility
+            const bird = new Birdee({
+                direction: "right", // Facing right
+                speed: 0, // Stationary for now
+                wingFlapSpeed: 120 + Math.random() * 30, // Still flapping wings
+                flightBounds: { left: 0, right: 1536 }, // Scene bounds
             });
 
-            this.add(spawnTimer);
+            // Position birds in a loose formation around the center
+            const formationRadius = 100; // Radius of the formation
+            const angle = (i / flockSize) * 2 * Math.PI; // Distribute evenly in a circle
+            const radiusVariation = Math.random() * 50; // Some randomness in distance
+
+            const posX =
+                centerX + Math.cos(angle) * (formationRadius + radiusVariation);
+            const posY =
+                centerY +
+                Math.sin(angle) * (formationRadius * 0.6 + radiusVariation); // Flatter formation
+
+            bird.pos = vec(posX, posY);
+            bird.z = 15; // Ensure birds are above background
+            this.add(bird);
+
+            console.log(
+                `🐦 Bird ${i + 1} created and positioned at: (${Math.floor(
+                    posX
+                )}, ${Math.floor(posY)}) with z=${bird.z}`
+            );
         }
 
         console.log(
-            `Bird flock of ${flockSize} birds initialized for Breaze scene`
+            `🐦 Bird flock complete: ${flockSize} stationary birds positioned in center of Breaze scene`
         );
     }
 }

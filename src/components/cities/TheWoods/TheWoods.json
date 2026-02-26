@@ -1,0 +1,26 @@
+{
+    "frames": {
+        "TheWoods.aseprite": {
+            "frame": { "x": 0, "y": 0, "w": 536, "h": 802 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 536, "h": 802 },
+            "sourceSize": { "w": 536, "h": 802 },
+            "duration": 100
+        }
+    },
+    "meta": {
+        "app": "https://www.aseprite.org/",
+        "version": "1.3.13-arm64",
+        "image": "TheWoods.png",
+        "format": "RGBA8888",
+        "size": { "w": 536, "h": 802 },
+        "scale": "1",
+        "frameTags": [],
+        "layers": [
+            { "name": "Backdrop", "opacity": 255, "blendMode": "normal" },
+            { "name": "Collision", "opacity": 0, "blendMode": "normal" }
+        ],
+        "slices": []
+    }
+}
