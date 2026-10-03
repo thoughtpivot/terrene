@@ -10,7 +10,7 @@ import {
     Timer,
     CoordPlane,
     GraphicsGroup,
-    Input,
+    Keys,
 } from "excalibur";
 
 export interface ChatMessage {
@@ -79,11 +79,11 @@ export class ChatSystem {
                 this.isWaitingForResponse
             );
 
-            if (evt.key === Input.Keys.Enter) {
+            if (evt.key === Keys.Enter) {
                 console.log("ChatSystem: Enter key pressed, sending message");
                 this.sendUserMessage();
                 return;
-            } else if (evt.key === Input.Keys.Backspace) {
+            } else if (evt.key === Keys.Backspace) {
                 if (!this.isWaitingForResponse) {
                     this.userInput = this.userInput.slice(0, -1);
                     this.throttledUpdateDisplay();
@@ -101,7 +101,7 @@ export class ChatSystem {
                 ) {
                     // Handle keys like "Digit1", "Digit2", etc.
                     char = evt.key.substring(5);
-                } else if (evt.key === Input.Keys.Space) {
+                } else if (evt.key === Keys.Space) {
                     char = " ";
                 } else if (evt.key.length === 1) {
                     // Handle direct character keys
@@ -261,7 +261,7 @@ export class ChatSystem {
                         height: inputHeight,
                         color: Color.fromHex("#2a2a2a"),
                     }),
-                    pos: Vector.Zero,
+                    offset: Vector.Zero,
                 },
                 // Input field border
                 {
@@ -270,7 +270,7 @@ export class ChatSystem {
                         height: inputHeight,
                         color: Color.fromHex("#4A90E2"),
                     }),
-                    pos: Vector.Zero,
+                    offset: Vector.Zero,
                 },
                 // Inner input area
                 {
@@ -279,7 +279,7 @@ export class ChatSystem {
                         height: inputHeight - 4,
                         color: Color.fromHex("#1a1a1a"),
                     }),
-                    pos: Vector.Zero,
+                    offset: Vector.Zero,
                 },
             ],
         });
@@ -521,7 +521,7 @@ export class ChatSystem {
                         height: chatHeight + 6,
                         color: Color.fromHex("#000000"), // Black shadow
                     }),
-                    pos: new Vector(2, 2), // Offset for shadow effect
+                    offset: new Vector(2, 2), // Offset for shadow effect
                 },
                 // Main border (larger rectangle with border color)
                 {
@@ -530,7 +530,7 @@ export class ChatSystem {
                         height: chatHeight,
                         color: Color.fromHex("#4A90E2"), // Nice blue border
                     }),
-                    pos: Vector.Zero,
+                    offset: Vector.Zero,
                 },
                 // Inner highlight border (creates depth)
                 {
@@ -539,7 +539,7 @@ export class ChatSystem {
                         height: chatHeight - borderWidth * 2 + 1,
                         color: Color.fromHex("#87CEEB"), // Sky blue highlight
                     }),
-                    pos: Vector.Zero,
+                    offset: Vector.Zero,
                 },
                 // Inner background (main content area)
                 {
@@ -548,7 +548,7 @@ export class ChatSystem {
                         height: chatHeight - borderWidth * 2,
                         color: Color.fromHex("#1a1a1a"), // Dark charcoal background
                     }),
-                    pos: Vector.Zero,
+                    offset: Vector.Zero,
                 },
             ],
         });

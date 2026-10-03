@@ -7,13 +7,13 @@ import {
     Color,
     Vector,
 } from "excalibur";
-import { TiledMapResource } from "@excaliburjs/plugin-tiled";
+import { TiledResource } from "@excaliburjs/plugin-tiled";
 import You from "../../characters/player/You/You";
 
-const tiledMapResource = new TiledMapResource(
+const tiledMapResource = new TiledResource(
     "./components/cities/Craydon/Craydon.tmx",
     {
-        startingLayerZIndex: -2,
+        startZIndex: -2,
     }
 );
 
@@ -37,7 +37,7 @@ export default class Craydon extends Scene {
                 craydonThemeSong.loop = true;
             });
 
-            tiledMapResource.addTiledMapToScene(this);
+            tiledMapResource.addToScene(this);
 
             // Add and setup player character
             this.setupPlayer(engine);

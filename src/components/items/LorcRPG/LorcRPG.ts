@@ -25,7 +25,7 @@ export default class LorcRPG extends Actor {
             height: 64,
             scale: vec(scale, scale),
             ...actorArgs,
-        });
+        } as ActorArgs);
 
         // Get icon by ID
         try {

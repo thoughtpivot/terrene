@@ -2,7 +2,7 @@ import {
     Engine,
     Actor,
     Die,
-    Input,
+    Keys,
     vec,
     Vector,
     ImageSource,
@@ -69,24 +69,24 @@ export default class You extends Actor {
             this.targetPosition = null;
 
             switch (press.key) {
-                case Input.Keys.Up:
-                case Input.Keys.W:
+                case Keys.Up:
+                case Keys.W:
                     this.pos.y = this.pos.y - this.moveSpeed;
                     break;
-                case Input.Keys.Down:
-                case Input.Keys.S:
+                case Keys.Down:
+                case Keys.S:
                     this.pos.y = this.pos.y + this.moveSpeed;
                     break;
-                case Input.Keys.Left:
-                case Input.Keys.A:
+                case Keys.Left:
+                case Keys.A:
                     this.pos.x = this.pos.x - this.moveSpeed;
                     if (this.movementSound) {
                         this.movementSound.loop = true;
                         this.movementSound.play(1.0);
                     }
                     break;
-                case Input.Keys.Right:
-                case Input.Keys.D:
+                case Keys.Right:
+                case Keys.D:
                     this.pos.x = this.pos.x + this.moveSpeed;
                     break;
             }
@@ -95,24 +95,24 @@ export default class You extends Actor {
         engine.input.keyboard.on("press", (press) => {
             console.log("Key pressed:", press.key, "Key code:", press.key);
 
-            if (press.key === Input.Keys.Space) {
+            if (press.key === Keys.Space) {
                 // Stop automatic movement when using space to skip
                 this.isMovingToTarget = false;
                 this.targetPosition = null;
 
                 // Get current movement direction from held keys
                 const isMovingUp =
-                    engine.input.keyboard.isHeld(Input.Keys.Up) ||
-                    engine.input.keyboard.isHeld(Input.Keys.W);
+                    engine.input.keyboard.isHeld(Keys.Up) ||
+                    engine.input.keyboard.isHeld(Keys.W);
                 const isMovingDown =
-                    engine.input.keyboard.isHeld(Input.Keys.Down) ||
-                    engine.input.keyboard.isHeld(Input.Keys.S);
+                    engine.input.keyboard.isHeld(Keys.Down) ||
+                    engine.input.keyboard.isHeld(Keys.S);
                 const isMovingLeft =
-                    engine.input.keyboard.isHeld(Input.Keys.Left) ||
-                    engine.input.keyboard.isHeld(Input.Keys.A);
+                    engine.input.keyboard.isHeld(Keys.Left) ||
+                    engine.input.keyboard.isHeld(Keys.A);
                 const isMovingRight =
-                    engine.input.keyboard.isHeld(Input.Keys.Right) ||
-                    engine.input.keyboard.isHeld(Input.Keys.D);
+                    engine.input.keyboard.isHeld(Keys.Right) ||
+                    engine.input.keyboard.isHeld(Keys.D);
 
                 // Skip in the direction of movement
                 if (isMovingUp) this.pos.y -= 10;
@@ -121,12 +121,12 @@ export default class You extends Actor {
                 if (isMovingRight) this.pos.x += 10;
             }
 
-            if (press.key === Input.Keys.X) {
+            if (press.key === Keys.X) {
                 this.swingSword();
             }
 
             // T key for talking to NPCs
-            if (press.key === Input.Keys.T) {
+            if (press.key === Keys.T) {
                 console.log("*** T KEY DETECTED! ***");
                 this.attemptTalkToNPC(engine);
             }
@@ -134,24 +134,24 @@ export default class You extends Actor {
             // Arrow keys for chat navigation when chat is active
             const chatSystem = getChatSystem(engine);
             if (chatSystem.getIsActive()) {
-                if (press.key === Input.Keys.Right) {
+                if (press.key === Keys.Right) {
                     console.log("*** RIGHT ARROW DETECTED IN CHAT ***");
                     chatSystem.navigateToNextMessage();
                     return; // Don't process other movement when in chat
                 }
-                if (press.key === Input.Keys.Left) {
+                if (press.key === Keys.Left) {
                     console.log("*** LEFT ARROW DETECTED IN CHAT ***");
                     chatSystem.navigateToPreviousMessage();
                     return; // Don't process other movement when in chat
                 }
                 // Block all other movement when in chat
                 if (
-                    press.key === Input.Keys.Up ||
-                    press.key === Input.Keys.Down ||
-                    press.key === Input.Keys.W ||
-                    press.key === Input.Keys.A ||
-                    press.key === Input.Keys.S ||
-                    press.key === Input.Keys.D
+                    press.key === Keys.Up ||
+                    press.key === Keys.Down ||
+                    press.key === Keys.W ||
+                    press.key === Keys.A ||
+                    press.key === Keys.S ||
+                    press.key === Keys.D
                 ) {
                     console.log("Movement blocked during chat");
                     return;
@@ -159,7 +159,7 @@ export default class You extends Actor {
             }
 
             // Return to city selection menu on Escape key
-            if (press.key === Input.Keys.Escape) {
+            if (press.key === Keys.Escape) {
                 console.log(
                     "Escape key pressed - fading out audio and returning to city selection menu"
                 );
