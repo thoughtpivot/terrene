@@ -12,9 +12,9 @@ import {
     Rectangle,
 } from "excalibur";
 
-import { TiledMapResource } from "@excaliburjs/plugin-tiled";
+import { TiledResource } from "@excaliburjs/plugin-tiled";
 
-// const tiledMapResource = new TiledMapResource("./cities/Craydon/Craydon.json");
+// const tiledMapResource = new TiledResource("./cities/Craydon/Craydon.json");
 
 import Navosah, {
     Resources as NovosahResources,

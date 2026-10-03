@@ -200,31 +200,31 @@ export default class Birdee extends Actor {
         const compositeGraphic = new GraphicsGroup({
             members: [
                 // Tail (back layer)
-                { graphic: tailFeather1, pos: vec(12, 0) },
-                { graphic: tailFeather2, pos: vec(14, -1) },
-                { graphic: tailFeather3, pos: vec(16, -2) },
+                { graphic: tailFeather1, offset: vec(12, 0) },
+                { graphic: tailFeather2, offset: vec(14, -1) },
+                { graphic: tailFeather3, offset: vec(16, -2) },
 
                 // Body (middle layer)
-                { graphic: mainBody, pos: vec(0, 2) },
-                { graphic: bodyShading, pos: vec(0, 4) },
-                { graphic: head, pos: vec(-4, -4) },
+                { graphic: mainBody, offset: vec(0, 2) },
+                { graphic: bodyShading, offset: vec(0, 4) },
+                { graphic: head, offset: vec(-4, -4) },
 
                 // Wings (FRONT layer - most visible!)
-                { graphic: leftWingBase, pos: vec(-12, -3) },
-                { graphic: rightWingBase, pos: vec(12, -3) },
-                { graphic: leftWingFeather1, pos: vec(-11, -6) },
-                { graphic: leftWingFeather2, pos: vec(-10, -2) },
-                { graphic: leftWingFeather3, pos: vec(-9, 2) },
-                { graphic: rightWingFeather1, pos: vec(11, -6) },
-                { graphic: rightWingFeather2, pos: vec(10, -2) },
-                { graphic: rightWingFeather3, pos: vec(9, 2) },
+                { graphic: leftWingBase, offset: vec(-12, -3) },
+                { graphic: rightWingBase, offset: vec(12, -3) },
+                { graphic: leftWingFeather1, offset: vec(-11, -6) },
+                { graphic: leftWingFeather2, offset: vec(-10, -2) },
+                { graphic: leftWingFeather3, offset: vec(-9, 2) },
+                { graphic: rightWingFeather1, offset: vec(11, -6) },
+                { graphic: rightWingFeather2, offset: vec(10, -2) },
+                { graphic: rightWingFeather3, offset: vec(9, 2) },
 
                 // Face details (top layer)
-                { graphic: beak, pos: vec(-8, -4) },
-                { graphic: leftEye, pos: vec(-6, -6) },
-                { graphic: rightEye, pos: vec(-2, -6) },
-                { graphic: leftEyeHighlight, pos: vec(-5.5, -6.5) },
-                { graphic: rightEyeHighlight, pos: vec(-1.5, -6.5) },
+                { graphic: beak, offset: vec(-8, -4) },
+                { graphic: leftEye, offset: vec(-6, -6) },
+                { graphic: rightEye, offset: vec(-2, -6) },
+                { graphic: leftEyeHighlight, offset: vec(-5.5, -6.5) },
+                { graphic: rightEyeHighlight, offset: vec(-1.5, -6.5) },
             ],
         });
 
@@ -276,46 +276,52 @@ export default class Birdee extends Actor {
             console.log("🐦 Wings down position");
 
             // Find and update wing positions in the members array
-            members.forEach((member, index) => {
+            members.forEach((member) => {
+                if (!("offset" in member)) {
+                    return;
+                }
                 if (member.graphic === this.leftWing) {
-                    member.pos = vec(-10, -1); // Move down and inward
+                    member.offset = vec(-10, -1); // Move down and inward
                 } else if (member.graphic === this.rightWing) {
-                    member.pos = vec(10, -1);
+                    member.offset = vec(10, -1);
                 } else if (member.graphic === this.leftWingFeathers[0]) {
-                    member.pos = vec(-9, -4);
+                    member.offset = vec(-9, -4);
                 } else if (member.graphic === this.leftWingFeathers[1]) {
-                    member.pos = vec(-8, 0);
+                    member.offset = vec(-8, 0);
                 } else if (member.graphic === this.leftWingFeathers[2]) {
-                    member.pos = vec(-7, 4);
+                    member.offset = vec(-7, 4);
                 } else if (member.graphic === this.rightWingFeathers[0]) {
-                    member.pos = vec(9, -4);
+                    member.offset = vec(9, -4);
                 } else if (member.graphic === this.rightWingFeathers[1]) {
-                    member.pos = vec(8, 0);
+                    member.offset = vec(8, 0);
                 } else if (member.graphic === this.rightWingFeathers[2]) {
-                    member.pos = vec(7, 4);
+                    member.offset = vec(7, 4);
                 }
             });
         } else {
             // Wings up position (flapping) - move wings up and outward
             console.log("🐦 Wings up position");
 
-            members.forEach((member, index) => {
+            members.forEach((member) => {
+                if (!("offset" in member)) {
+                    return;
+                }
                 if (member.graphic === this.leftWing) {
-                    member.pos = vec(-14, -5); // Move up and outward
+                    member.offset = vec(-14, -5); // Move up and outward
                 } else if (member.graphic === this.rightWing) {
-                    member.pos = vec(14, -5);
+                    member.offset = vec(14, -5);
                 } else if (member.graphic === this.leftWingFeathers[0]) {
-                    member.pos = vec(-13, -8);
+                    member.offset = vec(-13, -8);
                 } else if (member.graphic === this.leftWingFeathers[1]) {
-                    member.pos = vec(-12, -4);
+                    member.offset = vec(-12, -4);
                 } else if (member.graphic === this.leftWingFeathers[2]) {
-                    member.pos = vec(-11, 0);
+                    member.offset = vec(-11, 0);
                 } else if (member.graphic === this.rightWingFeathers[0]) {
-                    member.pos = vec(13, -8);
+                    member.offset = vec(13, -8);
                 } else if (member.graphic === this.rightWingFeathers[1]) {
-                    member.pos = vec(12, -4);
+                    member.offset = vec(12, -4);
                 } else if (member.graphic === this.rightWingFeathers[2]) {
-                    member.pos = vec(11, 0);
+                    member.offset = vec(11, 0);
                 }
             });
         }
