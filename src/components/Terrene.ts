@@ -52,7 +52,7 @@ class MainMenu extends Scene {
 class Terrene extends Engine {
     constructor() {
         super({
-            displayMode: DisplayMode.FitScreen,
+            displayMode: DisplayMode.FitScreenAndFill,
             maxFps: 30,
             pointerScope: PointerScope.Canvas,
             antialiasing: false,
@@ -61,7 +61,7 @@ class Terrene extends Engine {
             suppressConsoleBootMessage: true,
             suppressHiDPIScaling: false,
             width: 960,
-            height: 480,
+            height: 540,
         });
     }
 
