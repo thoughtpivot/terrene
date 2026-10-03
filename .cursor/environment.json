@@ -1,0 +1,4 @@
+{
+  "install": "source ~/.nvm/nvm.sh\nnvm install 16\nnvm use 16\nnpm install",
+  "start": "docker compose up -d redis-stack"
+}
