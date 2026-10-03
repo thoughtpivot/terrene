@@ -1,0 +1,11 @@
+---
+description: Commits use Dan Stephenson and never include a Cursor co-author trailer
+alwaysApply: true
+---
+
+# Git author
+
+- Author every commit as **Dan Stephenson** `<ispyhumanfly@gmail.com>`.
+- Do not replace that identity with the agent account.
+- Never add a `Co-authored-by` trailer for Cursor, Cursor Agent, or any Cursor account to commits, pull requests, or commit-message templates.
+- If a tool or hook inserts a Cursor co-author trailer, remove it before the commit is created.
