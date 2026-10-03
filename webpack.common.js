@@ -52,7 +52,8 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebPackPlugin({
-      title: "@thoughtpivot/terrene",
+      title: "Terrene - A 2D RPG Adventure",
+      template: "./src/index.html",
     }),
     new CopyPlugin({  patterns: [{ from: "src/**/*",  to: "[name][ext]]" }]}),
     new webpack.DefinePlugin({

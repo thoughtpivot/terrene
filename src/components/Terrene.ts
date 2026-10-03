@@ -43,6 +43,7 @@ import { Resources as DonutResources } from "./items/food/Donut/Donut";
 import { Resources as LorcRPGResources } from "./items/LorcRPG/LorcRPG";
 import Baston from "./cities/Baston/Baston";
 import TheWoods from "./cities/TheWoods/TheWoods";
+import Eldergrove from "./cities/Eldergrove/Eldergrove";
 
 class MainMenu extends Scene {
     onInitialize(_engine: Engine): void {}
@@ -51,7 +52,7 @@ class MainMenu extends Scene {
 class Terrene extends Engine {
     constructor() {
         super({
-            displayMode: DisplayMode.FitScreen,
+            displayMode: DisplayMode.FitScreenAndFill,
             maxFps: 30,
             pointerScope: PointerScope.Canvas,
             antialiasing: false,
@@ -60,7 +61,7 @@ class Terrene extends Engine {
             suppressConsoleBootMessage: true,
             suppressHiDPIScaling: false,
             width: 960,
-            height: 480,
+            height: 540,
         });
     }
 
@@ -169,6 +170,7 @@ class Terrene extends Engine {
                 { name: "Breaze", scene: new Breaze() },
                 { name: "Baston", scene: new Baston() },
                 { name: "TheWoods", scene: new TheWoods() },
+                { name: "Eldergrove", scene: new Eldergrove() },
             ];
 
             cities.forEach((city, index) => {
