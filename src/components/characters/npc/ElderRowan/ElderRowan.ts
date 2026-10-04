@@ -14,6 +14,12 @@ import ElderRowanImage from "./ElderRowan.png";
 
 export default class ElderRowan extends Actor implements DialogueNPC {
     private hasInteracted: boolean = false;
+    private homePosition: Vector;
+    private wanderRadius: number = 60;
+    private movementTimer: number = 0;
+    private movementInterval: number = 3000; // Change direction every 3 seconds
+    private currentDirection: Vector = vec(0, 0);
+    private movementSpeed: number = 20;
 
     constructor(position: Vector) {
         super({
@@ -21,9 +27,10 @@ export default class ElderRowan extends Actor implements DialogueNPC {
             width: 16,
             height: 16,
             scale: vec(2.5, 2.5),
-            collisionType: CollisionType.Fixed,
+            collisionType: CollisionType.Active,
             name: "ElderRowan",
         });
+        this.homePosition = position.clone();
     }
 
     onInitialize(engine: Engine) {
@@ -285,6 +292,40 @@ export default class ElderRowan extends Actor implements DialogueNPC {
 
     onPreUpdate(engine: Engine, delta: number): void {
         super.onPreUpdate(engine, delta);
+        
+        // Slow wandering movement
+        this.movementTimer += delta;
+        
+        if (this.movementTimer >= this.movementInterval) {
+            this.movementTimer = 0;
+            
+            // Randomly choose to move or stand still
+            if (Math.random() > 0.3) {
+                // Pick a random direction
+                const angle = Math.random() * Math.PI * 2;
+                this.currentDirection = vec(Math.cos(angle), Math.sin(angle));
+            } else {
+                // Stand still
+                this.currentDirection = vec(0, 0);
+            }
+        }
+        
+        // Apply movement
+        if (!this.currentDirection.equals(vec(0, 0))) {
+            const newPos = this.pos.add(this.currentDirection.scale(this.movementSpeed * (delta / 1000)));
+            
+            // Keep within wander radius of home position
+            const distanceFromHome = newPos.distance(this.homePosition);
+            if (distanceFromHome < this.wanderRadius) {
+                this.vel = this.currentDirection.scale(this.movementSpeed);
+            } else {
+                // Turn back towards home
+                const directionHome = this.homePosition.sub(this.pos).normalize();
+                this.vel = directionHome.scale(this.movementSpeed);
+            }
+        } else {
+            this.vel = vec(0, 0);
+        }
         
         // Update quest indicator
         const questSystem = getQuestSystem(engine);
