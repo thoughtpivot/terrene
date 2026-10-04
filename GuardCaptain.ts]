@@ -14,6 +14,12 @@ import GuardCaptainImage from "./GuardCaptain.png";
 
 export default class GuardCaptain extends Actor implements DialogueNPC {
     private talkedAboutRuins: boolean = false;
+    private patrolPoints: Vector[] = [];
+    private currentPatrolIndex: number = 0;
+    private patrolSpeed: number = 30;
+    private waitTimer: number = 0;
+    private waitDuration: number = 2000; // Wait 2 seconds at each point
+    private isWaiting: boolean = false;
 
     constructor(position: Vector) {
         super({
@@ -21,9 +27,17 @@ export default class GuardCaptain extends Actor implements DialogueNPC {
             width: 16,
             height: 16,
             scale: vec(2.5, 2.5),
-            collisionType: CollisionType.Fixed,
+            collisionType: CollisionType.Active,
             name: "GuardCaptain",
         });
+        
+        // Set up patrol route
+        this.patrolPoints = [
+            position.clone(),
+            position.add(vec(80, 0)),
+            position.add(vec(80, 80)),
+            position.add(vec(0, 80)),
+        ];
     }
 
     onInitialize(engine: Engine) {
@@ -115,6 +129,32 @@ export default class GuardCaptain extends Actor implements DialogueNPC {
 
     onPreUpdate(engine: Engine, delta: number): void {
         super.onPreUpdate(engine, delta);
+        
+        // Patrol behavior
+        if (this.isWaiting) {
+            this.waitTimer += delta;
+            this.vel = vec(0, 0);
+            
+            if (this.waitTimer >= this.waitDuration) {
+                this.isWaiting = false;
+                this.waitTimer = 0;
+                this.currentPatrolIndex = (this.currentPatrolIndex + 1) % this.patrolPoints.length;
+            }
+        } else {
+            const targetPoint = this.patrolPoints[this.currentPatrolIndex];
+            const direction = targetPoint.sub(this.pos);
+            const distance = direction.size;
+            
+            if (distance < 5) {
+                // Reached patrol point, start waiting
+                this.isWaiting = true;
+                this.vel = vec(0, 0);
+            } else {
+                // Move towards patrol point
+                const normalized = direction.normalize();
+                this.vel = normalized.scale(this.patrolSpeed);
+            }
+        }
         
         const questSystem = getQuestSystem(engine);
         questSystem.updateQuestIndicatorPosition(this);

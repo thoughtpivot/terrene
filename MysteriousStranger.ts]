@@ -14,6 +14,10 @@ import MysteriousStrangerImage from "./MysteriousStranger.png";
 
 export default class MysteriousStranger extends Actor implements DialogueNPC {
     private hasRevealed: boolean = false;
+    private pacePoints: Vector[] = [];
+    private currentPaceIndex: number = 0;
+    private paceSpeed: number = 15;
+    private isMoving: boolean = true;
 
     constructor(position: Vector) {
         super({
@@ -21,9 +25,15 @@ export default class MysteriousStranger extends Actor implements DialogueNPC {
             width: 16,
             height: 16,
             scale: vec(2.5, 2.5),
-            collisionType: CollisionType.Fixed,
+            collisionType: CollisionType.Active,
             name: "MysteriousStranger",
         });
+        
+        // Set up a simple back-and-forth pacing pattern
+        this.pacePoints = [
+            position.clone(),
+            position.add(vec(-40, 0)),
+        ];
     }
 
     onInitialize(engine: Engine) {
@@ -152,6 +162,21 @@ export default class MysteriousStranger extends Actor implements DialogueNPC {
 
     onPreUpdate(engine: Engine, delta: number): void {
         super.onPreUpdate(engine, delta);
+        
+        // Slow pacing movement (mysterious and brooding)
+        const targetPoint = this.pacePoints[this.currentPaceIndex];
+        const direction = targetPoint.sub(this.pos);
+        const distance = direction.size;
+        
+        if (distance < 2) {
+            // Reached point, switch direction
+            this.currentPaceIndex = (this.currentPaceIndex + 1) % this.pacePoints.length;
+            this.vel = vec(0, 0);
+        } else {
+            // Move slowly towards point
+            const normalized = direction.normalize();
+            this.vel = normalized.scale(this.paceSpeed);
+        }
         
         const questSystem = getQuestSystem(engine);
         questSystem.updateQuestIndicatorPosition(this);
