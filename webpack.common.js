@@ -55,7 +55,15 @@ module.exports = {
       title: "Terrene - A 2D RPG Adventure",
       template: "./src/index.html",
     }),
-    new CopyPlugin({  patterns: [{ from: "src/**/*",  to: "[name][ext]]" }]}),
+    new CopyPlugin({
+      patterns: [{
+        from: "src/**/*",
+        to: "[name][ext]",
+        globOptions: {
+          ignore: ["**/*.html", "**/*.ts", "**/*.js"]
+        }
+      }]
+    }),
     new webpack.DefinePlugin({
       'process.env.AWS_REGION': JSON.stringify(process.env.AWS_REGION || 'us-east-1'),
       'process.env.AWS_ACCESS_KEY_ID': JSON.stringify(process.env.AWS_ACCESS_KEY_ID),
