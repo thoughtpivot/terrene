@@ -431,7 +431,9 @@ export class ChatSystem {
 
         if (this.speakerText && this.messageText && this.chatUI) {
             this.speakerText.text = this.currentMessage.speaker + ":";
-            this.messageText.text = this.currentMessage.text;
+            // Wrap text to fit within chat box (accounting for padding)
+            const maxTextWidth = this.chatUI.width - 100; // Leave padding on both sides
+            this.messageText.text = this.wrapText(this.currentMessage.text, maxTextWidth);
 
             // Position speaker text
             this.currentSpeakerActor = new Actor({
@@ -637,7 +639,9 @@ export class ChatSystem {
         // Update UI with new message
         if (this.speakerText && this.messageText && this.chatUI) {
             this.speakerText.text = this.currentMessage.speaker + ":";
-            this.messageText.text = this.currentMessage.text;
+            // Wrap text to fit within chat box (accounting for padding)
+            const maxTextWidth = this.chatUI.width - 100; // Leave padding on both sides
+            this.messageText.text = this.wrapText(this.currentMessage.text, maxTextWidth);
 
             // Position speaker text in the upper portion of the chat box, well inside the border
             this.currentSpeakerActor = new Actor({
@@ -686,6 +690,30 @@ export class ChatSystem {
         const baseTime = 2000;
         const perCharTime = 50;
         return Math.max(baseTime, text.length * perCharTime);
+    }
+
+    private wrapText(text: string, maxWidth: number): string {
+        const words = text.split(' ');
+        const lines: string[] = [];
+        let currentLine = '';
+
+        words.forEach(word => {
+            // Rough character width estimation (average 8 pixels per character at size 15)
+            const estimatedWidth = (currentLine + word).length * 8;
+            
+            if (estimatedWidth > maxWidth && currentLine.length > 0) {
+                lines.push(currentLine.trim());
+                currentLine = word + ' ';
+            } else {
+                currentLine += word + ' ';
+            }
+        });
+
+        if (currentLine.trim().length > 0) {
+            lines.push(currentLine.trim());
+        }
+
+        return lines.join('\n');
     }
 
     private endChat(): void {
