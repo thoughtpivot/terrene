@@ -431,9 +431,8 @@ export class ChatSystem {
 
         if (this.speakerText && this.messageText && this.chatUI) {
             this.speakerText.text = this.currentMessage.speaker + ":";
-            // Wrap text to fit within chat box (accounting for padding)
-            const maxTextWidth = this.chatUI.width - 100; // Leave padding on both sides
-            this.messageText.text = this.wrapText(this.currentMessage.text, maxTextWidth);
+            // Set text directly - maxWidth is already configured on the Text object
+            this.messageText.text = this.currentMessage.text;
 
             // Position speaker text
             this.currentSpeakerActor = new Actor({
@@ -589,6 +588,7 @@ export class ChatSystem {
                 size: 15, // Slightly larger for better readability
                 unit: FontUnit.Px,
             }),
+            maxWidth: chatWidth - 100, // Set max width to prevent overflow
         });
     }
 
@@ -639,9 +639,8 @@ export class ChatSystem {
         // Update UI with new message
         if (this.speakerText && this.messageText && this.chatUI) {
             this.speakerText.text = this.currentMessage.speaker + ":";
-            // Wrap text to fit within chat box (accounting for padding)
-            const maxTextWidth = this.chatUI.width - 100; // Leave padding on both sides
-            this.messageText.text = this.wrapText(this.currentMessage.text, maxTextWidth);
+            // Set text directly - maxWidth is already configured on the Text object
+            this.messageText.text = this.currentMessage.text;
 
             // Position speaker text in the upper portion of the chat box, well inside the border
             this.currentSpeakerActor = new Actor({
