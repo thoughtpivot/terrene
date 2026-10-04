@@ -16,6 +16,7 @@ import YouImage from "./You.png";
 import Sword from "../../../items/weapons/Sword";
 import { getChatSystem } from "../../../../common/ChatSystem";
 import { DialogueNPC } from "../../../../common/DialogueNPC";
+import { getQuestLogUI } from "../../../../common/QuestLogUI";
 
 export default class You extends Actor {
     private isSwinging: boolean = false;
@@ -95,6 +96,19 @@ export default class You extends Actor {
         engine.input.keyboard.on("press", (press) => {
             console.log("Key pressed:", press.key, "Key code:", press.key);
 
+            // Q key for quest log
+            if (press.key === Input.Keys.Q) {
+                const questLogUI = getQuestLogUI(engine);
+                questLogUI.toggle();
+                
+                // Stop movement when opening quest log
+                if (questLogUI.getIsVisible()) {
+                    this.isMovingToTarget = false;
+                    this.targetPosition = null;
+                }
+                return;
+            }
+
             if (press.key === Input.Keys.Space) {
                 // Stop automatic movement when using space to skip
                 this.isMovingToTarget = false;
@@ -133,18 +147,21 @@ export default class You extends Actor {
 
             // Arrow keys for chat navigation when chat is active
             const chatSystem = getChatSystem(engine);
-            if (chatSystem.getIsActive()) {
-                if (press.key === Input.Keys.Right) {
+            const questLogUI = getQuestLogUI(engine);
+            
+            // Block movement if chat or quest log is open
+            if (chatSystem.getIsActive() || questLogUI.getIsVisible()) {
+                if (press.key === Input.Keys.Right && chatSystem.getIsActive()) {
                     console.log("*** RIGHT ARROW DETECTED IN CHAT ***");
                     chatSystem.navigateToNextMessage();
                     return; // Don't process other movement when in chat
                 }
-                if (press.key === Input.Keys.Left) {
+                if (press.key === Input.Keys.Left && chatSystem.getIsActive()) {
                     console.log("*** LEFT ARROW DETECTED IN CHAT ***");
                     chatSystem.navigateToPreviousMessage();
                     return; // Don't process other movement when in chat
                 }
-                // Block all other movement when in chat
+                // Block all other movement when in chat or quest log
                 if (
                     press.key === Input.Keys.Up ||
                     press.key === Input.Keys.Down ||
@@ -153,7 +170,7 @@ export default class You extends Actor {
                     press.key === Input.Keys.S ||
                     press.key === Input.Keys.D
                 ) {
-                    console.log("Movement blocked during chat");
+                    console.log("Movement blocked during chat or quest log");
                     return;
                 }
             }
