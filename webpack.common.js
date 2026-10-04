@@ -58,7 +58,6 @@ module.exports = {
     new CopyPlugin({
       patterns: [{
         from: "src/**/*",
-        to: "[name][ext]",
         globOptions: {
           ignore: ["**/*.html", "**/*.ts", "**/*.js"]
         }
