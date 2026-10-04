@@ -72,9 +72,9 @@ export default class Eldergrove extends Scene {
         // Set up NPC interaction system
         this.setupInteractionSystem(engine);
 
-        // Setup camera to follow player with zoom
-        this.camera.zoom = 2;
-        this.camera.strategy.elasticToActor(this.player, 0.8, 0.9);
+            // Setup camera to follow player with zoom
+            this.camera.zoom = 1.5;
+            this.camera.strategy.elasticToActor(this.player, 0.8, 0.9);
 
         console.log("*** ELDERGROVE SCENE INITIALIZED ***");
     }
