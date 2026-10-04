@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GitHub Pages Test</title>
+</head>
+<body>
+    <h1>Path Resolution Test</h1>
+    <div id="results"></div>
+    <script>
+        const results = document.getElementById('results');
+        
+        // Test 1: Can we access the TMX?
+        fetch('./src/components/cities/Eldergrove/Eldergrove.tmx')
+            .then(r => r.ok ? 'TMX: ✅ OK' : 'TMX: ❌ ' + r.status)
+            .then(msg => {
+                results.innerHTML += `<p>${msg}</p>`;
+            });
+        
+        // Test 2: Can we access the tileset from root?
+        fetch('./src/assets/roguelike-pack/Spritesheet/roguelikeSheet_transparent.png')
+            .then(r => r.ok ? 'Tileset from root: ✅ OK' : 'Tileset from root: ❌ ' + r.status)
+            .then(msg => {
+                results.innerHTML += `<p>${msg}</p>`;
+            });
+        
+        // Test 3: What about the relative path from TMX location?
+        // From /src/components/cities/Eldergrove/ going ../../../assets/
+        const base = 'https://thoughtpivot.github.io/terrene/src/components/cities/Eldergrove/';
+        const relativePath = '../../../assets/roguelike-pack/Spritesheet/roguelikeSheet_transparent.png';
+        const resolvedURL = new URL(relativePath, base).href;
+        
+        results.innerHTML += `<p>Resolved path: ${resolvedURL}</p>`;
+        
+        fetch(resolvedURL)
+            .then(r => r.ok ? 'Relative path resolution: ✅ OK' : 'Relative path resolution: ❌ ' + r.status)
+            .then(msg => {
+                results.innerHTML += `<p>${msg}</p>`;
+            });
+    </script>
+</body>
+</html>
