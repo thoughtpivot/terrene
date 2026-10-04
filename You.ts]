@@ -31,7 +31,7 @@ export default class You extends Actor {
             pos: vec(300, 300),
             width: 16,
             height: 16,
-            scale: vec(1, 1),
+            scale: vec(2.5, 2.5),
             collisionType: CollisionType.Active,
         });
     }
