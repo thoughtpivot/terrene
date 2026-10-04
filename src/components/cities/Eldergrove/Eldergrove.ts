@@ -21,7 +21,7 @@ import { getDialogueFromNPC } from "../../../common/DialogueUtils";
 import { getQuestSystem } from "../../../common/QuestSystem";
 
 const tiledMapResource = new TiledMapResource(
-    "./src/components/cities/Eldergrove/Eldergrove.tmx",
+    "./components/cities/Eldergrove/Eldergrove.tmx",
     {
         startingLayerZIndex: -2,
     }
