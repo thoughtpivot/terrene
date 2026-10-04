@@ -140,6 +140,9 @@ export default class ElderRowan extends Actor implements DialogueNPC {
         // Quest 2 completion
         if (shadowsQuest && shadowsQuest.status === QuestStatus.InProgress && 
             shadowsQuest.objectives.every(obj => obj.completed)) {
+            // Complete the quest
+            questSystem.completeQuest("shadows_gathering");
+            
             return [
                 {
                     speaker: "Elder Rowan",
@@ -160,6 +163,11 @@ export default class ElderRowan extends Actor implements DialogueNPC {
                     speaker: "Elder Rowan",
                     text: "I sense our journey together is only beginning, brave traveler.",
                     duration: 3500,
+                },
+                {
+                    speaker: "System",
+                    text: "Quest completed: Shadows Gathering! (+250 XP, +100 Gold, Elder's Blessing, Shadow Ward Charm)",
+                    duration: 4000,
                 },
             ];
         }
@@ -182,6 +190,9 @@ export default class ElderRowan extends Actor implements DialogueNPC {
         
         // Quest 2 available (Quest 1 completed)
         if (questSystem.isQuestAvailable("shadows_gathering")) {
+            // Automatically start the second quest
+            questSystem.startQuest("shadows_gathering");
+            
             return [
                 {
                     speaker: "Elder Rowan",
@@ -198,12 +209,20 @@ export default class ElderRowan extends Actor implements DialogueNPC {
                     text: "I fear they may be drawn to the heirloom's power. Will you investigate?",
                     duration: 4000,
                 },
+                {
+                    speaker: "System",
+                    text: "Quest accepted: Shadows Gathering (Press Q to view Quest Log)",
+                    duration: 3000,
+                },
             ];
         }
         
         // Quest 1 completion
         if (lostHeirloomQuest && lostHeirloomQuest.status === QuestStatus.InProgress &&
             lostHeirloomQuest.objectives.every(obj => obj.completed)) {
+            // Complete the quest
+            questSystem.completeQuest("lost_heirloom");
+            
             return [
                 {
                     speaker: "Elder Rowan",
@@ -219,6 +238,11 @@ export default class ElderRowan extends Actor implements DialogueNPC {
                     speaker: "Elder Rowan",
                     text: "You've done well, traveler. Your reward is well-earned.",
                     duration: 3000,
+                },
+                {
+                    speaker: "System",
+                    text: "Quest completed: The Lost Heirloom! (+100 XP, +50 Gold, Ancient Map Fragment)",
+                    duration: 3500,
                 },
             ];
         }
@@ -242,6 +266,10 @@ export default class ElderRowan extends Actor implements DialogueNPC {
         // First meeting - Quest 1 available
         if (!this.hasInteracted) {
             this.hasInteracted = true;
+            
+            // Automatically start the quest
+            questSystem.startQuest("lost_heirloom");
+            
             return [
                 {
                     speaker: "Elder Rowan",
@@ -261,6 +289,11 @@ export default class ElderRowan extends Actor implements DialogueNPC {
                 {
                     speaker: "Elder Rowan",
                     text: "Would you help an old man recover what was lost?",
+                    duration: 3000,
+                },
+                {
+                    speaker: "System",
+                    text: "Quest accepted: The Lost Heirloom (Press Q to view Quest Log)",
                     duration: 3000,
                 },
             ];
