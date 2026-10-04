@@ -9,7 +9,6 @@ import {
     ImageFiltering,
     BoundingBox,
     Vector,
-    Loader,
     Rectangle,
     Text,
     Font,
@@ -47,57 +46,50 @@ export default class Eldergrove extends Scene {
     onInitialize(engine: Engine): void {
         console.log("*** ELDERGROVE SCENE INITIALIZING ***");
 
-        const loader = new Loader([
-            ElderRowanResources.Image,
-            GuardCaptainResources.Image,
-            MysteriousStrangerResources.Image,
-        ]);
+        // Resources are already loaded in main Terrene loader
+        console.log("Eldergrove scene loaded");
 
-        engine.start(loader).then(() => {
-            console.log("Eldergrove scene loaded");
+        // Set scene dimensions
+        this.camera.strategy.limitCameraBounds(
+            new BoundingBox({
+                left: 0,
+                top: 0,
+                right: 1536,
+                bottom: 1024,
+            })
+        );
 
-            // Set scene dimensions
-            this.camera.strategy.limitCameraBounds(
-                new BoundingBox({
-                    left: 0,
-                    top: 0,
-                    right: 1536,
-                    bottom: 1024,
-                })
-            );
+        // Create background
+        this.createBackground();
 
-            // Create background
-            this.createBackground();
+        // Create simple collision boundaries
+        this.createSimpleBoundaries();
 
-            // Create simple collision boundaries
-            this.createSimpleBoundaries();
+        // Create player
+        this.player = new You();
+        this.player.pos = vec(768, 800); // Start near bottom center
+        this.add(this.player);
 
-            // Create player
-            this.player = new You();
-            this.player.pos = vec(768, 800); // Start near bottom center
-            this.add(this.player);
+        // Create NPCs
+        this.elderRowan = new ElderRowan(vec(768, 400)); // Center of village
+        this.add(this.elderRowan);
 
-            // Create NPCs
-            this.elderRowan = new ElderRowan(vec(768, 400)); // Center of village
-            this.add(this.elderRowan);
+        this.guardCaptain = new GuardCaptain(vec(600, 500)); // Near village entrance
+        this.add(this.guardCaptain);
 
-            this.guardCaptain = new GuardCaptain(vec(600, 500)); // Near village entrance
-            this.add(this.guardCaptain);
+        this.mysteriousStranger = new MysteriousStranger(vec(950, 600)); // By the old well
+        this.add(this.mysteriousStranger);
 
-            this.mysteriousStranger = new MysteriousStranger(vec(950, 600)); // By the old well
-            this.add(this.mysteriousStranger);
+        // Create quest interaction markers
+        this.createQuestMarkers();
 
-            // Create quest interaction markers
-            this.createQuestMarkers();
+        // Set up NPC interaction system
+        this.setupInteractionSystem(engine);
 
-            // Set up NPC interaction system
-            this.setupInteractionSystem(engine);
+        // Focus camera on player
+        this.camera.strategy.lockToActor(this.player);
 
-            // Focus camera on player
-            this.camera.strategy.lockToActor(this.player);
-
-            console.log("*** ELDERGROVE SCENE INITIALIZED ***");
-        });
+        console.log("*** ELDERGROVE SCENE INITIALIZED ***");
     }
 
     private createBackground(): void {
