@@ -44,9 +44,6 @@ import { Resources as LorcRPGResources } from "./items/LorcRPG/LorcRPG";
 import Baston from "./cities/Baston/Baston";
 import TheWoods from "./cities/TheWoods/TheWoods";
 import Eldergrove from "./cities/Eldergrove/Eldergrove";
-import { Resources as ElderRowanResources } from "./characters/npc/ElderRowan/ElderRowan";
-import { Resources as GuardCaptainResources } from "./characters/npc/GuardCaptain/GuardCaptain";
-import { Resources as MysteriousStrangerResources } from "./characters/npc/MysteriousStranger/MysteriousStranger";
 
 class MainMenu extends Scene {
     onInitialize(_engine: Engine): void {}
@@ -101,10 +98,7 @@ class Terrene extends Engine {
             LorcRPGResources.AsepriteResource,
             BreazeResources.Image,
             BreazeResources.AsepriteResource,
-            // Eldergrove NPCs
-            ElderRowanResources.Image,
-            GuardCaptainResources.Image,
-            MysteriousStrangerResources.Image,
+            // Eldergrove NPCs are now loaded by the scene itself
         ]);
 
         this.start(loader).then(() => {
