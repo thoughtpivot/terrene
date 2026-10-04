@@ -4,7 +4,6 @@ import {
     Color,
     vec,
     Actor,
-    Loader,
     Vector,
     Text,
     Font,
@@ -14,11 +13,8 @@ import {
 import { TiledMapResource } from "@excaliburjs/plugin-tiled";
 import You from "../../characters/player/You/You";
 import ElderRowan from "../../characters/npc/ElderRowan/ElderRowan";
-import { Resources as ElderRowanResources } from "../../characters/npc/ElderRowan/ElderRowan";
 import GuardCaptain from "../../characters/npc/GuardCaptain/GuardCaptain";
-import { Resources as GuardCaptainResources } from "../../characters/npc/GuardCaptain/GuardCaptain";
 import MysteriousStranger from "../../characters/npc/MysteriousStranger/MysteriousStranger";
-import { Resources as MysteriousStrangerResources } from "../../characters/npc/MysteriousStranger/MysteriousStranger";
 import { DialogueNPC } from "../../../common/DialogueNPC";
 import { getChatSystem } from "../../../common/ChatSystem";
 import { getDialogueFromNPC } from "../../../common/DialogueUtils";
@@ -30,6 +26,8 @@ const tiledMapResource = new TiledMapResource(
         startingLayerZIndex: -2,
     }
 );
+
+export { tiledMapResource };
 
 export default class Eldergrove extends Scene {
     private player!: You;
@@ -49,47 +47,36 @@ export default class Eldergrove extends Scene {
     onInitialize(engine: Engine): void {
         console.log("*** ELDERGROVE SCENE INITIALIZING ***");
 
-        // Load tiled map and NPC resources
-        const loader = new Loader([
-            tiledMapResource,
-            ElderRowanResources.Image,
-            GuardCaptainResources.Image,
-            MysteriousStrangerResources.Image,
-        ]);
-        
-        engine.start(loader).then(() => {
-            console.log("Eldergrove tiled map loaded");
-            
-            // Add the tiled map to the scene
-            tiledMapResource.addTiledMapToScene(this);
+        // Add the tiled map directly to the scene
+        tiledMapResource.addTiledMapToScene(this);
+        console.log("Eldergrove tiled map added to scene");
 
-            // Create player
-            this.player = new You();
-            this.player.pos = vec(640, 800); // Start near bottom center
-            this.add(this.player);
+        // Create player
+        this.player = new You();
+        this.player.pos = vec(640, 800); // Start near bottom center
+        this.add(this.player);
 
-            // Create NPCs (positioned on the tiled map)
-            this.elderRowan = new ElderRowan(vec(640, 480)); // Center of village
-            this.add(this.elderRowan);
+        // Create NPCs (positioned on the tiled map)
+        this.elderRowan = new ElderRowan(vec(640, 480)); // Center of village
+        this.add(this.elderRowan);
 
-            this.guardCaptain = new GuardCaptain(vec(480, 520)); // Near village entrance
-            this.add(this.guardCaptain);
+        this.guardCaptain = new GuardCaptain(vec(480, 520)); // Near village entrance
+        this.add(this.guardCaptain);
 
-            this.mysteriousStranger = new MysteriousStranger(vec(800, 560)); // By the old well
-            this.add(this.mysteriousStranger);
+        this.mysteriousStranger = new MysteriousStranger(vec(800, 560)); // By the old well
+        this.add(this.mysteriousStranger);
 
-            // Create quest interaction markers
-            this.createQuestMarkers();
+        // Create quest interaction markers
+        this.createQuestMarkers();
 
-            // Set up NPC interaction system
-            this.setupInteractionSystem(engine);
+        // Set up NPC interaction system
+        this.setupInteractionSystem(engine);
 
-            // Setup camera to follow player with zoom
-            this.camera.zoom = 2;
-            this.camera.strategy.elasticToActor(this.player, 0.8, 0.9);
+        // Setup camera to follow player with zoom
+        this.camera.zoom = 2;
+        this.camera.strategy.elasticToActor(this.player, 0.8, 0.9);
 
-            console.log("*** ELDERGROVE SCENE INITIALIZED ***");
-        });
+        console.log("*** ELDERGROVE SCENE INITIALIZED ***");
     }
 
     private createQuestMarkers(): void {

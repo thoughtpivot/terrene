@@ -43,7 +43,7 @@ import { Resources as DonutResources } from "./items/food/Donut/Donut";
 import { Resources as LorcRPGResources } from "./items/LorcRPG/LorcRPG";
 import Baston from "./cities/Baston/Baston";
 import TheWoods from "./cities/TheWoods/TheWoods";
-import Eldergrove from "./cities/Eldergrove/Eldergrove";
+import Eldergrove, { tiledMapResource as EldergroveMap } from "./cities/Eldergrove/Eldergrove";
 
 class MainMenu extends Scene {
     onInitialize(_engine: Engine): void {}
@@ -82,6 +82,7 @@ class Terrene extends Engine {
 
         const loader = new Loader([
             // tiledMapResource,
+            EldergroveMap,
             NovosahResources.Image,
             OldManSamResources.Image,
             SallyResources.Image,
