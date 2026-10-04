@@ -1,6 +1,16 @@
 # Generated files
 dist/
 .env
+
+# Build artifacts (should only be in dist/)
+/*.png
+/*.js
+/*.js.LICENSE.txt
+/*.js.map
+/main.ts
+/index.html
+/*]
+
 # Logs
 logs
 *.log
