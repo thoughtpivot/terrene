@@ -142,7 +142,15 @@ export default class You extends Actor {
             // T key for talking to NPCs
             if (press.key === Input.Keys.T) {
                 console.log("*** T KEY DETECTED! ***");
+                
+                // Close quest log if open before talking to NPCs
+                const questLogUI = getQuestLogUI(engine);
+                if (questLogUI.getIsVisible()) {
+                    questLogUI.hide();
+                }
+                
                 this.attemptTalkToNPC(engine);
+                return;
             }
 
             // Arrow keys for chat navigation when chat is active
