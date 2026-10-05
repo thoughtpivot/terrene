@@ -9,6 +9,7 @@ import {
     Font,
     FontUnit,
     Input,
+    ImageSource,
 } from "excalibur";
 import { TiledMapResource } from "@excaliburjs/plugin-tiled";
 import You from "../../characters/player/You/You";
@@ -19,6 +20,7 @@ import { DialogueNPC } from "../../../common/DialogueNPC";
 import { getChatSystem } from "../../../common/ChatSystem";
 import { getDialogueFromNPC } from "../../../common/DialogueUtils";
 import { getQuestSystem } from "../../../common/QuestSystem";
+import backgroundImage from "./Eldergrove-sidescroll.png";
 
 const tiledMapResource = new TiledMapResource(
     "./src/components/cities/Eldergrove/Eldergrove.tmx",
@@ -27,7 +29,9 @@ const tiledMapResource = new TiledMapResource(
     }
 );
 
-export { tiledMapResource };
+const backgroundImageSource = new ImageSource(backgroundImage);
+
+export { tiledMapResource, backgroundImageSource };
 
 export default class Eldergrove extends Scene {
     private player!: You;
@@ -79,42 +83,33 @@ export default class Eldergrove extends Scene {
     }
 
     private createPlatformerWorld(): void {
-        // Sky background
-        const sky = new Actor({
+        // Use the generated pixel art background
+        const background = new Actor({
             pos: vec(800, 240),
             width: 1600,
             height: 480,
-            color: Color.fromRGB(135, 206, 235), // Sky blue
             z: -100,
         });
-        this.add(sky);
+        background.graphics.use(backgroundImageSource.toSprite());
+        this.add(background);
 
-        // Ground platform (main floor)
+        // Invisible collision platforms matching the background terrain
+        // Main ground platform
         const ground = new Actor({
             pos: vec(800, 440),
             width: 1600,
             height: 80,
-            color: Color.fromRGB(139, 69, 19), // Brown
+            color: Color.Transparent,
             z: -2,
         });
         this.add(ground);
-
-        // Grass on top of ground
-        const grass = new Actor({
-            pos: vec(800, 400),
-            width: 1600,
-            height: 10,
-            color: Color.fromRGB(34, 139, 34), // Green
-            z: -1,
-        });
-        this.add(grass);
 
         // Platform 1 (left side)
         const platform1 = new Actor({
             pos: vec(300, 320),
             width: 200,
             height: 20,
-            color: Color.fromRGB(101, 67, 33),
+            color: Color.Transparent,
             z: -1,
         });
         this.add(platform1);
@@ -124,7 +119,7 @@ export default class Eldergrove extends Scene {
             pos: vec(500, 250),
             width: 150,
             height: 20,
-            color: Color.fromRGB(101, 67, 33),
+            color: Color.Transparent,
             z: -1,
         });
         this.add(platform2);
@@ -134,7 +129,7 @@ export default class Eldergrove extends Scene {
             pos: vec(900, 280),
             width: 180,
             height: 20,
-            color: Color.fromRGB(101, 67, 33),
+            color: Color.Transparent,
             z: -1,
         });
         this.add(platform3);
@@ -144,36 +139,10 @@ export default class Eldergrove extends Scene {
             pos: vec(1200, 220),
             width: 160,
             height: 20,
-            color: Color.fromRGB(101, 67, 33),
+            color: Color.Transparent,
             z: -1,
         });
         this.add(platform4);
-
-        // Add some decorative trees
-        this.createTree(vec(200, 360), Color.fromRGB(34, 139, 34), Color.fromRGB(101, 67, 33));
-        this.createTree(vec(1100, 360), Color.fromRGB(34, 139, 34), Color.fromRGB(101, 67, 33));
-    }
-
-    private createTree(position: Vector, leafColor: Color, trunkColor: Color): void {
-        // Trunk
-        const trunk = new Actor({
-            pos: position,
-            width: 15,
-            height: 40,
-            color: trunkColor,
-            z: -5,
-        });
-        this.add(trunk);
-
-        // Leaves (foliage)
-        const leaves = new Actor({
-            pos: vec(position.x, position.y - 30),
-            width: 50,
-            height: 50,
-            color: leafColor,
-            z: -6,
-        });
-        this.add(leaves);
     }
 
     private createQuestMarkers(): void {
