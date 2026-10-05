@@ -96,13 +96,13 @@ export default class Eldergrove extends Scene {
         background.graphics.use(backgroundImageSource.toSprite());
         this.add(background);
 
-        // BRIGHT RED collision platforms - aligned ONLY with yellow-green grass
+        // BRIGHT RED collision platforms - NOW positioned DIRECTLY on grass
         
-        // BOTTOM GRASS - Full width yellow grass at bottom
+        // BOTTOM GRASS - The yellow grass at the very bottom
         const bottomGrass = new Actor({
-            pos: vec(800, 380),
+            pos: vec(800, 405),
             width: 1600,
-            height: 12,
+            height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
             collisionType: CollisionType.Fixed,
             z: 10,
@@ -111,7 +111,7 @@ export default class Eldergrove extends Scene {
 
         // LEFT TOP GRASS - Small grass on left tower
         const leftTopGrass = new Actor({
-            pos: vec(220, 118),
+            pos: vec(220, 138),
             width: 130,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
@@ -120,9 +120,9 @@ export default class Eldergrove extends Scene {
         });
         this.add(leftTopGrass);
 
-        // LEFT CURVED GRASS - Grass on left curved platform
+        // LEFT CURVED GRASS
         const leftCurvedGrass = new Actor({
-            pos: vec(340, 268),
+            pos: vec(340, 288),
             width: 180,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
@@ -131,9 +131,9 @@ export default class Eldergrove extends Scene {
         });
         this.add(leftCurvedGrass);
 
-        // CENTER MAIN GRASS - Large center grass platform
+        // CENTER MAIN GRASS
         const centerMainGrass = new Actor({
-            pos: vec(700, 235),
+            pos: vec(700, 255),
             width: 220,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
@@ -142,9 +142,9 @@ export default class Eldergrove extends Scene {
         });
         this.add(centerMainGrass);
 
-        // CENTER SMALL GRASS - Small ledge below center
+        // CENTER SMALL GRASS
         const centerSmallGrass = new Actor({
-            pos: vec(645, 325),
+            pos: vec(645, 345),
             width: 80,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
@@ -153,9 +153,9 @@ export default class Eldergrove extends Scene {
         });
         this.add(centerSmallGrass);
 
-        // RIGHT UPPER GRASS - Upper grass on right structure
+        // RIGHT UPPER GRASS
         const rightUpperGrass = new Actor({
-            pos: vec(1040, 250),
+            pos: vec(1040, 270),
             width: 170,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
@@ -164,9 +164,9 @@ export default class Eldergrove extends Scene {
         });
         this.add(rightUpperGrass);
 
-        // RIGHT MIDDLE GRASS - Middle grass on right structure
+        // RIGHT MIDDLE GRASS
         const rightMiddleGrass = new Actor({
-            pos: vec(995, 285),
+            pos: vec(995, 305),
             width: 110,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
@@ -175,9 +175,9 @@ export default class Eldergrove extends Scene {
         });
         this.add(rightMiddleGrass);
 
-        // TOP RIGHT GRASS - Highest grass platform
+        // TOP RIGHT GRASS
         const topRightGrass = new Actor({
-            pos: vec(1450, 100),
+            pos: vec(1450, 120),
             width: 190,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
