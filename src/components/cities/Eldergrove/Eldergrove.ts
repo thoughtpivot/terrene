@@ -96,96 +96,97 @@ export default class Eldergrove extends Scene {
         background.graphics.use(backgroundImageSource.toSprite());
         this.add(background);
 
-        // Aligned collision platforms matching the exact grass surfaces
-        // Background spans: x[0-1600], y[0-480] with center at (800, 240)
+        // BRIGHT RED collision platforms for debugging - placed directly on grass surfaces
+        // Background coordinates: center (800, 240), size 1600x480
+        // Grass surfaces are the yellow-green tufts on top of brown platforms
         
-        // BOTTOM GROUND - Main floor at very bottom
-        const bottomGround = new Actor({
-            pos: vec(800, 400),
+        // BOTTOM GROUND - Yellow grass line at bottom
+        const bottomGrass = new Actor({
+            pos: vec(800, 392),
             width: 1600,
-            height: 20,
-            color: Color.fromRGB(34, 139, 34, 0.7), // Green
+            height: 16,
+            color: Color.fromRGB(255, 0, 0, 1.0), // BRIGHT RED
             collisionType: CollisionType.Fixed,
             z: 10,
         });
-        this.add(bottomGround);
+        this.add(bottomGrass);
 
-        // LEFT TALL TOWER TOP - Small platform on left pillar
-        const leftTowerTop = new Actor({
-            pos: vec(220, 130),
-            width: 140,
-            height: 20,
-            color: Color.fromRGB(34, 139, 34, 0.7),
+        // LEFT TOP TOWER - Small grass platform on tall left structure
+        const leftTowerGrass = new Actor({
+            pos: vec(220, 125),
+            width: 135,
+            height: 10,
+            color: Color.fromRGB(255, 0, 0, 1.0), // BRIGHT RED
             collisionType: CollisionType.Fixed,
             z: 10,
         });
-        this.add(leftTowerTop);
+        this.add(leftTowerGrass);
 
-        // LEFT CURVED PLATFORM - Mid-left curved section
-        const leftCurvedPlatform = new Actor({
-            pos: vec(350, 280),
-            width: 200,
-            height: 20,
-            color: Color.fromRGB(34, 139, 34, 0.7),
+        // LEFT CURVED PLATFORM - Grass on curved middle-left platform
+        const leftCurvedGrass = new Actor({
+            pos: vec(350, 275),
+            width: 190,
+            height: 10,
+            color: Color.fromRGB(255, 0, 0, 1.0), // BRIGHT RED
             collisionType: CollisionType.Fixed,
             z: 10,
         });
-        this.add(leftCurvedPlatform);
+        this.add(leftCurvedGrass);
 
-        // CENTER LARGE PLATFORM - Main center platform with grass
-        const centerLargePlatform = new Actor({
-            pos: vec(700, 250),
-            width: 240,
-            height: 20,
-            color: Color.fromRGB(34, 139, 34, 0.7),
+        // CENTER MAIN PLATFORM - Large grass platform in center
+        const centerMainGrass = new Actor({
+            pos: vec(700, 242),
+            width: 230,
+            height: 10,
+            color: Color.fromRGB(255, 0, 0, 1.0), // BRIGHT RED
             collisionType: CollisionType.Fixed,
             z: 10,
         });
-        this.add(centerLargePlatform);
+        this.add(centerMainGrass);
 
-        // CENTER SMALL LEDGE - Below center
-        const centerSmallLedge = new Actor({
-            pos: vec(650, 340),
-            width: 90,
-            height: 20,
-            color: Color.fromRGB(34, 139, 34, 0.7),
+        // CENTER SMALL LEDGE - Small grass ledge below center
+        const centerSmallGrass = new Actor({
+            pos: vec(650, 332),
+            width: 85,
+            height: 10,
+            color: Color.fromRGB(255, 0, 0, 1.0), // BRIGHT RED
             collisionType: CollisionType.Fixed,
             z: 10,
         });
-        this.add(centerSmallLedge);
+        this.add(centerSmallGrass);
 
-        // RIGHT MIDDLE UPPER - Upper tier right side
-        const rightMiddleUpper = new Actor({
-            pos: vec(1050, 265),
-            width: 180,
-            height: 20,
-            color: Color.fromRGB(34, 139, 34, 0.7),
+        // RIGHT UPPER PLATFORM - Upper grass on right structure
+        const rightUpperGrass = new Actor({
+            pos: vec(1050, 257),
+            width: 175,
+            height: 10,
+            color: Color.fromRGB(255, 0, 0, 1.0), // BRIGHT RED
             collisionType: CollisionType.Fixed,
             z: 10,
         });
-        this.add(rightMiddleUpper);
+        this.add(rightUpperGrass);
 
-        // RIGHT MIDDLE LOWER - Lower tier right side
-        const rightMiddleLower = new Actor({
-            pos: vec(1000, 300),
-            width: 120,
-            height: 20,
-            color: Color.fromRGB(34, 139, 34, 0.7),
+        // RIGHT LOWER PLATFORM - Lower grass on right structure
+        const rightLowerGrass = new Actor({
+            pos: vec(1000, 292),
+            width: 115,
+            height: 10,
+            color: Color.fromRGB(255, 0, 0, 1.0), // BRIGHT RED
             collisionType: CollisionType.Fixed,
             z: 10,
         });
-        this.add(rightMiddleLower);
+        this.add(rightLowerGrass);
 
-        // TOP RIGHT TOWER - Highest platform far right
-        const topRightTower = new Actor({
-            pos: vec(1450, 115),
-            width: 200,
-            height: 20,
-            color: Color.fromRGB(34, 139, 34, 0.7),
+        // TOP RIGHT TOWER - Highest grass platform on right
+        const topRightGrass = new Actor({
+            pos: vec(1450, 107),
+            width: 195,
+            height: 10,
+            color: Color.fromRGB(255, 0, 0, 1.0), // BRIGHT RED
             collisionType: CollisionType.Fixed,
             z: 10,
         });
-        this.add(topRightTower);
+        this.add(topRightGrass);
     }
 
     private createQuestMarkers(): void {
