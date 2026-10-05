@@ -96,61 +96,86 @@ export default class Eldergrove extends Scene {
         background.graphics.use(backgroundImageSource.toSprite());
         this.add(background);
 
-        // Solid collision platforms (semi-transparent so you can see them)
-        // Main ground platform
+        // Collision platforms matching the visible terrain
+        // Background is centered at (800, 240) with size 1600x480
+        // So actual coordinates: x: 0-1600, y: 0-480
+        
+        // BOTTOM GROUND - Full width grass surface at bottom
         const ground = new Actor({
-            pos: vec(800, 430),
+            pos: vec(800, 445),
             width: 1600,
-            height: 60,
-            color: Color.fromRGB(139, 69, 19, 0.3), // Semi-transparent brown
+            height: 30,
+            color: Color.fromRGB(139, 69, 19, 0.3),
             collisionType: CollisionType.Fixed,
             z: 10,
         });
         this.add(ground);
 
-        // Platform 1 (left side)
-        const platform1 = new Actor({
-            pos: vec(300, 320),
-            width: 200,
-            height: 20,
-            color: Color.fromRGB(101, 67, 33, 0.3), // Semi-transparent
-            collisionType: CollisionType.Fixed,
-            z: 10,
-        });
-        this.add(platform1);
-
-        // Platform 2 (center-left, elevated)
-        const platform2 = new Actor({
-            pos: vec(500, 250),
-            width: 150,
-            height: 20,
-            color: Color.fromRGB(101, 67, 33, 0.3),
-            collisionType: CollisionType.Fixed,
-            z: 10,
-        });
-        this.add(platform2);
-
-        // Platform 3 (right side)
-        const platform3 = new Actor({
-            pos: vec(900, 280),
+        // LEFT TALL PILLAR - Top platform on left tall structure
+        const leftPillar = new Actor({
+            pos: vec(200, 135),
             width: 180,
             height: 20,
             color: Color.fromRGB(101, 67, 33, 0.3),
             collisionType: CollisionType.Fixed,
             z: 10,
         });
-        this.add(platform3);
+        this.add(leftPillar);
 
-        // Platform 4 (far right, elevated)
-        const platform4 = new Actor({
-            pos: vec(1200, 220),
-            width: 160,
+        // CENTER-LEFT ELEVATED - The curved platform in middle-left
+        const centerLeftPlatform = new Actor({
+            pos: vec(400, 280),
+            width: 200,
             height: 20,
             color: Color.fromRGB(101, 67, 33, 0.3),
             collisionType: CollisionType.Fixed,
             z: 10,
         });
-        this.add(platform4);
+        this.add(centerLeftPlatform);
+
+        // CENTER PLATFORM - Middle floating platform with grass
+        const centerPlatform = new Actor({
+            pos: vec(700, 260),
+            width: 220,
+            height: 20,
+            color: Color.fromRGB(101, 67, 33, 0.3),
+            collisionType: CollisionType.Fixed,
+            z: 10,
+        });
+        this.add(centerPlatform);
+
+        // CENTER SMALL LEDGE - Small platform below center
+        const centerSmallLedge = new Actor({
+            pos: vec(630, 340),
+            width: 100,
+            height: 20,
+            color: Color.fromRGB(101, 67, 33, 0.3),
+            collisionType: CollisionType.Fixed,
+            z: 10,
+        });
+        this.add(centerSmallLedge);
+
+        // RIGHT MIDDLE PLATFORM - Right side elevated platform
+        const rightMiddlePlatform = new Actor({
+            pos: vec(1050, 290),
+            width: 180,
+            height: 20,
+            color: Color.fromRGB(101, 67, 33, 0.3),
+            collisionType: CollisionType.Fixed,
+            z: 10,
+        });
+        this.add(rightMiddlePlatform);
+
+        // TOP RIGHT PLATFORM - Highest platform on the right
+        const topRightPlatform = new Actor({
+            pos: vec(1350, 120),
+            width: 200,
+            height: 20,
+            color: Color.fromRGB(101, 67, 33, 0.3),
+            collisionType: CollisionType.Fixed,
+            z: 10,
+        });
+        this.add(topRightPlatform);
     }
 
     private createQuestMarkers(): void {
