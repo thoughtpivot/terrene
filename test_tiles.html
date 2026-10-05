@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tile Test</title>
+    <style>
+        body { background: #000; color: #fff; font-family: monospace; }
+        canvas { border: 2px solid #fff; margin: 10px; image-rendering: pixelated; }
+        .tile { display: inline-block; margin: 5px; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>Testing Tiles: 241, 482, 483</h1>
+    <div id="tiles"></div>
+    <script>
+        const tilesheet = new Image();
+        tilesheet.src = 'src/assets/roguelike-pack/Spritesheet/roguelikeSheet_transparent.png';
+        
+        tilesheet.onload = () => {
+            console.log('Tilesheet loaded:', tilesheet.width, 'x', tilesheet.height);
+            const columns = 60;
+            const tileWidth = 16;
+            const tileHeight = 16;
+            
+            [241, 482, 483].forEach(gid => {
+                const tileIndex = gid - 1;
+                const col = tileIndex % columns;
+                const row = Math.floor(tileIndex / columns);
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = 64;
+                canvas.height = 64;
+                const ctx = canvas.getContext('2d');
+                
+                ctx.imageSmoothingEnabled = false;
+                ctx.drawImage(
+                    tilesheet,
+                    col * tileWidth, row * tileHeight, tileWidth, tileHeight,
+                    0, 0, 64, 64
+                );
+                
+                const div = document.createElement('div');
+                div.className = 'tile';
+                div.innerHTML = `<div>GID ${gid}</div>`;
+                div.appendChild(canvas);
+                div.innerHTML += `<div>Row ${row}, Col ${col}</div>`;
+                
+                document.getElementById('tiles').appendChild(div);
+            });
+        };
+        
+        tilesheet.onerror = () => {
+            document.body.innerHTML += '<p>ERROR loading tilesheet</p>';
+        };
+    </script>
+</body>
+</html>

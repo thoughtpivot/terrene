@@ -47,23 +47,22 @@ export default class Eldergrove extends Scene {
     onInitialize(engine: Engine): void {
         console.log("*** ELDERGROVE SCENE INITIALIZING ***");
 
-        // Add the tiled map directly to the scene
-        tiledMapResource.addTiledMapToScene(this);
-        console.log("Eldergrove tiled map added to scene");
+        // Create a side-scrolling platformer background
+        this.createPlatformerWorld();
 
         // Create player
         this.player = new You();
-        this.player.pos = vec(640, 800); // Start near bottom center
+        this.player.pos = vec(640, 400); // Start on main platform
         this.add(this.player);
 
-        // Create NPCs (positioned on the tiled map)
-        this.elderRowan = new ElderRowan(vec(640, 480)); // Center of village
+        // Create NPCs (positioned on platforms)
+        this.elderRowan = new ElderRowan(vec(640, 380)); // Center platform
         this.add(this.elderRowan);
 
-        this.guardCaptain = new GuardCaptain(vec(480, 520)); // Near village entrance
+        this.guardCaptain = new GuardCaptain(vec(400, 380)); // Left platform
         this.add(this.guardCaptain);
 
-        this.mysteriousStranger = new MysteriousStranger(vec(800, 560)); // By the old well
+        this.mysteriousStranger = new MysteriousStranger(vec(900, 300)); // Right upper platform
         this.add(this.mysteriousStranger);
 
         // Create quest interaction markers
@@ -72,17 +71,115 @@ export default class Eldergrove extends Scene {
         // Set up NPC interaction system
         this.setupInteractionSystem(engine);
 
-            // Setup camera to follow player with zoom
-            this.camera.zoom = 1.5;
-            this.camera.strategy.elasticToActor(this.player, 0.8, 0.9);
+        // Setup camera to follow player with zoom
+        this.camera.zoom = 1.5;
+        this.camera.strategy.elasticToActor(this.player, 0.8, 0.9);
 
         console.log("*** ELDERGROVE SCENE INITIALIZED ***");
     }
 
+    private createPlatformerWorld(): void {
+        // Sky background
+        const sky = new Actor({
+            pos: vec(800, 240),
+            width: 1600,
+            height: 480,
+            color: Color.fromRGB(135, 206, 235), // Sky blue
+            z: -100,
+        });
+        this.add(sky);
+
+        // Ground platform (main floor)
+        const ground = new Actor({
+            pos: vec(800, 440),
+            width: 1600,
+            height: 80,
+            color: Color.fromRGB(139, 69, 19), // Brown
+            z: -2,
+        });
+        this.add(ground);
+
+        // Grass on top of ground
+        const grass = new Actor({
+            pos: vec(800, 400),
+            width: 1600,
+            height: 10,
+            color: Color.fromRGB(34, 139, 34), // Green
+            z: -1,
+        });
+        this.add(grass);
+
+        // Platform 1 (left side)
+        const platform1 = new Actor({
+            pos: vec(300, 320),
+            width: 200,
+            height: 20,
+            color: Color.fromRGB(101, 67, 33),
+            z: -1,
+        });
+        this.add(platform1);
+
+        // Platform 2 (center-left, elevated)
+        const platform2 = new Actor({
+            pos: vec(500, 250),
+            width: 150,
+            height: 20,
+            color: Color.fromRGB(101, 67, 33),
+            z: -1,
+        });
+        this.add(platform2);
+
+        // Platform 3 (right side)
+        const platform3 = new Actor({
+            pos: vec(900, 280),
+            width: 180,
+            height: 20,
+            color: Color.fromRGB(101, 67, 33),
+            z: -1,
+        });
+        this.add(platform3);
+
+        // Platform 4 (far right, elevated)
+        const platform4 = new Actor({
+            pos: vec(1200, 220),
+            width: 160,
+            height: 20,
+            color: Color.fromRGB(101, 67, 33),
+            z: -1,
+        });
+        this.add(platform4);
+
+        // Add some decorative trees
+        this.createTree(vec(200, 360), Color.fromRGB(34, 139, 34), Color.fromRGB(101, 67, 33));
+        this.createTree(vec(1100, 360), Color.fromRGB(34, 139, 34), Color.fromRGB(101, 67, 33));
+    }
+
+    private createTree(position: Vector, leafColor: Color, trunkColor: Color): void {
+        // Trunk
+        const trunk = new Actor({
+            pos: position,
+            width: 15,
+            height: 40,
+            color: trunkColor,
+            z: -5,
+        });
+        this.add(trunk);
+
+        // Leaves (foliage)
+        const leaves = new Actor({
+            pos: vec(position.x, position.y - 30),
+            width: 50,
+            height: 50,
+            color: leafColor,
+            z: -6,
+        });
+        this.add(leaves);
+    }
+
     private createQuestMarkers(): void {
-        // Ruins marker (east side) - for investigating
+        // Ruins marker (far right elevated platform) - for investigating
         this.ruinsMarker = new Actor({
-            pos: vec(1100, 400),
+            pos: vec(1200, 190),
             width: 40,
             height: 40,
             color: Color.fromRGB(100, 100, 150, 0.5),
@@ -90,9 +187,9 @@ export default class Eldergrove extends Scene {
         });
         this.add(this.ruinsMarker);
 
-        // Old oak marker (for clue 1)
+        // Old oak marker (left platform - for clue 1)
         this.oldOakMarker = new Actor({
-            pos: vec(320, 240),
+            pos: vec(300, 290),
             width: 30,
             height: 30,
             color: Color.fromRGB(139, 69, 19, 0.5),
@@ -100,9 +197,9 @@ export default class Eldergrove extends Scene {
         });
         this.add(this.oldOakMarker);
 
-        // Well marker (for clue 2)
+        // Well marker (right platform - for clue 2)
         this.wellMarker = new Actor({
-            pos: vec(850, 560),
+            pos: vec(900, 250),
             width: 30,
             height: 30,
             color: Color.fromRGB(128, 128, 128, 0.5),
