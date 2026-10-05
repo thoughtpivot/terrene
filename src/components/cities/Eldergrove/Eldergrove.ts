@@ -86,22 +86,24 @@ export default class Eldergrove extends Scene {
     }
 
     private createPlatformerWorld(): void {
-        // Use the generated pixel art background
+        // Background image is ACTUALLY 1280x720 pixels
+        // Set up coordinates: (0,0) top-left to (1280,720) bottom-right
         const background = new Actor({
-            pos: vec(800, 240),
-            width: 1600,
-            height: 480,
+            pos: vec(640, 360), // Center at half width (640) and half height (360)
+            width: 1280,
+            height: 720,
             z: -100,
         });
         background.graphics.use(backgroundImageSource.toSprite());
         this.add(background);
 
-        // BRIGHT RED collision platforms - NOW positioned DIRECTLY on grass
+        // RED platforms using absolute coordinates from 1280x720 image
+        // Y coordinates: 0 = top, 720 = bottom
         
-        // BOTTOM GRASS - The yellow grass at the very bottom
+        // BOTTOM GRASS - grass line at bottom
         const bottomGrass = new Actor({
-            pos: vec(800, 405),
-            width: 1600,
+            pos: vec(640, 590),
+            width: 1280,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
             collisionType: CollisionType.Fixed,
@@ -109,10 +111,10 @@ export default class Eldergrove extends Scene {
         });
         this.add(bottomGrass);
 
-        // LEFT TOP GRASS - Small grass on left tower
+        // LEFT TOP GRASS
         const leftTopGrass = new Actor({
-            pos: vec(220, 138),
-            width: 130,
+            pos: vec(175, 190),
+            width: 100,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
             collisionType: CollisionType.Fixed,
@@ -122,8 +124,8 @@ export default class Eldergrove extends Scene {
 
         // LEFT CURVED GRASS
         const leftCurvedGrass = new Actor({
-            pos: vec(340, 288),
-            width: 180,
+            pos: vec(270, 415),
+            width: 145,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
             collisionType: CollisionType.Fixed,
@@ -133,8 +135,8 @@ export default class Eldergrove extends Scene {
 
         // CENTER MAIN GRASS
         const centerMainGrass = new Actor({
-            pos: vec(700, 255),
-            width: 220,
+            pos: vec(560, 365),
+            width: 175,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
             collisionType: CollisionType.Fixed,
@@ -144,8 +146,8 @@ export default class Eldergrove extends Scene {
 
         // CENTER SMALL GRASS
         const centerSmallGrass = new Actor({
-            pos: vec(645, 345),
-            width: 80,
+            pos: vec(515, 500),
+            width: 65,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
             collisionType: CollisionType.Fixed,
@@ -155,8 +157,8 @@ export default class Eldergrove extends Scene {
 
         // RIGHT UPPER GRASS
         const rightUpperGrass = new Actor({
-            pos: vec(1040, 270),
-            width: 170,
+            pos: vec(830, 390),
+            width: 135,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
             collisionType: CollisionType.Fixed,
@@ -166,8 +168,8 @@ export default class Eldergrove extends Scene {
 
         // RIGHT MIDDLE GRASS
         const rightMiddleGrass = new Actor({
-            pos: vec(995, 305),
-            width: 110,
+            pos: vec(795, 440),
+            width: 85,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
             collisionType: CollisionType.Fixed,
@@ -177,8 +179,8 @@ export default class Eldergrove extends Scene {
 
         // TOP RIGHT GRASS
         const topRightGrass = new Actor({
-            pos: vec(1450, 120),
-            width: 190,
+            pos: vec(1160, 165),
+            width: 150,
             height: 10,
             color: Color.fromRGB(255, 0, 0, 1.0),
             collisionType: CollisionType.Fixed,
