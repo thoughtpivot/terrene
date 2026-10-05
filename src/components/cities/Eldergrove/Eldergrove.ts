@@ -10,6 +10,8 @@ import {
     FontUnit,
     Input,
     ImageSource,
+    CollisionType,
+    Shape,
 } from "excalibur";
 import { TiledMapResource } from "@excaliburjs/plugin-tiled";
 import You from "../../characters/player/You/You";
@@ -56,17 +58,18 @@ export default class Eldergrove extends Scene {
 
         // Create player
         this.player = new You();
-        this.player.pos = vec(640, 400); // Start on main platform
+        this.player.pos = vec(640, 350); // Start on main platform
+        this.player.enablePlatformerMode(); // Enable platformer physics
         this.add(this.player);
 
         // Create NPCs (positioned on platforms)
-        this.elderRowan = new ElderRowan(vec(640, 380)); // Center platform
+        this.elderRowan = new ElderRowan(vec(640, 350)); // Center platform
         this.add(this.elderRowan);
 
-        this.guardCaptain = new GuardCaptain(vec(400, 380)); // Left platform
+        this.guardCaptain = new GuardCaptain(vec(400, 350)); // Left platform
         this.add(this.guardCaptain);
 
-        this.mysteriousStranger = new MysteriousStranger(vec(900, 300)); // Right upper platform
+        this.mysteriousStranger = new MysteriousStranger(vec(900, 250)); // Right upper platform
         this.add(this.mysteriousStranger);
 
         // Create quest interaction markers
@@ -93,13 +96,14 @@ export default class Eldergrove extends Scene {
         background.graphics.use(backgroundImageSource.toSprite());
         this.add(background);
 
-        // Invisible collision platforms matching the background terrain
+        // Solid collision platforms
         // Main ground platform
         const ground = new Actor({
-            pos: vec(800, 440),
+            pos: vec(800, 430),
             width: 1600,
-            height: 80,
+            height: 60,
             color: Color.Transparent,
+            collisionType: CollisionType.Fixed,
             z: -2,
         });
         this.add(ground);
@@ -110,6 +114,7 @@ export default class Eldergrove extends Scene {
             width: 200,
             height: 20,
             color: Color.Transparent,
+            collisionType: CollisionType.Fixed,
             z: -1,
         });
         this.add(platform1);
@@ -120,6 +125,7 @@ export default class Eldergrove extends Scene {
             width: 150,
             height: 20,
             color: Color.Transparent,
+            collisionType: CollisionType.Fixed,
             z: -1,
         });
         this.add(platform2);
@@ -130,6 +136,7 @@ export default class Eldergrove extends Scene {
             width: 180,
             height: 20,
             color: Color.Transparent,
+            collisionType: CollisionType.Fixed,
             z: -1,
         });
         this.add(platform3);
@@ -140,6 +147,7 @@ export default class Eldergrove extends Scene {
             width: 160,
             height: 20,
             color: Color.Transparent,
+            collisionType: CollisionType.Fixed,
             z: -1,
         });
         this.add(platform4);

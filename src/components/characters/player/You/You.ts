@@ -24,8 +24,10 @@ export default class You extends Actor {
     private sword: Sword;
     private targetPosition: Vector | null = null;
     private isMovingToTarget: boolean = false;
-    private moveSpeed: number = 2;
-    private movementSound: Sound | null = null; // Track movement sound
+    private moveSpeed: number = 200; // Pixels per second for platformer
+    private jumpSpeed: number = 400; // Jump force
+    private movementSound: Sound | null = null;
+    private isPlatformerMode: boolean = false; // Track if we're in platformer mode
 
     constructor() {
         super({
@@ -35,6 +37,18 @@ export default class You extends Actor {
             scale: vec(2.5, 2.5),
             collisionType: CollisionType.Active,
         });
+    }
+    
+    public enablePlatformerMode(): void {
+        this.isPlatformerMode = true;
+        // Enable gravity using body.acc (acceleration) for downward force
+        this.body.acc = vec(0, 800); // Gravity acceleration downward
+        this.body.mass = 10;
+    }
+    
+    public disablePlatformerMode(): void {
+        this.isPlatformerMode = false;
+        this.body.acc = vec(0, 0); // Remove gravity
     }
 
     onInitialize(engine: Engine) {
@@ -65,7 +79,21 @@ export default class You extends Actor {
         });
 
         engine.input.keyboard.on("hold", (press) => {
-            // Stop automatic movement when manual keyboard input is detected
+            // In platformer mode, handle horizontal movement only
+            if (this.isPlatformerMode) {
+                const velocity = this.vel;
+                
+                if (press.key === Input.Keys.Left || press.key === Input.Keys.A) {
+                    velocity.x = -this.moveSpeed;
+                } else if (press.key === Input.Keys.Right || press.key === Input.Keys.D) {
+                    velocity.x = this.moveSpeed;
+                }
+                
+                this.vel = velocity;
+                return;
+            }
+            
+            // Original top-down movement for non-platformer modes
             this.isMovingToTarget = false;
             this.targetPosition = null;
 
@@ -92,6 +120,16 @@ export default class You extends Actor {
                     break;
             }
         });
+        
+        // Stop horizontal movement when keys are released in platformer mode
+        engine.input.keyboard.on("release", (press) => {
+            if (this.isPlatformerMode) {
+                if (press.key === Input.Keys.Left || press.key === Input.Keys.A ||
+                    press.key === Input.Keys.Right || press.key === Input.Keys.D) {
+                    this.vel.x = 0;
+                }
+            }
+        });
 
         engine.input.keyboard.on("press", (press) => {
             console.log("Key pressed:", press.key, "Key code:", press.key);
@@ -110,7 +148,17 @@ export default class You extends Actor {
             }
 
             if (press.key === Input.Keys.Space) {
-                // Stop automatic movement when using space to skip
+                // In platformer mode, Space is for jumping
+                if (this.isPlatformerMode) {
+                    // Check if player is on the ground (simple collision check)
+                    const onGround = Math.abs(this.vel.y) < 10;
+                    if (onGround) {
+                        this.vel.y = -this.jumpSpeed;
+                    }
+                    return;
+                }
+                
+                // Original space behavior for non-platformer modes
                 this.isMovingToTarget = false;
                 this.targetPosition = null;
 
