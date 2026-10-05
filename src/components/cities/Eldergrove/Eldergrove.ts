@@ -96,15 +96,15 @@ export default class Eldergrove extends Scene {
         background.graphics.use(backgroundImageSource.toSprite());
         this.add(background);
 
-        // Solid collision platforms
+        // Solid collision platforms (semi-transparent so you can see them)
         // Main ground platform
         const ground = new Actor({
             pos: vec(800, 430),
             width: 1600,
             height: 60,
-            color: Color.Transparent,
+            color: Color.fromRGB(139, 69, 19, 0.3), // Semi-transparent brown
             collisionType: CollisionType.Fixed,
-            z: -2,
+            z: 10,
         });
         this.add(ground);
 
@@ -113,9 +113,9 @@ export default class Eldergrove extends Scene {
             pos: vec(300, 320),
             width: 200,
             height: 20,
-            color: Color.Transparent,
+            color: Color.fromRGB(101, 67, 33, 0.3), // Semi-transparent
             collisionType: CollisionType.Fixed,
-            z: -1,
+            z: 10,
         });
         this.add(platform1);
 
@@ -124,9 +124,9 @@ export default class Eldergrove extends Scene {
             pos: vec(500, 250),
             width: 150,
             height: 20,
-            color: Color.Transparent,
+            color: Color.fromRGB(101, 67, 33, 0.3),
             collisionType: CollisionType.Fixed,
-            z: -1,
+            z: 10,
         });
         this.add(platform2);
 
@@ -135,9 +135,9 @@ export default class Eldergrove extends Scene {
             pos: vec(900, 280),
             width: 180,
             height: 20,
-            color: Color.Transparent,
+            color: Color.fromRGB(101, 67, 33, 0.3),
             collisionType: CollisionType.Fixed,
-            z: -1,
+            z: 10,
         });
         this.add(platform3);
 
@@ -146,9 +146,9 @@ export default class Eldergrove extends Scene {
             pos: vec(1200, 220),
             width: 160,
             height: 20,
-            color: Color.Transparent,
+            color: Color.fromRGB(101, 67, 33, 0.3),
             collisionType: CollisionType.Fixed,
-            z: -1,
+            z: 10,
         });
         this.add(platform4);
     }

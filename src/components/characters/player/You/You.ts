@@ -40,10 +40,12 @@ export default class You extends Actor {
     }
     
     public enablePlatformerMode(): void {
+        console.log("*** ENABLING PLATFORMER MODE ***");
         this.isPlatformerMode = true;
         // Enable gravity using body.acc (acceleration) for downward force
-        this.body.acc = vec(0, 800); // Gravity acceleration downward
-        this.body.mass = 10;
+        this.body.acc = vec(0, 1200); // Stronger gravity acceleration downward
+        this.body.mass = 1; // Lower mass for better responsiveness
+        console.log("Platformer mode enabled, gravity acc:", this.body.acc);
     }
     
     public disablePlatformerMode(): void {
