@@ -96,105 +96,111 @@ export default class Eldergrove extends Scene {
         background.graphics.use(backgroundImageSource.toSprite());
         this.add(background);
 
-        // Precisely matched collision platforms to visible grass surfaces
-        // Background coordinates: center (800, 240), size 1600x480
-        // Actual range: x[0-1600], y[0-480]
-        
-        // BOTTOM LEFT GROUND - Far left ground section
+        // DEBUG: Large visible ground to catch the player
+        const debugGround = new Actor({
+            pos: vec(800, 460),
+            width: 1600,
+            height: 40,
+            color: Color.fromRGB(255, 0, 0, 0.8), // Bright red for debugging
+            collisionType: CollisionType.Fixed,
+            z: 10,
+        });
+        this.add(debugGround);
+
+        // Visible collision platforms matching grass surfaces
+        // Bottom left ground section
         const bottomLeftGround = new Actor({
-            pos: vec(200, 395),
+            pos: vec(200, 405),
             width: 400,
-            height: 15,
-            color: Color.fromRGB(139, 69, 19, 0.4),
+            height: 20,
+            color: Color.fromRGB(0, 255, 0, 0.8), // Bright green
             collisionType: CollisionType.Fixed,
             z: 10,
         });
         this.add(bottomLeftGround);
 
-        // BOTTOM RIGHT GROUND - Far right ground section
+        // Bottom right ground section
         const bottomRightGround = new Actor({
-            pos: vec(1300, 395),
+            pos: vec(1300, 405),
             width: 600,
-            height: 15,
-            color: Color.fromRGB(139, 69, 19, 0.4),
+            height: 20,
+            color: Color.fromRGB(0, 255, 0, 0.8),
             collisionType: CollisionType.Fixed,
             z: 10,
         });
         this.add(bottomRightGround);
 
-        // LEFT TALL PILLAR TOP - Small grass platform on left tower
+        // Left tall pillar top
         const leftPillarTop = new Actor({
-            pos: vec(220, 125),
+            pos: vec(220, 145),
             width: 140,
-            height: 12,
-            color: Color.fromRGB(34, 139, 34, 0.4),
+            height: 20,
+            color: Color.fromRGB(0, 255, 0, 0.8),
             collisionType: CollisionType.Fixed,
             z: 10,
         });
         this.add(leftPillarTop);
 
-        // LEFT CURVED MIDDLE PLATFORM
+        // Left curved middle platform
         const leftCurvedPlatform = new Actor({
-            pos: vec(380, 285),
+            pos: vec(380, 295),
             width: 160,
-            height: 12,
-            color: Color.fromRGB(34, 139, 34, 0.4),
+            height: 20,
+            color: Color.fromRGB(0, 255, 0, 0.8),
             collisionType: CollisionType.Fixed,
             z: 10,
         });
         this.add(leftCurvedPlatform);
 
-        // CENTER MAIN PLATFORM - Large center platform with grass
+        // Center main platform
         const centerMainPlatform = new Actor({
-            pos: vec(720, 247),
+            pos: vec(720, 260),
             width: 200,
-            height: 12,
-            color: Color.fromRGB(34, 139, 34, 0.4),
+            height: 20,
+            color: Color.fromRGB(0, 255, 0, 0.8),
             collisionType: CollisionType.Fixed,
             z: 10,
         });
         this.add(centerMainPlatform);
 
-        // CENTER SMALL LEDGE - Below center platform
+        // Center small ledge
         const centerSmallLedge = new Actor({
-            pos: vec(660, 343),
+            pos: vec(660, 350),
             width: 80,
-            height: 12,
-            color: Color.fromRGB(34, 139, 34, 0.4),
+            height: 20,
+            color: Color.fromRGB(0, 255, 0, 0.8),
             collisionType: CollisionType.Fixed,
             z: 10,
         });
         this.add(centerSmallLedge);
 
-        // RIGHT MIDDLE DOUBLE PLATFORM - Two-tier structure on right
-        // Upper tier
+        // Right middle platforms
         const rightMiddleUpper = new Actor({
-            pos: vec(1070, 260),
+            pos: vec(1070, 270),
             width: 160,
-            height: 12,
-            color: Color.fromRGB(34, 139, 34, 0.4),
+            height: 20,
+            color: Color.fromRGB(0, 255, 0, 0.8),
             collisionType: CollisionType.Fixed,
             z: 10,
         });
         this.add(rightMiddleUpper);
 
-        // Lower tier of right middle
         const rightMiddleLower = new Actor({
-            pos: vec(1020, 295),
+            pos: vec(1020, 305),
             width: 100,
-            height: 12,
-            color: Color.fromRGB(34, 139, 34, 0.4),
+            height: 20,
+            color: Color.fromRGB(0, 255, 0, 0.8),
             collisionType: CollisionType.Fixed,
             z: 10,
         });
         this.add(rightMiddleLower);
 
-        // TOP RIGHT PLATFORM - Highest platform
+        // Top right platform
         const topRightPlatform = new Actor({
-            pos: vec(1420, 112),
+            pos: vec(1420, 130),
             width: 180,
-            height: 12,
-            color: Color.fromRGB(34, 139, 34, 0.4),
+            height: 20,
+            color: Color.fromRGB(0, 255, 0, 0.8),
             collisionType: CollisionType.Fixed,
             z: 10,
         });
