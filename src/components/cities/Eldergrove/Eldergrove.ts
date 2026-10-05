@@ -58,7 +58,7 @@ export default class Eldergrove extends Scene {
 
         // Create player
         this.player = new You();
-        this.player.pos = vec(640, 350); // Start on main platform
+        this.player.pos = vec(515, 520); // Start on center platform (1280x720 coords)
         this.player.enablePlatformerMode(); // Enable platformer physics
         this.add(this.player);
 
