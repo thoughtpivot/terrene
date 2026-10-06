@@ -369,14 +369,14 @@ export class Critter extends Actor {
             this.vel.x = this.dir * 24;
             this.show(this.frame(["rusk-0", "rusk-1"], 160));
             const player = this.pilot();
-            const ahead = !!player && (this.dir < 0 ? player.x < this.pos.x : player.x > this.pos.x);
             if (
-                ahead &&
                 player &&
-                Math.abs(player.x - this.pos.x) < 104 &&
+                Math.abs(player.x - this.pos.x) < 100 &&
                 Math.abs(player.y - this.pos.y) < 22 &&
-                this.stateTime > 0.35
+                this.stateTime > 0.4
             ) {
+                // Face Pip, then hold still so the lowered head reads before the rush.
+                this.dir = player.x < this.pos.x ? -1 : 1;
                 this.goto("windup");
             }
         } else if (this.state === "windup") {
@@ -678,7 +678,8 @@ class Bubble extends Actor {
     halfH = 4;
     pose = "bubble";
     private alive = true;
-    private life = 1.7;
+    private life = 2.2;
+    private hops = 0;
 
     constructor(
         x: number,
@@ -705,7 +706,15 @@ class Bubble extends Actor {
         this.on("postcollision", (evt) => {
             const other = evt.other;
             if (other.hasTag("player") || other.hasTag("enemy")) return;
-            if (evt.side === Side.Bottom || evt.side === Side.Left || evt.side === Side.Right) this.pop(false);
+            if (evt.side === Side.Left || evt.side === Side.Right) {
+                this.pop(false);
+                return;
+            }
+            if (evt.side === Side.Bottom) {
+                this.hops += 1;
+                if (this.hops >= 2) this.pop(false);
+                else this.vel.y = -70;
+            }
         });
     }
 
