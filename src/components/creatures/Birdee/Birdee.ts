@@ -2,12 +2,11 @@ import {
     Actor,
     vec,
     Engine,
-    Scene,
     Rectangle,
     Color,
-    Timer,
     GraphicsGroup,
     Circle,
+    CollisionType,
 } from "excalibur";
 
 export interface BirdeeOptions {
@@ -39,7 +38,8 @@ export default class Birdee extends Actor {
         rightFeather3: any;
     };
     private isFlapping: boolean = false;
-    private flapTimer!: Timer;
+    private flapClock = 0;
+    private age = 0;
 
     constructor(options: BirdeeOptions = {}) {
         super({
@@ -57,10 +57,12 @@ export default class Birdee extends Actor {
         this.flightBounds = options.flightBounds || { left: -100, right: 800 };
     }
 
-    onInitialize(engine: Engine): void {
+    onInitialize(_engine: Engine): void {
+        // The old bobbing action overwrote vel.x, and Breaze used to pass speed 0,
+        // so these birds never actually flew. Motion now lives in onPreUpdate.
+        this.body.useGravity = false;
+        this.body.collisionType = CollisionType.PreventCollision;
         this.createBirdGraphics();
-        this.startFlapping();
-        this.startFlying();
     }
 
     private createBirdGraphics(): void {
@@ -256,16 +258,6 @@ export default class Birdee extends Actor {
         );
     }
 
-    private startFlapping(): void {
-        // Wing flapping animation using timer
-        this.flapTimer = new Timer({
-            fcn: () => this.flapWings(),
-            interval: this.wingFlapSpeed,
-            repeats: true,
-        });
-        this.scene?.add(this.flapTimer);
-    }
-
     private flapWings(): void {
         // Get the current members array from the composite graphic
         const members = this.compositeGraphic.members;
@@ -273,9 +265,6 @@ export default class Birdee extends Actor {
         // Find and animate wing positions within the composite graphic
         if (this.isFlapping) {
             // Wings down position (relaxed) - move wings down and inward
-            console.log("🐦 Wings down position");
-
-            // Find and update wing positions in the members array
             members.forEach((member, index) => {
                 if (member.graphic === this.leftWing) {
                     member.pos = vec(-10, -1); // Move down and inward
@@ -297,9 +286,7 @@ export default class Birdee extends Actor {
             });
         } else {
             // Wings up position (flapping) - move wings up and outward
-            console.log("🐦 Wings up position");
-
-            members.forEach((member, index) => {
+            members.forEach((member) => {
                 if (member.graphic === this.leftWing) {
                     member.pos = vec(-14, -5); // Move up and outward
                 } else if (member.graphic === this.rightWing) {
@@ -323,27 +310,22 @@ export default class Birdee extends Actor {
         this.isFlapping = !this.isFlapping;
     }
 
-    private startFlying(): void {
-        // Continuous horizontal movement
-        const moveDirection = this.direction === "left" ? -1 : 1;
-        this.vel.x = this.speed * moveDirection;
-
-        // Add slight vertical bobbing motion for realism
-        this.actions.repeatForever((ctx) =>
-            ctx.moveBy(0, -3, 600).moveBy(0, 3, 600)
-        );
-    }
-
-    onPreUpdate(): void {
-        // Check bounds and reverse direction if needed
+    onPreUpdate(_engine: Engine, delta: number): void {
+        this.body.useGravity = false;
+        this.age += delta;
+        this.flapClock += delta;
+        if (this.flapClock >= this.wingFlapSpeed) {
+            this.flapClock = 0;
+            this.flapWings();
+        }
         if (this.direction === "left" && this.pos.x <= this.flightBounds.left) {
             this.reverseDirection();
-        } else if (
-            this.direction === "right" &&
-            this.pos.x >= this.flightBounds.right
-        ) {
+        } else if (this.direction === "right" && this.pos.x >= this.flightBounds.right) {
             this.reverseDirection();
         }
+        const move = this.direction === "left" ? -1 : 1;
+        this.vel.x = this.speed * move;
+        this.vel.y = Math.cos(this.age / 260) * (this.speed > 0 ? 24 : 10);
     }
 
     private reverseDirection(): void {

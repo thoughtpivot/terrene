@@ -1534,10 +1534,10 @@ export default class Breaze extends Scene {
         for (let i = 0; i < flockSize; i++) {
             // Create stationary birds for visibility
             const bird = new Birdee({
-                direction: "right", // Facing right
-                speed: 0, // Stationary for now
-                wingFlapSpeed: 120 + Math.random() * 30, // Still flapping wings
-                flightBounds: { left: 0, right: 1536 }, // Scene bounds
+                direction: i % 2 === 0 ? "left" : "right",
+                speed: 34,
+                wingFlapSpeed: 140,
+                flightBounds: { left: 0, right: 1536 },
             });
 
             // Position birds in a loose formation around the center
@@ -1552,6 +1552,8 @@ export default class Breaze extends Scene {
                 Math.sin(angle) * (formationRadius * 0.6 + radiusVariation); // Flatter formation
 
             bird.pos = vec(posX, posY);
+            bird.setFlightBounds({ left: posX - 90, right: posX + 90 });
+            bird.setSpeed(30 + (i % 3) * 8);
             bird.z = 15; // Ensure birds are above background
             this.add(bird);
 

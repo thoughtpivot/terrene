@@ -25,6 +25,7 @@ import {
     Walker,
     WorldApi,
 } from "./Actors";
+import { Critter, type CritterKind } from "./Creatures";
 import {
     sfxClear,
     sfxDie,
@@ -170,6 +171,10 @@ export default class WorldOne extends Scene implements WorldApi {
 
     forgetBlock(col: number, row: number): void {
         this.blocks.delete(`${col},${row}`);
+    }
+
+    adopt(actor: Actor): void {
+        this.track(actor);
     }
 
     combo(): number {
@@ -386,6 +391,8 @@ export default class WorldOne extends Scene implements WorldApi {
             }
         }
 
+        this.spawnCritters();
+
         this.addBlock(64, 9, "hidden", "life");
         this.addScenery();
         this.addFinale();
@@ -401,6 +408,33 @@ export default class WorldOne extends Scene implements WorldApi {
         });
         this.track(this.player);
         this.camera.pos = vec(VIEW_W / 2, VIEW_H / 2);
+    }
+
+    /**
+     * New critters stay off the opening screen. Each one gets a leash so its
+     * job is readable before the next animal shows up.
+     */
+    private spawnCritters(): void {
+        const gy = 12 * TILE + 8;
+        const add = (col: number, y: number, kind: CritterKind, minCol: number, maxCol: number) => {
+            this.track(
+                new Critter(col * TILE + 8, y, kind, this, (x, yPos) => this.solidAt(x, yPos), {
+                    minX: minCol * TILE,
+                    maxX: maxCol * TILE + TILE,
+                })
+            );
+        };
+        add(34, gy, "bink", 30, 37);
+        add(52, 152, "birdie", 49, 55);
+        add(64, gy, "flick", 60, 68);
+        add(74, gy, "rusk", 71, 84);
+        add(92, 108, "vesper", 89, 96);
+        add(116, gy, "mog", 112, 120);
+        add(138, 96, "sable", 132, 146);
+        add(145, gy, "rollo", 144, 147);
+        add(160, gy, "brunt", 156, 162);
+        add(168, gy, "puff", 166, 172);
+        add(193, gy, "bram", 190, 196);
     }
 
     private addBlock(
@@ -561,12 +595,20 @@ export default class WorldOne extends Scene implements WorldApi {
                 (actor as Pickup).collect(this.player, this);
             }
             if (actor.hasTag("enemy")) {
+                const sized = actor as {
+                    halfW?: number;
+                    halfH?: number;
+                    receivePlayer?: (player: Player, stomp: boolean) => void;
+                };
+                if (typeof sized.receivePlayer !== "function") continue;
+                const halfW = sized.halfW ?? 6;
+                const halfH = sized.halfH ?? 8;
                 const dx = Math.abs(actor.pos.x - this.player.pos.x);
                 const feet = this.player.pos.y + half;
-                const head = actor.pos.y - 8;
-                if (dx < 12 && feet > head - 2 && this.player.pos.y < actor.pos.y + 12) {
+                const head = actor.pos.y - halfH;
+                if (dx < halfW + 6 && feet > head - 2 && this.player.pos.y < actor.pos.y + halfH + 4) {
                     const stomp = this.player.vel.y > 20 && feet < actor.pos.y + 4;
-                    (actor as Walker).receivePlayer(this.player, stomp);
+                    sized.receivePlayer(this.player, stomp);
                 }
             }
         }

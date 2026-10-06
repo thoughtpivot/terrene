@@ -28,6 +28,7 @@ export interface WorldApi {
     spawnPickup(kind: "fruit" | "life" | "star", x: number, y: number): void;
     spawnShards(x: number, y: number): void;
     forgetBlock(col: number, row: number): void;
+    adopt(actor: Actor): void;
     combo(): number;
     extraLife(x: number, y: number): void;
 }
@@ -250,6 +251,12 @@ export class Walker extends Actor {
         this.collider.useBoxCollider(14, 12);
     }
 
+    /** Killed by a kicked shell or by star power. */
+    defeat(): void {
+        if (!this.alive) return;
+        this.squashOut({ star: 1 } as Player);
+    }
+
     private squashOut(player: Player): void {
         this.alive = false;
         this.body.collisionType = CollisionType.PreventCollision;
@@ -273,9 +280,8 @@ export class Walker extends Actor {
         if (!this.alive) return;
         if (side === Side.Left || side === Side.Right) {
             if (other.hasTag("enemy") && this.kicked) {
-                if (typeof (other as Walker).squashOut === "function") {
-                    (other as Walker).squashOut({ star: 1 } as Player);
-                }
+                const foe = other as { defeat?: () => void };
+                if (typeof foe.defeat === "function") foe.defeat();
                 return;
             }
             if (!other.hasTag("player") && !this.kicked) this.dir *= -1;
