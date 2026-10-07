@@ -99,6 +99,10 @@ const PAL = {
     "<": "9ec0ee",
     ">": "24344e",
     "?": "15263c",
+    // Distant ridges. Kept off the critter alphabet so a typo cannot repaint a creature.
+    "`": "9cbaec",
+    "\\": "6f97cf",
+    '"': "eef5ff",
 };
 
 const SHEET_W = 336;
@@ -203,6 +207,40 @@ function outline(rows) {
         }
     }
     return out.map((r) => r.join(""));
+}
+
+/**
+ * Layered peaks. `peaks` are measured from the bottom of the sprite.
+ * Left of each summit is the lit face so the range reads as volume, not a blob.
+ */
+function ridge(w, h, peaks, colors) {
+    const grid = blank(w, h).map((row) => row.split(""));
+    const heightAt = (x) => {
+        let best = 0;
+        let owner = peaks[0];
+        for (const peak of peaks) {
+            const dx = Math.abs(x - peak.cx) / peak.half;
+            if (dx >= 1) continue;
+            const rise = peak.h * Math.pow(1 - dx, 1.45);
+            if (rise > best) {
+                best = rise;
+                owner = peak;
+            }
+        }
+        return { best, owner };
+    };
+    for (let x = 0; x < w; x++) {
+        const { best, owner } = heightAt(x);
+        if (best < 1) continue;
+        const top = h - Math.round(best);
+        for (let y = Math.max(0, top); y < h; y++) {
+            const down = y - top;
+            const snowLine = Math.max(2, Math.round(best * 0.16));
+            if (down < snowLine && best > h * 0.5) grid[y][x] = colors.snow;
+            else grid[y][x] = x <= owner.cx ? colors.lit : colors.mid;
+        }
+    }
+    return grid.map((row) => row.join(""));
 }
 
 function hill(w, h) {
@@ -2229,6 +2267,38 @@ function wickDrip() {
 }
 place("wick-drip", wickDrip());
 
+// Background ridges for World 1-1. No black rim: a hard outline would pull them forward.
+place(
+    "mtn-far",
+    ridge(112, 36, [
+        { cx: 20, half: 26, h: 28 },
+        { cx: 58, half: 34, h: 36 },
+        { cx: 96, half: 24, h: 22 },
+    ], { lit: "`", mid: "\\", snow: '"' })
+);
+place(
+    "mtn-far-b",
+    ridge(96, 30, [
+        { cx: 24, half: 28, h: 26 },
+        { cx: 68, half: 30, h: 30 },
+    ], { lit: "`", mid: "\\", snow: '"' })
+);
+place(
+    "mtn-near",
+    ridge(120, 56, [
+        { cx: 26, half: 30, h: 48 },
+        { cx: 70, half: 36, h: 56 },
+        { cx: 104, half: 22, h: 34 },
+    ], { lit: "a", mid: "A", snow: '"' })
+);
+place(
+    "mtn-near-b",
+    ridge(88, 46, [
+        { cx: 22, half: 26, h: 40 },
+        { cx: 60, half: 32, h: 46 },
+    ], { lit: "a", mid: "A", snow: '"' })
+);
+
 // Bitmap font, packed with no gaps so SpriteFont can slice it.
 cursorX = 0;
 cursorY += rowH + 2;
@@ -2508,6 +2578,10 @@ sheet.pack().pipe(fs.createWriteStream(pngPath)).on("finish", () => {
             }
         }
     }
+    sample("mtn-far", 0, 160 - 16 - frames["mtn-far"].h - 18);
+    sample("mtn-far-b", 108, 160 - 16 - frames["mtn-far-b"].h - 14);
+    sample("mtn-near", 20, 160 - 16 - frames["mtn-near"].h);
+    sample("mtn-near-b", 150, 160 - 16 - frames["mtn-near-b"].h + 4);
     sample("hill-lg", 8, 160 - 16 - frames["hill-lg"].h);
     sample("hill-sm", 120, 160 - 16 - frames["hill-sm"].h);
     sample("cloud-a", 150, 16);

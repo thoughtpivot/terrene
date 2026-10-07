@@ -90,6 +90,8 @@ export default class WorldOne extends Scene implements WorldApi {
     private message!: Text;
     private hint!: Text;
     private shade!: ScreenElement;
+    private skyBits: SkyBit[] = [];
+    private skyTime = 0;
     private readonly onKey = (event: KeyboardEvent): void => {
         if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(event.code)) {
             event.preventDefault();
@@ -201,6 +203,7 @@ export default class WorldOne extends Scene implements WorldApi {
         const sec = delta / 1000;
         this.comboTime = Math.max(0, this.comboTime - sec);
         this.hintTime = Math.max(0, this.hintTime - sec);
+        this.skyTime += sec;
         this.modeTime += sec;
 
         if (this.mode === "play" || this.mode === "bonus") {
@@ -264,6 +267,7 @@ export default class WorldOne extends Scene implements WorldApi {
             const maxX = 20 * TILE - halfW;
             const x = clamp(this.player.pos.x, minX, Math.max(minX, maxX));
             this.camera.pos = vec(x, BONUS_Y + VIEW_H / 2);
+            this.layoutSky();
             return;
         }
         let x = this.camera.pos.x;
@@ -275,6 +279,7 @@ export default class WorldOne extends Scene implements WorldApi {
             const left = x - halfW + 8;
             if (this.player.pos.x < left) this.player.pos.x = left;
         }
+        this.layoutSky();
         void engine;
     }
 
@@ -337,6 +342,8 @@ export default class WorldOne extends Scene implements WorldApi {
         this.message.text = "";
         this.hint.text = "ARROWS MOVE  Z JUMP  X RUN";
         this.hintTime = 6;
+        this.skyBits = [];
+        this.skyTime = 0;
 
         const map = this.makeMap(0, 0, COLS, ROWS);
         const pipeTops: { col: number; row: number }[] = [];
@@ -411,6 +418,7 @@ export default class WorldOne extends Scene implements WorldApi {
         });
         this.track(this.player);
         this.camera.pos = vec(VIEW_W / 2, VIEW_H / 2);
+        this.layoutSky();
     }
 
     /**
@@ -452,6 +460,9 @@ export default class WorldOne extends Scene implements WorldApi {
 
     private addScenery(): void {
         const groundY = GROUND_ROW * TILE;
+        // Far ridge barely follows the camera. The nearer ridge moves more, still behind the hills.
+        this.addRidge("mtn-far", "mtn-far-b", groundY - 6, -36, 0.16, 600, 6);
+        this.addRidge("mtn-near", "mtn-near-b", groundY + 2, -28, 0.34, 550, 5);
         const hillCols = [0, 48, 96, 144, 192];
         for (const col of hillCols) {
             const name = col % 96 === 0 ? "hill-lg" : "hill-sm";
@@ -462,20 +473,78 @@ export default class WorldOne extends Scene implements WorldApi {
             if (this.nearPipe(col)) continue;
             this.decor(col % 2 === 0 ? "bush-a" : "bush-b", col * TILE, groundY + 2, -6);
         }
-        const clouds: [number, number, string][] = [
-            [6, 2, "cloud-b"],
-            [19, 3, "cloud-a"],
-            [36, 2, "cloud-b"],
-            [54, 1, "cloud-a"],
-            [78, 3, "cloud-b"],
-            [100, 2, "cloud-a"],
-            [126, 1, "cloud-b"],
-            [148, 3, "cloud-a"],
-            [170, 2, "cloud-b"],
-            [190, 1, "cloud-a"],
+        // Clouds scroll at half the ground speed and also drift, so the sky keeps moving while Pip stands still.
+        const cloudSpan = 768;
+        const clouds: [number, number, string, number][] = [
+            [8, 6, "cloud-a", -14],
+            [86, 34, "cloud-b", -8],
+            [164, 14, "cloud-a", -16],
+            [242, 42, "cloud-b", -10],
+            [320, 8, "cloud-a", -12],
+            [398, 30, "cloud-b", -7],
+            [476, 16, "cloud-a", -15],
+            [554, 40, "cloud-b", -9],
+            [632, 10, "cloud-a", -13],
+            [710, 28, "cloud-b", -11],
         ];
-        for (const [col, row, name] of clouds) {
-            this.decorTop(name, col * TILE, row * TILE, -18);
+        for (const [home, y, name, speed] of clouds) {
+            this.addSky(name, home, y, -20, 0.5, speed, cloudSpan, 48, false);
+        }
+    }
+
+    /**
+     * Repeating mountain silhouettes. `factor` is the Tiled parallax factor:
+     * 0 stays glued to the screen, 1 scrolls with the ground.
+     */
+    private addRidge(
+        wide: string,
+        narrow: string,
+        y: number,
+        z: number,
+        factor: number,
+        span: number,
+        count: number
+    ): void {
+        for (let i = 0; i < count; i++) {
+            const name = i % 2 === 0 ? wide : narrow;
+            const home = (i * span) / count;
+            this.addSky(name, home, y, z, factor, 0, span, 120, true);
+        }
+    }
+
+    private addSky(
+        name: string,
+        home: number,
+        y: number,
+        z: number,
+        factor: number,
+        speed: number,
+        span: number,
+        bleed: number,
+        anchorBottom: boolean
+    ): void {
+        const actor = new Actor({
+            pos: vec(home, y),
+            anchor: anchorBottom ? vec(0, 1) : vec(0, 0),
+            collisionType: CollisionType.PreventCollision,
+            z,
+        });
+        actor.graphics.use(sprite(name));
+        this.track(actor);
+        this.skyBits.push({ actor, home, speed, factor, span, bleed });
+    }
+
+    /**
+     * Place each sky sprite so its screen x is `home + drift - cameraDelta * factor`,
+     * then wrap that slot across the layer so the strip never runs out.
+     */
+    private layoutSky(): void {
+        const cameraDelta = this.camera.pos.x - VIEW_W / 2;
+        for (const bit of this.skyBits) {
+            if (bit.actor.isKilled()) continue;
+            const raw = bit.home + this.skyTime * bit.speed - cameraDelta * bit.factor;
+            const wrapped = wrap(raw + bit.bleed, bit.span) - bit.bleed;
+            bit.actor.pos.x = wrapped + cameraDelta;
         }
     }
 
@@ -565,17 +634,6 @@ export default class WorldOne extends Scene implements WorldApi {
         const actor = new Actor({
             pos: vec(x, y),
             anchor: vec(0, 1),
-            collisionType: CollisionType.PreventCollision,
-            z,
-        });
-        actor.graphics.use(sprite(name));
-        this.track(actor);
-    }
-
-    private decorTop(name: string, x: number, y: number, z: number): void {
-        const actor = new Actor({
-            pos: vec(x, y),
-            anchor: vec(0, 0),
             collisionType: CollisionType.PreventCollision,
             z,
         });
@@ -771,6 +829,19 @@ function setGravity(y: number): void {
 
 function clamp(value: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, value));
+}
+
+function wrap(value: number, period: number): number {
+    return ((value % period) + period) % period;
+}
+
+interface SkyBit {
+    actor: Actor;
+    home: number;
+    speed: number;
+    factor: number;
+    span: number;
+    bleed: number;
 }
 
 export { Resources };
