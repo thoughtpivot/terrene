@@ -81,10 +81,28 @@ const PAL = {
     "(": "f6e6cf",
     ")": "3c9a34",
     "=": "f2c84a",
+    // World 1-2 crypt. Kept off Pip's letters so a typo cannot repaint the hero.
+    "~": "1a1722",
+    "{": "3c3648",
+    "}": "a89fbe",
+    "[": "241f2e",
+    "]": "3c6e46",
+    "!": "ffe27a",
+    "@": "fff8dc",
+    "/": "ff5c2a",
+    ";": "f3e7d4",
+    ":": "b9a78c",
+    "|": "8b93a0",
+    _: "e4e8ef",
+    "'": "2a1c30",
+    ",": "8a74c4",
+    "<": "9ec0ee",
+    ">": "24344e",
+    "?": "15263c",
 };
 
 const SHEET_W = 336;
-const SHEET_H = 720;
+const SHEET_H = 960;
 const sheet = new PNG({ width: SHEET_W, height: SHEET_H, fill: true });
 const frames = {};
 
@@ -1928,6 +1946,285 @@ place("flick-flat", [
     ".KKKKKKKKKKKK...",
 ]);
 
+// World 1-2 crypt tiles and creatures. Same sheet as Pip so both stages share one atlas.
+function frame16(lines) {
+    const rows = lines.map((line) => {
+        if (line.length > 16) throw new Error(`wide sprite row ${line.length}: ${line}`);
+        return (line + ".".repeat(16)).slice(0, 16);
+    });
+    while (rows.length < 16) rows.push(".".repeat(16));
+    if (rows.length > 16) throw new Error("sprite taller than 16");
+    return rows;
+}
+
+function masonry(body, lip, crack, lipAt) {
+    const rows = [];
+    for (let y = 0; y < 16; y++) {
+        let row = "";
+        for (let x = 0; x < 16; x++) {
+            const edge = lipAt === "top" ? y === 0 : lipAt === "bottom" ? y === 15 : false;
+            const seam = y % 5 === 4 || (x + (Math.floor(y / 5) % 2 === 0 ? 0 : 4)) % 8 === 7;
+            if (edge) row += lip;
+            else if (seam) row += crack;
+            else row += body;
+        }
+        rows.push(row);
+    }
+    return rows;
+}
+
+place("stone", masonry("{", "}", "[", "top"));
+place("stone-roof", masonry("{", "}", "[", "bottom"));
+place("stone-cold", masonry(">", "<", "?", "top"));
+place("stone-cold-roof", masonry(">", "<", "?", "bottom"));
+place("crypt-deep", masonry("~", "~", "[", "none"));
+
+place(
+    "torch-0",
+    frame16([
+        "......@!......",
+        ".....!@@!.....",
+        ".....!@!......",
+        "......!!......",
+        "......''......",
+        ".....''''.....",
+        "......''......",
+        "......||......",
+        ".....|__|.....",
+    ])
+);
+place(
+    "torch-1",
+    frame16([
+        ".....@!@......",
+        "....!@@@!.....",
+        ".....!@!......",
+        "......!!......",
+        "......''......",
+        ".....''''.....",
+        "......''......",
+        "......||......",
+        ".....|__|.....",
+    ])
+);
+place(
+    "skull",
+    frame16([
+        "....;;;;;;....",
+        "...;::::::;...",
+        "..;::@@::@@:..",
+        "..;::::::::;..",
+        "...;::;;::;...",
+        "....;;;;;;....",
+        "....;:;;:;....",
+        "....;;..;;....",
+    ])
+);
+place(
+    "bones",
+    frame16([
+        "....;;....;;..",
+        "...;::;..;::;.",
+        "....;;....;;..",
+        "..;;......;;..",
+        "...;::;;::;...",
+        "....;;;;;;....",
+    ])
+);
+place("chain", [
+    "..||..",
+    ".|..|.",
+    "..||..",
+    "..||..",
+    ".|..|.",
+    "..||..",
+    "..||..",
+    ".|..|.",
+    "..||..",
+    "..||..",
+    ".|..|.",
+    "..||..",
+    "..||..",
+    ".|..|.",
+    "..||..",
+    "..||..",
+]);
+
+function cryptGate() {
+    const w = 32;
+    const h = 48;
+    const grid = blank(w, h).map((row) => row.split(""));
+    fillRect(grid, 1, 2, 30, 46, "|");
+    fillRect(grid, 4, 6, 24, 38, "~");
+    fillRect(grid, 14, 8, 4, 30, "!");
+    fillRect(grid, 15, 10, 2, 26, "@");
+    for (const x of [6, 10, 20, 24]) fillRect(grid, x, 6, 2, 38, "|");
+    fillRect(grid, 1, 2, 30, 2, "_");
+    fillRect(grid, 1, 44, 30, 3, "_");
+    fillRect(grid, 12, 40, 8, 4, "_");
+    return grid.map((row) => row.join(""));
+}
+place("crypt-gate", cryptGate());
+
+place(
+    "gloam-0",
+    frame16([
+        "......@!......",
+        ".....!@@!.....",
+        "......!!......",
+        "....,,,,,,....",
+        "...;;@@;;@@;..",
+        "...;;;;;;;;...",
+        "....,,,,,,....",
+        ".....;;;;.....",
+        "......;;......",
+    ])
+);
+place(
+    "gloam-1",
+    frame16([
+        ".....@!@......",
+        "....!@@@!.....",
+        "......!!......",
+        "...;;;;;;;;...",
+        "..;;@@;;@@;;..",
+        "...;;;;;;;;...",
+        "....;;;;;;....",
+        ".....;;;;.....",
+        "......;;......",
+    ])
+);
+place(
+    "gloam-flare",
+    frame16([
+        ".....@!@......",
+        "....!@@@!.....",
+        "...!@@@@@!....",
+        "....!@@@!.....",
+        "....,,,,,,....",
+        "...;;@@;;@@;..",
+        "...;;;;;;;;...",
+        "....,,,,,,....",
+        ".....;;;;.....",
+    ])
+);
+place(
+    "gloam-glide",
+    frame16([
+        "........@!....",
+        ".......!@@!...",
+        "........!!....",
+        "....,,,,,,,,..",
+        "...;;@@;;@@;..",
+        "..;;;;;;;;;;..",
+        "....,,,,,,....",
+        "......;;;;....",
+        ".......;;.....",
+    ])
+);
+place(
+    "marrow-pile",
+    frame16([
+        "....!!........",
+        "...;::;;......",
+        "..;:::::;.....",
+        "...;;::;;.....",
+        "....;;;;......",
+    ])
+);
+place(
+    "marrow-shake",
+    frame16([
+        "...@..@.......",
+        "...;::;;......",
+        "..;:::::;.....",
+        "...;;::;;.....",
+        "....;;;;......",
+        "...;;..;;.....",
+    ])
+);
+place(
+    "marrow-0",
+    frame16([
+        "..;@@;........",
+        ".;;::;;.......",
+        ";::::::;......",
+        ";;::;;::;;....",
+        ".;;....;;.....",
+        "..;;..;;......",
+    ])
+);
+place(
+    "marrow-1",
+    frame16([
+        "..;@@;........",
+        ".;;::;;.......",
+        ";::::::;......",
+        ";;::;;::;;....",
+        "..;;..;;......",
+        ".;;....;;.....",
+    ])
+);
+place(
+    "marrow-flat",
+    frame16([
+        "..;@@;..;;....",
+        ";::::::::;;...",
+        ";;;;;;;;;;;;..",
+    ])
+);
+place(
+    "wick-0",
+    frame16([
+        "...!@!........",
+        "..!@@@!.......",
+        "...!@!........",
+        "...,,,........",
+        "..,,,,,.......",
+        "..,;;,,.......",
+        "...,,,........",
+        "....,,........",
+    ])
+);
+place(
+    "wick-swell",
+    frame16([
+        "..@!@!@.......",
+        ".!@@@@@!......",
+        "..!@@@!.......",
+        "..,,,,,.......",
+        ".,,,,,,,......",
+        "..,;;,,.......",
+        "...,,,........",
+        "....,,........",
+    ])
+);
+place(
+    "wick-flat",
+    frame16([
+        "..!@!.........",
+        ",,,,,,,,,.....",
+        ";;;;;;;;;;;...",
+    ])
+);
+
+function wickDrip() {
+    const w = 8;
+    const h = 96;
+    const rows = [];
+    for (let y = 0; y < h; y++) {
+        const chars = "........".split("");
+        const hot = y % 5 < 2;
+        chars[2] = hot ? "@" : "!";
+        chars[3] = "/";
+        chars[4] = hot ? "!" : "/";
+        chars[5] = y % 9 === 0 ? "@" : "!";
+        rows.push(chars.join(""));
+    }
+    return rows;
+}
+place("wick-drip", wickDrip());
+
 // Bitmap font, packed with no gaps so SpriteFont can slice it.
 cursorX = 0;
 cursorY += rowH + 2;
@@ -2071,7 +2368,7 @@ function addBrim(name) {
     }
 }
 
-const GROUND_CRITTERS = ["bink", "rusk", "puff", "rollo", "mog", "brunt", "bram", "flick"];
+const GROUND_CRITTERS = ["bink", "rusk", "puff", "rollo", "mog", "brunt", "bram", "flick", "marrow"];
 
 for (const name of Object.keys(frames)) {
     if (
@@ -2141,6 +2438,9 @@ const CRITTER_FRAMES = [
     "brunt",
     "bram",
     "flick",
+    "gloam",
+    "marrow",
+    "wick",
 ];
 
 for (const name of Object.keys(frames)) {
@@ -2237,6 +2537,9 @@ sheet.pack().pipe(fs.createWriteStream(pngPath)).on("finish", () => {
         ["BRUNT", ["brunt-0", "brunt-1", "brunt-flat"]],
         ["BRAM", ["bram-0", "bram-1", "bram-crack"]],
         ["FLICK", ["flick-0", "flick-1", "flick-nip", "flick-flat"]],
+        ["GLOAM", ["gloam-0", "gloam-1", "gloam-flare", "gloam-glide"]],
+        ["MARROW", ["marrow-pile", "marrow-shake", "marrow-0", "marrow-1", "marrow-flat"]],
+        ["WICK", ["wick-0", "wick-swell", "wick-flat"]],
     ];
     const lineupScale = 4;
     const rowH = 16 * lineupScale + 18;

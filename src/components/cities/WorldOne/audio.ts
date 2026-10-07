@@ -80,6 +80,26 @@ export function startMusic(): void {
     }, 170);
 }
 
+/** Lower, slower crypt bed. Same voice as the overworld, not the same tune. */
+const DUNGEON_LEAD = [58, 61, 58, 56, 53, 56, 51, 49, 51, 53, 56, 53, 51, 49, 46, 49];
+const DUNGEON_BASS = [34, 34, 37, 37, 32, 32, 30, 30];
+
+export function startDungeonMusic(): void {
+    const ac = audio();
+    if (!ac || musicOn) return;
+    musicOn = true;
+    step = 0;
+    stepTimer = setInterval(() => {
+        if (!musicOn) return;
+        const lead = DUNGEON_LEAD[step % DUNGEON_LEAD.length];
+        tone(midi(lead), 0.22, "triangle", 0.03);
+        if (step % 2 === 0) {
+            tone(midi(DUNGEON_BASS[(step / 2) % DUNGEON_BASS.length]), 0.36, "square", 0.02);
+        }
+        step++;
+    }, 280);
+}
+
 export function stopMusic(): void {
     musicOn = false;
     if (stepTimer) {

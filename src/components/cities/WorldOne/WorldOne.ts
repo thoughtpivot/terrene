@@ -35,6 +35,7 @@ import {
     stopMusic,
     unlockAudio,
 } from "./audio";
+import { WORLD_ONE_TWO_SCENE } from "../WorldOneTwo/WorldOneTwo";
 
 const TILE = 16;
 const VIEW_W = 256;
@@ -81,6 +82,7 @@ export default class WorldOne extends Scene implements WorldApi {
     private bonusExit = { x: 0, top: 0 };
     private doorX = 0;
     private clearAcc = 0;
+    private leftStage = false;
     private scoreLabel!: Text;
     private coinLabel!: Text;
     private timeLabel!: Text;
@@ -118,6 +120,7 @@ export default class WorldOne extends Scene implements WorldApi {
 
     onActivate(): void {
         setGravity(1700);
+        this.engine.backgroundColor = Color.fromHex("#5c94fc");
         this.camera.pos = vec(VIEW_W / 2, VIEW_H / 2);
     }
 
@@ -234,7 +237,7 @@ export default class WorldOne extends Scene implements WorldApi {
             }
         } else if (this.mode === "clear") {
             this.tickTimeBonus(delta);
-            if (this.time <= 0 && this.modeTime > 2.2) this.restart();
+            if (this.time <= 0 && this.modeTime > 2.2) this.proceed();
         } else if (this.mode === "dead") {
             if (this.modeTime > 1.6) {
                 this.lives -= 1;
@@ -710,6 +713,21 @@ export default class WorldOne extends Scene implements WorldApi {
             this.time -= 1;
             this.points += 50;
         }
+    }
+
+    /** Course clear hands the run to World 1-2. Death still restarts 1-1. */
+    private proceed(): void {
+        if (this.leftStage) return;
+        this.leftStage = true;
+        const big = this.player?.big ?? false;
+        stopMusic();
+        this.musicStarted = false;
+        this.engine.goToScene(WORLD_ONE_TWO_SCENE, {
+            points: this.points,
+            coins: this.coins,
+            lives: this.lives,
+            big,
+        });
     }
 
     private die(): void {

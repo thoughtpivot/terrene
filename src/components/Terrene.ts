@@ -1,5 +1,6 @@
 import { Color, DisplayMode, Engine, Loader, Physics, PointerScope, vec } from "excalibur";
 import WorldOne, { Resources as WorldOneResources } from "./cities/WorldOne/WorldOne";
+import WorldOneTwo, { WORLD_ONE_TWO_SCENE } from "./cities/WorldOneTwo/WorldOneTwo";
 
 class Terrene extends Engine {
     constructor() {
@@ -28,7 +29,9 @@ class Terrene extends Engine {
             Physics.acc = vec(0, 1700);
             console.log("🏰 Engine started, loading World 1-1 as the default scene");
             const world = new WorldOne();
+            const crypt = new WorldOneTwo();
             this.addScene("worldone", world);
+            this.addScene(WORLD_ONE_TWO_SCENE, crypt);
             this.goToScene("worldone");
         });
     }
