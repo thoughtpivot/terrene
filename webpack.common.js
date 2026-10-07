@@ -52,7 +52,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebPackPlugin({
-      title: "Terrene - World 1-1",
+      title: "Terrene - Zelda Land",
       template: "./src/index.html",
     }),
     new CopyPlugin({

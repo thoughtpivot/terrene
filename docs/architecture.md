@@ -97,7 +97,7 @@ Cities are ExcaliburJS `Scene` subclasses that represent game levels:
 - Quest marker creation
 - Interaction system setup
 
-**Examples:** Eldergrove, Breaze, TheWoods, Vitosha, Solic, Baston
+**Examples:** Eldergrove, Breaze, TheWoods, Vitosha, Solic, Baston, Zelda Land, Zelda Cave
 
 ### NPCs (Characters)
 
