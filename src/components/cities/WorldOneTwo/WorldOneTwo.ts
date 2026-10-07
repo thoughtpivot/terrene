@@ -2,7 +2,6 @@ import {
     Actor,
     BodyComponent,
     Canvas,
-    Circle,
     Color,
     CollisionType,
     Engine,
@@ -55,11 +54,11 @@ export interface RunCarry {
 
 /**
  * World 1-2, the crypt after World 1-1.
- * Darkness is a cool ambient, warm torch pools, a light floor lip, and an edge vignette.
+ * Darkness is a cool ambient, warm torches, a light floor lip, and an edge vignette.
  * The path, the three creatures, and the gate stay in a brighter value band than the stone.
  *
  * Layout lessons, applied from dungeon-design writing:
- * - Motivated warm pools mark the route. The wick chamber stays cold so the hazard reads as danger.
+ * - Warm torches mark the route. The wick chamber stays cold so the hazard reads as danger.
  * - Gameplay edges (floor lip, creature silhouettes, the gate slit) keep contrast. The rest falls off.
  * - One creature per beat, with a safe mouth, a squeeze, a breather, then the exit.
  * - Ceiling height and a short corridor change the pace without a second path.
@@ -407,10 +406,7 @@ export default class WorldOneTwo extends Scene implements WorldApi {
     private addDressing(): void {
         const groundY = GROUND_ROW * TILE;
         for (const torch of TORCHES) {
-            const x = torch.col * TILE;
-            const y = torch.row * TILE;
-            this.track(new Sconce(x, y));
-            this.track(new Lamp(x + 8, y - 8));
+            this.track(new Sconce(torch.col * TILE, torch.row * TILE));
         }
         for (const prop of PROPS) {
             if (prop.name === "chain") {
@@ -597,23 +593,6 @@ class Sconce extends Actor {
         if (this.frame === name) return;
         this.frame = name;
         this.graphics.use(sprite(name));
-    }
-}
-
-class Lamp extends Actor {
-    constructor(x: number, y: number) {
-        super({
-            pos: vec(x, y),
-            anchor: vec(0.5, 0.5),
-            collisionType: CollisionType.PreventCollision,
-            z: 1,
-        });
-        this.graphics.use(
-            new Circle({
-                radius: 34,
-                color: Color.fromRGB(255, 164, 64, 0.14),
-            })
-        );
     }
 }
 

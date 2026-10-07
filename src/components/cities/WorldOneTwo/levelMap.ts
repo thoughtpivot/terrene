@@ -107,13 +107,13 @@ export const TORCHES: readonly Decor[] = [
 ];
 
 export const PROPS: readonly Decor[] = [
-    { name: "skull", col: 9, row: 13 },
+    { name: "skull", col: 9, row: 12 },
     { name: "chain", col: 30, row: 2 },
-    { name: "bones", col: 37, row: 13 },
+    { name: "bones", col: 37, row: 12 },
+    { name: "skull", col: 48, row: 12 },
     { name: "chain", col: 50, row: 6 },
-    { name: "skull", col: 48, row: 13 },
-    { name: "bones", col: 72, row: 13 },
-    { name: "skull", col: 106, row: 13 },
+    { name: "bones", col: 72, row: 12 },
+    { name: "skull", col: 106, row: 12 },
     { name: "chain", col: 109, row: 4 },
 ];
 
