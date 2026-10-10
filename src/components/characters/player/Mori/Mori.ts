@@ -49,6 +49,7 @@ export default class Mori extends Actor implements OkaHero {
     private facing: -1 | 1 = 1;
     private coyote = 0;
     private buffer = 0;
+    private leaping = false;
     private hurtTime = 0;
     private invuln = 0;
     private runClock = 0;
@@ -121,10 +122,15 @@ export default class Mori extends Actor implements OkaHero {
         if (this.invuln > 0) this.invuln -= dt;
         if (this.hurtTime > 0) this.hurtTime -= dt;
 
-        const water = physics.waterAt(b.x, b.y - b.h * 0.45);
         const wasInWater = this.inWater;
+        // Enter when the body is half under, leave only once the feet clear the surface,
+        // otherwise floating at the waterline flickers between swimming and falling.
+        // A leap out of the water rides normal jump physics until it peaks.
+        if (this.leaping && b.vy >= 0) this.leaping = false;
+        const water = this.leaping ? null : physics.waterAt(b.x, wasInWater ? b.y - 2 : b.y - b.h * 0.45);
         this.inWater = water !== null;
         if (water) this.water = water;
+        if (wasInWater && !this.inWater && !this.leaping) this.coyote = COYOTE * 1.5;
         if (this.inWater !== wasInWater && this.water) {
             const strength = Math.min(1.5, Math.abs(b.vy) / 400 + 0.3);
             this.onSplash?.(this.water, b.x, strength);
@@ -206,7 +212,9 @@ export default class Mori extends Actor implements OkaHero {
             if (atSurface) {
                 // leap out of the water
                 b.vy = -JUMP_SPEED * 0.92;
+                this.leaping = true;
                 this.hooks.sfx("splash", b.x, 1.2);
+                return;
             } else {
                 b.vy = Math.min(b.vy, -230);
                 this.hooks.burst("glow", b.x, b.y - 40, 3);
