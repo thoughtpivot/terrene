@@ -33,7 +33,6 @@ import {
     sfxOneUp,
     startMusic,
     stopMusic,
-    unlockAudio,
 } from "./audio";
 import { WORLD_ONE_TWO_SCENE } from "../WorldOneTwo/WorldOneTwo";
 
@@ -92,15 +91,15 @@ export default class WorldOne extends Scene implements WorldApi {
     private shade!: ScreenElement;
     private skyBits: SkyBit[] = [];
     private skyTime = 0;
+    private gestureTargets: Window[] = [];
+    private readonly onPointer = (): void => {
+        this.tryMusic();
+    };
     private readonly onKey = (event: KeyboardEvent): void => {
         if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(event.code)) {
             event.preventDefault();
         }
-        if (!this.musicStarted) {
-            unlockAudio();
-            startMusic();
-            this.musicStarted = true;
-        }
+        this.tryMusic();
         if (this.mode === "over" && (event.code === "KeyZ" || event.code === "Space")) {
             this.points = 0;
             this.coins = 0;
@@ -114,7 +113,6 @@ export default class WorldOne extends Scene implements WorldApi {
         this.backgroundColor = Color.fromHex("#5c94fc");
         this.buildHud();
         this.spawnWorld();
-        window.addEventListener("keydown", this.onKey);
         (window as unknown as { __world?: WorldOne }).__world = this;
         console.log("🏰 World 1-1 ready");
         void engine;
@@ -124,12 +122,15 @@ export default class WorldOne extends Scene implements WorldApi {
         setGravity(1700);
         this.engine.backgroundColor = Color.fromHex("#5c94fc");
         this.camera.pos = vec(VIEW_W / 2, VIEW_H / 2);
+        this.bindMusicInput();
+        this.tryMusic();
     }
 
     onDeactivate(): void {
-        window.removeEventListener("keydown", this.onKey);
+        this.unbindMusicInput();
         setGravity(0);
         stopMusic();
+        this.musicStarted = false;
     }
 
     score(points: number, x: number, y: number): void {
@@ -200,6 +201,7 @@ export default class WorldOne extends Scene implements WorldApi {
     }
 
     onPreUpdate(engine: Engine, delta: number): void {
+        if (engine.input.keyboard.getKeys().length > 0) this.tryMusic();
         const sec = delta / 1000;
         this.comboTime = Math.max(0, this.comboTime - sec);
         this.hintTime = Math.max(0, this.hintTime - sec);
@@ -806,7 +808,34 @@ export default class WorldOne extends Scene implements WorldApi {
         this.blocks.clear();
         this.flagCloth = null;
         this.spawnWorld();
-        if (this.musicStarted) startMusic();
+        this.tryMusic();
+    }
+
+    private tryMusic(): void {
+        if (this.musicStarted) return;
+        if (startMusic()) this.musicStarted = true;
+    }
+
+    private bindMusicInput(): void {
+        this.unbindMusicInput();
+        this.gestureTargets = [window];
+        try {
+            if (window.top && window.top !== window) this.gestureTargets.push(window.top);
+        } catch {
+            // The parent frame is cross-origin, so this window still receives the keys.
+        }
+        for (const target of this.gestureTargets) {
+            target.addEventListener("keydown", this.onKey, true);
+            target.addEventListener("pointerdown", this.onPointer, true);
+        }
+    }
+
+    private unbindMusicInput(): void {
+        for (const target of this.gestureTargets) {
+            target.removeEventListener("keydown", this.onKey, true);
+            target.removeEventListener("pointerdown", this.onPointer, true);
+        }
+        this.gestureTargets = [];
     }
 
     private refreshHud(): void {
