@@ -21,7 +21,7 @@ import {
     Shard,
     type WorldApi,
 } from "../WorldOne/Actors";
-import { sfxClear, sfxDie, sfxHurt, sfxOneUp, startDungeonMusic, stopMusic, unlockAudio } from "../WorldOne/audio";
+import { sfxClear, sfxDie, sfxHurt, sfxOneUp, startDungeonMusic, stopMusic } from "../WorldOne/audio";
 import Player from "../WorldOne/Player";
 import { getFont, sprite } from "../WorldOne/sprites";
 import { DungeonCritter } from "./Creatures";
@@ -90,15 +90,15 @@ export default class WorldOneTwo extends Scene implements WorldApi {
     private message!: Text;
     private hint!: Text;
     private shade!: ScreenElement;
+    private gestureTargets: Window[] = [];
+    private readonly onPointer = (): void => {
+        this.tryMusic();
+    };
     private readonly onKey = (event: KeyboardEvent): void => {
         if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(event.code)) {
             event.preventDefault();
         }
-        if (!this.musicStarted) {
-            unlockAudio();
-            startDungeonMusic();
-            this.musicStarted = true;
-        }
+        this.tryMusic();
         if (this.mode === "over" && (event.code === "KeyZ" || event.code === "Space")) {
             this.points = 0;
             this.coins = 0;
@@ -112,7 +112,6 @@ export default class WorldOneTwo extends Scene implements WorldApi {
         this.backgroundColor = Color.fromHex("#100e16");
         this.buildHud();
         this.addVignette();
-        window.addEventListener("keydown", this.onKey);
         (window as unknown as { __worldTwo?: WorldOneTwo }).__worldTwo = this;
         console.log("🏰 World 1-2 ready");
         void engine;
@@ -121,6 +120,8 @@ export default class WorldOneTwo extends Scene implements WorldApi {
     onActivate(context: { data?: unknown; engine: Engine }): void {
         setGravity(1700);
         context.engine.backgroundColor = Color.fromHex("#100e16");
+        this.bindMusicInput();
+        this.tryMusic();
         if (this.booted) return;
         this.booted = true;
         const carry = readCarry(context.data);
@@ -134,9 +135,10 @@ export default class WorldOneTwo extends Scene implements WorldApi {
     }
 
     onDeactivate(): void {
-        window.removeEventListener("keydown", this.onKey);
+        this.unbindMusicInput();
         setGravity(0);
         stopMusic();
+        this.musicStarted = false;
     }
 
     score(points: number, x: number, y: number): void {
@@ -207,6 +209,7 @@ export default class WorldOneTwo extends Scene implements WorldApi {
     }
 
     onPreUpdate(engine: Engine, delta: number): void {
+        if (engine.input.keyboard.getKeys().length > 0) this.tryMusic();
         const sec = delta / 1000;
         this.comboTime = Math.max(0, this.comboTime - sec);
         this.hintTime = Math.max(0, this.hintTime - sec);
@@ -554,7 +557,34 @@ export default class WorldOneTwo extends Scene implements WorldApi {
         this.maps = [];
         this.blocks.clear();
         this.spawnWorld();
-        if (this.musicStarted) startDungeonMusic();
+        this.tryMusic();
+    }
+
+    private tryMusic(): void {
+        if (this.musicStarted) return;
+        if (startDungeonMusic()) this.musicStarted = true;
+    }
+
+    private bindMusicInput(): void {
+        this.unbindMusicInput();
+        this.gestureTargets = [window];
+        try {
+            if (window.top && window.top !== window) this.gestureTargets.push(window.top);
+        } catch {
+            // The parent frame is cross-origin, so this window still receives the keys.
+        }
+        for (const target of this.gestureTargets) {
+            target.addEventListener("keydown", this.onKey, true);
+            target.addEventListener("pointerdown", this.onPointer, true);
+        }
+    }
+
+    private unbindMusicInput(): void {
+        for (const target of this.gestureTargets) {
+            target.removeEventListener("keydown", this.onKey, true);
+            target.removeEventListener("pointerdown", this.onPointer, true);
+        }
+        this.gestureTargets = [];
     }
 
     private refreshHud(): void {

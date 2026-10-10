@@ -5,16 +5,39 @@
 
 let ctx: AudioContext | null = null;
 let musicOn = false;
+let resumePending = false;
+let resumeToken = 0;
 let stepTimer: ReturnType<typeof setInterval> | null = null;
 let step = 0;
 
+function AudioCtor(): typeof AudioContext | null {
+    if (typeof AudioContext !== "undefined") return AudioContext;
+    const webkit = (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (typeof webkit !== "undefined") return webkit;
+    return null;
+}
+
 function audio(): AudioContext | null {
-    if (typeof AudioContext === "undefined") return null;
-    if (!ctx) ctx = new AudioContext();
-    if (ctx.state === "suspended") {
-        void ctx.resume();
-    }
+    const Ctor = AudioCtor();
+    if (!Ctor) return null;
+    if (!ctx) ctx = new Ctor();
     return ctx;
+}
+
+function resumeThen(start: () => boolean): void {
+    const ac = audio();
+    if (!ac || resumePending) return;
+    resumePending = true;
+    const token = ++resumeToken;
+    void ac.resume().then(() => {
+        if (token !== resumeToken) return;
+        resumePending = false;
+        if (ac.state === "running") start();
+    }).catch((error) => {
+        if (token !== resumeToken) return;
+        resumePending = false;
+        console.error("❌ Audio resume failed", error);
+    });
 }
 
 function tone(freq: number, dur: number, type: OscillatorType, gainValue: number, slideTo?: number): void {
@@ -61,47 +84,58 @@ const LEAD = [74, 72, 69, 67, 69, 72, 74, 79, 77, 74, 72, 69, 67, 65, 64, 62, 64
 const BASS = [50, 50, 45, 45, 43, 43, 48, 48, 50, 45, 43, 41, 38, 38, 43, 43];
 
 export function unlockAudio(): void {
-    audio();
+    const ac = audio();
+    if (ac && ac.state === "suspended") {
+        void ac.resume().catch((error) => {
+            console.error("❌ Audio resume failed", error);
+        });
+    }
 }
 
-export function startMusic(): void {
-    const ac = audio();
-    if (!ac || musicOn) return;
-    musicOn = true;
-    step = 0;
-    stepTimer = setInterval(() => {
-        if (!musicOn) return;
-        const lead = LEAD[step % LEAD.length];
-        tone(midi(lead), 0.16, "square", 0.035);
-        if (step % 2 === 0) {
-            tone(midi(BASS[(step / 2) % BASS.length]), 0.28, "triangle", 0.04);
-        }
-        step++;
-    }, 170);
+export function startMusic(): boolean {
+    return beginBed(false);
 }
 
 /** Lower, slower crypt bed. Same voice as the overworld, not the same tune. */
 const DUNGEON_LEAD = [58, 61, 58, 56, 53, 56, 51, 49, 51, 53, 56, 53, 51, 49, 46, 49];
 const DUNGEON_BASS = [34, 34, 37, 37, 32, 32, 30, 30];
 
-export function startDungeonMusic(): void {
+export function startDungeonMusic(): boolean {
+    return beginBed(true);
+}
+
+function beginBed(dungeon: boolean): boolean {
     const ac = audio();
-    if (!ac || musicOn) return;
+    if (!ac) return false;
+    if (ac.state !== "running") {
+        resumeThen(() => beginBed(dungeon));
+        return false;
+    }
+    if (musicOn) return true;
     musicOn = true;
     step = 0;
+    const lead = dungeon ? DUNGEON_LEAD : LEAD;
+    const bass = dungeon ? DUNGEON_BASS : BASS;
+    const leadGain = dungeon ? 0.09 : 0.14;
+    const bassGain = dungeon ? 0.07 : 0.1;
+    const every = dungeon ? 280 : 170;
     stepTimer = setInterval(() => {
-        if (!musicOn) return;
-        const lead = DUNGEON_LEAD[step % DUNGEON_LEAD.length];
-        tone(midi(lead), 0.22, "triangle", 0.03);
+        if (!musicOn || ac.state !== "running") return;
+        const note = lead[step % lead.length];
+        tone(midi(note), dungeon ? 0.22 : 0.16, dungeon ? "triangle" : "square", leadGain);
         if (step % 2 === 0) {
-            tone(midi(DUNGEON_BASS[(step / 2) % DUNGEON_BASS.length]), 0.36, "square", 0.02);
+            tone(midi(bass[(step / 2) % bass.length]), dungeon ? 0.36 : 0.28, dungeon ? "square" : "triangle", bassGain);
         }
         step++;
-    }, 280);
+    }, every);
+    console.log(dungeon ? "🏰 Crypt music started" : "🏰 World 1-1 music started");
+    return true;
 }
 
 export function stopMusic(): void {
     musicOn = false;
+    resumePending = false;
+    resumeToken++;
     if (stepTimer) {
         clearInterval(stepTimer);
         stepTimer = null;
