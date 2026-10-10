@@ -1,7 +1,7 @@
 /**
  * Original pixel art for Terrene's World 1-1 platformer.
  * Nothing here is traced from Nintendo sprites or from the project's older art.
- * Run: node src/components/cities/WorldOne/art/build-sprites.mjs
+ * Run: node src/components/scenes/WorldOne/art/build-sprites.mjs
  */
 const fs = require("fs");
 const path = require("path");

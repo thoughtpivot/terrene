@@ -26,10 +26,10 @@ import TheWoodsImage from "./TheWoods.png";
 import TheWoodsWalkableImage from "./TheWoods.walkable.png";
 
 const theWoodsThemeSong = new Sound(
-    "./components/cities/TheWoods/TheWoods.mp3"
+    "./components/scenes/TheWoods/TheWoods.mp3"
 );
 const theWoodsFootsteps = new Sound(
-    "./components/cities/TheWoods/TheWoods.footsteps.mp3"
+    "./components/scenes/TheWoods/TheWoods.footsteps.mp3"
 );
 
 export default class TheWoods extends Scene {
@@ -172,7 +172,7 @@ export default class TheWoods extends Scene {
 
             // Fallback: fetch the JSON data directly
             const response = await fetch(
-                "./components/cities/TheWoods/TheWoods.json"
+                "./components/scenes/TheWoods/TheWoods.json"
             );
             asepriteJson = await response.json();
             console.log("Fetched Aseprite JSON data:", asepriteJson);

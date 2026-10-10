@@ -13,7 +13,7 @@ terrene/
 │   │   ├── DialogueNPC.ts
 │   │   └── DialogueUtils.ts
 │   ├── components/
-│   │   ├── cities/          # Game scenes/levels
+│   │   ├── scenes/          # Game scenes/levels
 │   │   ├── characters/
 │   │   │   ├── player/
 │   │   │   └── npc/
@@ -85,9 +85,9 @@ This ensures consistent NPC interactions across the game.
 
 ## Component Architecture
 
-### Cities (Scenes)
+### Scenes
 
-Cities are ExcaliburJS `Scene` subclasses that represent game levels:
+Scenes are ExcaliburJS `Scene` subclasses that represent game levels:
 
 **Responsibilities:**
 - Background rendering
@@ -97,7 +97,7 @@ Cities are ExcaliburJS `Scene` subclasses that represent game levels:
 - Quest marker creation
 - Interaction system setup
 
-**Examples:** Eldergrove, Breaze, TheWoods, Vitosha, Solic, Baston
+**Examples:** Eldergrove, Breaze, TheWoods, Vitosha, Solic, Baston, Zelda Land, Zelda Cave
 
 ### NPCs (Characters)
 
@@ -183,7 +183,7 @@ Collectible or usable objects:
 
 ### Scene Transition Flow
 ```
-1. Player clicks city button in main menu
+1. Player clicks a scene button in the main menu
    ↓
 2. Terrene.ts creates scene instance
    ↓
@@ -266,19 +266,19 @@ export { Resources };
 
 ### Adding New Features
 
-**New City:**
-1. Create folder in `src/components/cities/`
+**New Scene:**
+1. Create folder in `src/components/scenes/`
 2. Extend `Scene` class
-3. Follow city initialization pattern
+3. Follow the scene initialization pattern
 4. Export Resources
-5. Register in Terrene.ts menu
+5. Register in Terrene.ts
 
 **New NPC:**
 1. Create folder in `src/components/characters/npc/`
 2. Extend `Actor`, implement `DialogueNPC`
 3. Define dialogue logic
 4. Optional: Register quests
-5. Add to city scene
+5. Add to the scene
 
 **New Quest:**
 1. Define quest object with objectives
@@ -374,7 +374,7 @@ npm run build:prod  # Builds optimized bundle in dist/
 
 ### Scalability
 Current architecture supports:
-- Adding new cities/scenes
+- Adding new scenes
 - Adding new NPCs and quests
 - Extending quest types
 - Adding new item categories

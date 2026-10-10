@@ -14,7 +14,7 @@ src/
 │   ├── DialogueNPC.ts
 │   └── DialogueUtils.ts
 ├── components/
-│   ├── cities/          # Scene/level implementations
+│   ├── scenes/          # Scene/level implementations
 │   ├── characters/
 │   │   ├── player/      # Player character(s)
 │   │   └── npc/         # Non-player characters
@@ -111,12 +111,12 @@ export default class MyNPC extends Actor implements DialogueNPC {
 }
 ```
 
-### 3. City/Scene Pattern
+### 3. Scene Pattern
 
-Cities extend ExcaliburJS `Scene`:
+Scenes extend ExcaliburJS `Scene`:
 
 ```typescript
-export default class MyCityName extends Scene {
+export default class MySceneName extends Scene {
     private player!: You;
     private walkableMap: boolean[][] = [];
 
@@ -154,7 +154,7 @@ export default class MyCityName extends Scene {
 }
 
 // Export resources
-export { Resources as MyCityNameResources };
+export { Resources as MySceneNameResources };
 ```
 
 ### 4. Quest Integration Pattern
@@ -287,7 +287,7 @@ Helps identify log sources visually:
 
 ```typescript
 console.log("🧙 Elder Rowan initialized");    // NPCs
-console.log("🏰 Eldergrove scene loaded");     // Cities
+console.log("🏰 Eldergrove scene loaded");     // Scenes
 console.log("🎯 Quest started: ...");         // Quests
 console.log("💬 Starting dialogue with...");   // Chat
 console.log("⚔️ Combat initiated");            // Combat
@@ -406,11 +406,11 @@ public swing(
 - **List features** in multi-line commits
 
 ```
-Add quest system and Eldergrove city with storylines
+Add quest system and Eldergrove scene with storylines
 
 Features:
 - Quest system with objectives and rewards
-- New city: Eldergrove with quest NPCs
+- New scene: Eldergrove with quest NPCs
 - Quest indicators and persistence
 ```
 
