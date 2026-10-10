@@ -4,8 +4,8 @@ A 2d game we're working on.
 
 ## Scenes
 
--   World 1-1 is the default scene: [thoughtpivot.github.io/terrene](https://thoughtpivot.github.io/terrene/)
--   Oka World, a painted cave platformer: [thoughtpivot.github.io/terrene/#okaworld](https://thoughtpivot.github.io/terrene/#okaworld). See [docs/oka-world.md](docs/oka-world.md).
+-   Oka World, a painted cave platformer, is the default scene: [thoughtpivot.github.io/terrene](https://thoughtpivot.github.io/terrene/). See [docs/oka-world.md](docs/oka-world.md).
+-   World 1-1: [thoughtpivot.github.io/terrene/#worldone](https://thoughtpivot.github.io/terrene/#worldone)
 
 ## Cursor Rules & ExcaliburJS Guidance
 

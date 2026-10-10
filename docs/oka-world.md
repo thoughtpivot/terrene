@@ -2,8 +2,8 @@
 
 ## Overview
 
-Oka World is a hand-painted cave platformer scene, open it at `/#okaworld`
-(World 1-1 stays the default scene). It takes its mood from CartoonSmart's
+Oka World is a hand-painted cave platformer and the default scene: it opens
+at `/` (or `/#okaworld`), and World 1-1 is at `/#worldone`. It takes its mood from CartoonSmart's
 Underground Cave Tile Set: misty caverns of tall rock pillars, bonsai trees
 growing on floating ledges, crystal walls, and still pools lit by caustics.
 None of the kit's files are used. Every image is original art in
@@ -139,7 +139,7 @@ has no gap or click. The script also renders the seven sound effects.
 
 ## Testing
 
-Run `npm run build:prod`, serve `dist/` and open `/#okaworld`. While the scene is
+Run `npm run build:prod`, serve `dist/` and open `/`. While the scene is
 active, `window.__oka` holds the scene (`mori`, `cave` for the physics,
 `creatures`, `crystals`, `won`), for tests and console poking.
 With `engine.debug.useTestClock()` and `engine.clock.step(1000 / 60)` you can

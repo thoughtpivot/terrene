@@ -16,7 +16,7 @@ Welcome to the Terrene documentation! This directory contains comprehensive guid
 
 ### Scenes
 
-- **[oka-world.md](./oka-world.md)** - Oka World, the painted cave platformer at `/#okaworld`: rules, code layout, physics and the art and music pipeline
+- **[oka-world.md](./oka-world.md)** - Oka World, the painted cave platformer and default scene: rules, code layout, physics and the art and music pipeline
 
 ## Quick Links
 

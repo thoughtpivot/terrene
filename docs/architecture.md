@@ -99,7 +99,7 @@ Scenes are ExcaliburJS `Scene` subclasses that represent game levels:
 
 **Examples:** Eldergrove, Breaze, TheWoods, Vitosha, Solic, Baston, Zelda Land, Zelda Cave, Oka World
 
-World 1-1 is the default scene. Scenes listed in `ROUTED_SCENES` in `Terrene.ts` can be opened from the URL hash (for example `/#okaworld`). Oka World switches the engine to a 960x540 HD mode while it is active, see [oka-world.md](./oka-world.md).
+Oka World is the default scene (`DEFAULT_SCENE` in `Terrene.ts`) and opens at `/`. Scenes listed in `ROUTED_SCENES` can be opened from the URL hash, for example World 1-1 at `/#worldone`. An empty or unknown hash opens the default, and changing the hash switches scenes. Oka World switches the engine to a 960x540 HD mode while it is active, see [oka-world.md](./oka-world.md).
 
 ### NPCs (Characters)
 
