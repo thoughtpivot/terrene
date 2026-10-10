@@ -30,12 +30,12 @@ class Terrene extends Engine {
 
         this.start(loader).then(() => {
             Physics.acc = vec(0, 0);
-            console.log("🏰 Engine started, loading Zelda Land as the default scene");
-            this.addScene(ZELDA_LAND_SCENE, new ZeldaLand());
-            this.addScene(ZELDA_CAVE_SCENE, new ZeldaCave());
+            console.log("🏰 Engine started, loading World 1-1 as the default scene");
             this.addScene("worldone", new WorldOne());
             this.addScene(WORLD_ONE_TWO_SCENE, new WorldOneTwo());
-            this.goToScene(ZELDA_LAND_SCENE);
+            this.addScene(ZELDA_LAND_SCENE, new ZeldaLand());
+            this.addScene(ZELDA_CAVE_SCENE, new ZeldaCave());
+            this.goToScene("worldone");
         });
     }
 }
