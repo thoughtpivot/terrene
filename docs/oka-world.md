@@ -139,7 +139,7 @@ has no gap or click. The script also renders the seven sound effects.
 
 ## Testing
 
-Run `npm run build`, serve `dist/` and open `/#okaworld`. While the scene is
+Run `npm run build:prod`, serve `dist/` and open `/#okaworld`. While the scene is
 active, `window.__oka` holds the scene (`mori`, `cave` for the physics,
 `creatures`, `crystals`, `won`), for tests and console poking.
 With `engine.debug.useTestClock()` and `engine.clock.step(1000 / 60)` you can
