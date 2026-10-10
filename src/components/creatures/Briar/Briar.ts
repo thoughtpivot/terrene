@@ -1,9 +1,9 @@
 import { ImageFiltering, ImageSource } from "excalibur";
-import { tone } from "../../cities/ZeldaLand/audio";
-import { slide, type Box } from "../../cities/ZeldaLand/field";
-import { BROWN, GREEN, GREEN_DARK, WHITE } from "../../cities/ZeldaLand/palette";
-import type { RoomHooks } from "../../cities/ZeldaLand/room";
-import { ZeldaCritter } from "../../cities/ZeldaLand/ZeldaCritter";
+import { tone } from "../../scenes/ZeldaLand/audio";
+import { slide, type Box } from "../../scenes/ZeldaLand/field";
+import { BROWN, GREEN, GREEN_DARK, WHITE } from "../../scenes/ZeldaLand/palette";
+import type { RoomHooks } from "../../scenes/ZeldaLand/room";
+import { ZeldaCritter } from "../../scenes/ZeldaLand/ZeldaCritter";
 import BriarImage from "./Briar.png";
 
 const Resources = {

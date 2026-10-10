@@ -233,10 +233,10 @@ export default class You extends Actor {
                 }
             }
 
-            // Return to city selection menu on Escape key
+            // Return to the scene selection menu on Escape key
             if (press.key === Input.Keys.Escape) {
                 console.log(
-                    "Escape key pressed - fading out audio and returning to city selection menu"
+                    "Escape key pressed - fading out audio and returning to the scene selection menu"
                 );
                 this.fadeOutAudioAndChangeScene(engine);
             }

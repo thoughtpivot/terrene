@@ -27,9 +27,9 @@ import Birdee from "../../creatures/Birdee/Birdee";
 import BreazeImage from "./Breaze.png";
 import BreazeWalkableImage from "./Breaze.walkable.png";
 
-const breazeThemeSong = new Sound("./components/cities/Breeze/Breaze.mp3");
+const breazeThemeSong = new Sound("./components/scenes/Breeze/Breaze.mp3");
 const breazeFootsteps = new Sound(
-    "./components/cities/Breeze/Breaze.footsteps.mp3"
+    "./components/scenes/Breeze/Breaze.footsteps.mp3"
 );
 
 export default class Breaze extends Scene {
@@ -217,7 +217,7 @@ export default class Breaze extends Scene {
 
                 // Fallback: fetch the JSON data directly
                 const response = await fetch(
-                    "./components/cities/Breeze/Breaze.json"
+                    "./components/scenes/Breeze/Breaze.json"
                 );
                 asepriteJson = await response.json();
                 console.log("Fetched Aseprite JSON data:", asepriteJson);
@@ -1573,7 +1573,7 @@ export default class Breaze extends Scene {
 const Resources = {
     Image: new ImageSource(BreazeImage, true, ImageFiltering.Pixel),
     AsepriteResource: new AsepriteResource(
-        "./components/cities/Breeze/Breaze.json"
+        "./components/scenes/Breeze/Breaze.json"
     ),
 };
 

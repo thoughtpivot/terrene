@@ -10,7 +10,7 @@ This project is a 2D RPG game built with ExcaliburJS 0.28.x. These rules enforce
 
 Components MUST be organized by type:
 - `src/common/` - Shared systems (QuestSystem, ChatSystem, etc.)
-- `src/components/cities/` - Scene/level implementations
+- `src/components/scenes/` - Scene/level implementations
 - `src/components/characters/player/` - Player character(s)
 - `src/components/characters/npc/` - Non-player characters
 - `src/components/items/` - Collectible/usable items (weapons/, food/, etc.)
@@ -107,9 +107,9 @@ onPreUpdate(engine: Engine, delta: number): void {
 }
 ```
 
-## City/Scene Pattern
+## Scene Pattern
 
-Cities extending `Scene` MUST follow this initialization order:
+Scenes extending `Scene` MUST follow this initialization order:
 
 1. Load assets with `Loader`
 2. Set camera bounds
@@ -120,7 +120,7 @@ Cities extending `Scene` MUST follow this initialization order:
 7. Set up interaction system
 8. Focus camera on player
 
-Cities MUST implement `onDeactivate()` to clean up resources (stop music, timers, etc.)
+Scenes MUST implement `onDeactivate()` to clean up resources (stop music, timers, etc.)
 
 ## Naming Conventions
 
@@ -188,7 +188,7 @@ async loadData(): Promise<void> {
 
 Use emoji prefixes for visual identification:
 - 🧙 NPCs
-- 🏰 Cities/Scenes
+- 🏰 Scenes
 - 🎯 Quests
 - 💬 Dialogue/Chat
 - ⚔️ Combat
@@ -315,11 +315,11 @@ Use conventional commits:
 
 Be descriptive:
 ```
-feat: Add quest system and Eldergrove city
+feat: Add quest system and Eldergrove scene
 
 Features:
 - Quest management with objectives
-- New city with quest NPCs
+- New scene with quest NPCs
 - Quest indicators and persistence
 ```
 

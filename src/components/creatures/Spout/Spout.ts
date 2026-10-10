@@ -1,9 +1,9 @@
 import { Actor, Canvas, CollisionType, Color, Engine, ImageFiltering, ImageSource, vec } from "excalibur";
-import { tone } from "../../cities/ZeldaLand/audio";
-import { clearLine, face4, type Facing } from "../../cities/ZeldaLand/field";
-import { BROWN, BROWN_DARK, GRAY_DARK, TAN, WHITE } from "../../cities/ZeldaLand/palette";
-import type { RoomHooks } from "../../cities/ZeldaLand/room";
-import { ZeldaCritter } from "../../cities/ZeldaLand/ZeldaCritter";
+import { tone } from "../../scenes/ZeldaLand/audio";
+import { clearLine, face4, type Facing } from "../../scenes/ZeldaLand/field";
+import { BROWN, BROWN_DARK, GRAY_DARK, TAN, WHITE } from "../../scenes/ZeldaLand/palette";
+import type { RoomHooks } from "../../scenes/ZeldaLand/room";
+import { ZeldaCritter } from "../../scenes/ZeldaLand/ZeldaCritter";
 import SpoutImage from "./Spout.png";
 
 const Resources = {

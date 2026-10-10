@@ -23,7 +23,7 @@ import Sally from "../../characters/npc/Sally/Sally";
 import OldManSam from "../../characters/npc/OldManSam/OldManSam";
 
 const solicThemeSong = new Sound(
-    "./components/cities/Solic/Solic_theme_track.mp3"
+    "./components/scenes/Solic/Solic_theme_track.mp3"
 );
 
 export default class Solic extends Scene {

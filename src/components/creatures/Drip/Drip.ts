@@ -1,9 +1,9 @@
 import { ImageFiltering, ImageSource } from "excalibur";
-import { slide } from "../../cities/ZeldaLand/field";
-import { BLUE, BLUE_DARK, WHITE } from "../../cities/ZeldaLand/palette";
-import type { RoomHooks } from "../../cities/ZeldaLand/room";
-import { zeldaRun } from "../../cities/ZeldaLand/run";
-import { ZeldaCritter } from "../../cities/ZeldaLand/ZeldaCritter";
+import { slide } from "../../scenes/ZeldaLand/field";
+import { BLUE, BLUE_DARK, WHITE } from "../../scenes/ZeldaLand/palette";
+import type { RoomHooks } from "../../scenes/ZeldaLand/room";
+import { zeldaRun } from "../../scenes/ZeldaLand/run";
+import { ZeldaCritter } from "../../scenes/ZeldaLand/ZeldaCritter";
 import DripImage from "./Drip.png";
 
 const Resources = {

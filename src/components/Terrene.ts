@@ -1,9 +1,9 @@
 import { Color, DisplayMode, Engine, Loader, Physics, PointerScope, vec } from "excalibur";
-import ZeldaCave from "./cities/ZeldaCave/ZeldaCave";
-import ZeldaLand from "./cities/ZeldaLand/ZeldaLand";
-import { ZELDA_CAVE_SCENE, ZELDA_LAND_SCENE } from "./cities/ZeldaLand/run";
-import WorldOne, { Resources as WorldOneResources } from "./cities/WorldOne/WorldOne";
-import WorldOneTwo, { WORLD_ONE_TWO_SCENE } from "./cities/WorldOneTwo/WorldOneTwo";
+import ZeldaCave from "./scenes/ZeldaCave/ZeldaCave";
+import ZeldaLand from "./scenes/ZeldaLand/ZeldaLand";
+import { ZELDA_CAVE_SCENE, ZELDA_LAND_SCENE } from "./scenes/ZeldaLand/run";
+import WorldOne, { Resources as WorldOneResources } from "./scenes/WorldOne/WorldOne";
+import WorldOneTwo, { WORLD_ONE_TWO_SCENE } from "./scenes/WorldOneTwo/WorldOneTwo";
 
 class Terrene extends Engine {
     constructor() {
@@ -30,12 +30,12 @@ class Terrene extends Engine {
 
         this.start(loader).then(() => {
             Physics.acc = vec(0, 0);
-            console.log("🏰 Engine started, loading Zelda Land as the default scene");
-            this.addScene(ZELDA_LAND_SCENE, new ZeldaLand());
-            this.addScene(ZELDA_CAVE_SCENE, new ZeldaCave());
+            console.log("🏰 Engine started, loading World 1-1 as the default scene");
             this.addScene("worldone", new WorldOne());
             this.addScene(WORLD_ONE_TWO_SCENE, new WorldOneTwo());
-            this.goToScene(ZELDA_LAND_SCENE);
+            this.addScene(ZELDA_LAND_SCENE, new ZeldaLand());
+            this.addScene(ZELDA_CAVE_SCENE, new ZeldaCave());
+            this.goToScene("worldone");
         });
     }
 }
