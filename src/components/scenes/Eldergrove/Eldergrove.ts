@@ -25,7 +25,7 @@ import { getQuestSystem } from "../../../common/QuestSystem";
 import backgroundImage from "./Eldergrove-sidescroll.png";
 
 const tiledMapResource = new TiledMapResource(
-    "./src/components/cities/Eldergrove/Eldergrove.tmx",
+    "./src/components/scenes/Eldergrove/Eldergrove.tmx",
     {
         startingLayerZIndex: -2,
     }

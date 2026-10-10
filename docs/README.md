@@ -23,7 +23,7 @@ Start here:
 3. Check `.cursor/rules/` for AI-enforced rules
 
 ### For Adding Features
-- **New City**: See "Adding New City" in [architecture.md](./architecture.md)
+- **New Scene**: See "Adding New Scene" in [architecture.md](./architecture.md)
 - **New NPC**: See "NPC Pattern" in [coding-standards.md](./coding-standards.md)
 - **New Quest**: See [quest-system-guide.md](./quest-system-guide.md)
 

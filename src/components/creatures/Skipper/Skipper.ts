@@ -1,8 +1,8 @@
 import { ImageFiltering, ImageSource } from "excalibur";
-import { hits } from "../../cities/ZeldaLand/field";
-import { BROWN, BROWN_DARK, TAN, WHITE } from "../../cities/ZeldaLand/palette";
-import type { RoomHooks } from "../../cities/ZeldaLand/room";
-import { ZeldaCritter } from "../../cities/ZeldaLand/ZeldaCritter";
+import { hits } from "../../scenes/ZeldaLand/field";
+import { BROWN, BROWN_DARK, TAN, WHITE } from "../../scenes/ZeldaLand/palette";
+import type { RoomHooks } from "../../scenes/ZeldaLand/room";
+import { ZeldaCritter } from "../../scenes/ZeldaLand/ZeldaCritter";
 import SkipperImage from "./Skipper.png";
 
 const Resources = {

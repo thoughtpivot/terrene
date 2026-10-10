@@ -10,7 +10,7 @@
         const results = document.getElementById('results');
         
         // Test 1: Can we access the TMX?
-        fetch('./src/components/cities/Eldergrove/Eldergrove.tmx')
+        fetch('./src/components/scenes/Eldergrove/Eldergrove.tmx')
             .then(r => r.ok ? 'TMX: ✅ OK' : 'TMX: ❌ ' + r.status)
             .then(msg => {
                 results.innerHTML += `<p>${msg}</p>`;
@@ -24,8 +24,8 @@
             });
         
         // Test 3: What about the relative path from TMX location?
-        // From /src/components/cities/Eldergrove/ going ../../../assets/
-        const base = 'https://thoughtpivot.github.io/terrene/src/components/cities/Eldergrove/';
+        // From /src/components/scenes/Eldergrove/ going ../../../assets/
+        const base = 'https://thoughtpivot.github.io/terrene/src/components/scenes/Eldergrove/';
         const relativePath = '../../../assets/roguelike-pack/Spritesheet/roguelikeSheet_transparent.png';
         const resolvedURL = new URL(relativePath, base).href;
         

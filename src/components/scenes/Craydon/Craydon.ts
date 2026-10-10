@@ -11,13 +11,13 @@ import { TiledMapResource } from "@excaliburjs/plugin-tiled";
 import You from "../../characters/player/You/You";
 
 const tiledMapResource = new TiledMapResource(
-    "./components/cities/Craydon/Craydon.tmx",
+    "./components/scenes/Craydon/Craydon.tmx",
     {
         startingLayerZIndex: -2,
     }
 );
 
-// const craydonThemeSong = new Sound("./modules/cities/Craydon/Craydon.mp3");
+// const craydonThemeSong = new Sound("./modules/scenes/Craydon/Craydon.mp3");
 const craydonThemeSong = new Sound("./assets/from_one_to_the_next.mp3");
 
 export default class Craydon extends Scene {

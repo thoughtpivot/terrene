@@ -225,7 +225,7 @@ questSystem.clearAllQuests();
 
 ## Example: Full Quest Implementation
 
-See **Eldergrove** (`src/components/cities/Eldergrove/Eldergrove.ts`) for a complete example with:
+See **Eldergrove** (`src/components/scenes/Eldergrove/Eldergrove.ts`) for a complete example with:
 - Two chained quests
 - Multiple objective types
 - Three quest-giving NPCs
@@ -325,4 +325,4 @@ Potential additions to the quest system:
 
 ---
 
-For examples, see the **Eldergrove** implementation in `/src/components/cities/Eldergrove/`
+For examples, see the **Eldergrove** implementation in `/src/components/scenes/Eldergrove/`

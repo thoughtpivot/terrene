@@ -1,9 +1,9 @@
 import { ImageFiltering, ImageSource } from "excalibur";
-import { hits } from "../../cities/ZeldaLand/field";
-import { FLAME, GRAY, GRAY_DARK, WHITE } from "../../cities/ZeldaLand/palette";
-import type { RoomHooks } from "../../cities/ZeldaLand/room";
-import { zeldaRun } from "../../cities/ZeldaLand/run";
-import { ZeldaCritter } from "../../cities/ZeldaLand/ZeldaCritter";
+import { hits } from "../../scenes/ZeldaLand/field";
+import { FLAME, GRAY, GRAY_DARK, WHITE } from "../../scenes/ZeldaLand/palette";
+import type { RoomHooks } from "../../scenes/ZeldaLand/room";
+import { zeldaRun } from "../../scenes/ZeldaLand/run";
+import { ZeldaCritter } from "../../scenes/ZeldaLand/ZeldaCritter";
 import SootwingImage from "./Sootwing.png";
 
 const Resources = {

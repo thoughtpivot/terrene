@@ -1,9 +1,9 @@
 import { Color, DisplayMode, Engine, Loader, Physics, PointerScope, vec } from "excalibur";
-import ZeldaCave from "./cities/ZeldaCave/ZeldaCave";
-import ZeldaLand from "./cities/ZeldaLand/ZeldaLand";
-import { ZELDA_CAVE_SCENE, ZELDA_LAND_SCENE } from "./cities/ZeldaLand/run";
-import WorldOne, { Resources as WorldOneResources } from "./cities/WorldOne/WorldOne";
-import WorldOneTwo, { WORLD_ONE_TWO_SCENE } from "./cities/WorldOneTwo/WorldOneTwo";
+import ZeldaCave from "./scenes/ZeldaCave/ZeldaCave";
+import ZeldaLand from "./scenes/ZeldaLand/ZeldaLand";
+import { ZELDA_CAVE_SCENE, ZELDA_LAND_SCENE } from "./scenes/ZeldaLand/run";
+import WorldOne, { Resources as WorldOneResources } from "./scenes/WorldOne/WorldOne";
+import WorldOneTwo, { WORLD_ONE_TWO_SCENE } from "./scenes/WorldOneTwo/WorldOneTwo";
 
 class Terrene extends Engine {
     constructor() {
