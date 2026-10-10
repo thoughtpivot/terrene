@@ -97,7 +97,9 @@ Scenes are ExcaliburJS `Scene` subclasses that represent game levels:
 - Quest marker creation
 - Interaction system setup
 
-**Examples:** Eldergrove, Breaze, TheWoods, Vitosha, Solic, Baston, Zelda Land, Zelda Cave
+**Examples:** Eldergrove, Breaze, TheWoods, Vitosha, Solic, Baston, Zelda Land, Zelda Cave, Oka World
+
+Oka World is the default scene (`DEFAULT_SCENE` in `Terrene.ts`) and opens at `/`. Scenes listed in `ROUTED_SCENES` can be opened from the URL hash, for example World 1-1 at `/#worldone`. An empty or unknown hash opens the default, and changing the hash switches scenes. Oka World switches the engine to a 960x540 HD mode while it is active, see [oka-world.md](./oka-world.md).
 
 ### NPCs (Characters)
 
@@ -127,6 +129,8 @@ The player-controlled actor with:
 ### Items
 
 Collectible or usable objects:
+
+Newer items extend `BaseItem` (`common/BaseItem.ts`). A `PickupItem` is collected when the hero touches it, and a `FixtureItem` stays in the scene and may react to touch (a checkpoint, a goal) or just be scenery.
 
 **Types:**
 - **Weapons** - Sword (with swing animation)

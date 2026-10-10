@@ -14,6 +14,10 @@ Welcome to the Terrene documentation! This directory contains comprehensive guid
 
 - **[eldergrove-playthrough.md](./eldergrove-playthrough.md)** - Step-by-step playthrough of Eldergrove quests
 
+### Scenes
+
+- **[oka-world.md](./oka-world.md)** - Oka World, the painted cave platformer and default scene: rules, code layout, physics and the art and music pipeline
+
 ## Quick Links
 
 ### For New Contributors
