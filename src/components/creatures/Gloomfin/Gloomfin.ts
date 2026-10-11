@@ -1,13 +1,16 @@
 import { Actor, vec } from "excalibur";
 import { SHEETS } from "../../scenes/OkaWorld/art/atlas";
-import type { Box, OkaHooks } from "../../scenes/OkaWorld/hooks";
+import type { Box, OkaHooks, OkaVariant } from "../../scenes/OkaWorld/hooks";
 import OkaCreature from "../../scenes/OkaWorld/OkaCreature";
 import { glow, paintedFrames, paintedImage } from "../../scenes/OkaWorld/paint";
 import type { Water } from "../../scenes/OkaWorld/physics";
+import GloomfinDarkImage from "./Gloomfin-dark.png";
 import GloomfinImage from "./Gloomfin.png";
 
 const Resources = {
     Image: paintedImage(GloomfinImage),
+    /** Oka World 2: near-black indigo with pale spots, a sickly yellow eye and a cold white lure. */
+    Dark: paintedImage(GloomfinDarkImage),
 };
 
 export { Resources };
@@ -20,6 +23,8 @@ const LURE: [number, number][] = [[38, -5], [38, -7], [32, -25], [30, 20]];
 /**
  * A deep-pool anglerfish with a glowing lure. It cruises under the surface
  * and lunges out of the water at anything passing overhead. Too spiny to stomp.
+ *
+ * The dark variant, from the Hollow's black pools, strikes again sooner and from further off.
  */
 export default class Gloomfin extends OkaCreature {
     readonly stompable = false;
@@ -31,8 +36,10 @@ export default class Gloomfin extends OkaCreature {
     private cooldown = 1.5 + Math.random() * 2;
     private lure = new Actor({ z: 8.5 });
     private depth: number;
+    /** World position of the lure, for lighting. */
+    lurePos = { x: 0, y: 0 };
 
-    constructor(private water: Water, hooks: OkaHooks) {
+    constructor(private water: Water, hooks: OkaHooks, readonly variant: OkaVariant = "light") {
         super(water.x + water.w * (0.3 + Math.random() * 0.4), water.y + 46, hooks, 9);
         this.anchor = vec(0.5, 0.5);
         this.artFacing = 1;
@@ -41,8 +48,9 @@ export default class Gloomfin extends OkaCreature {
 
     onInitialize(): void {
         const s = SHEETS.gloomfin;
-        this.frames = paintedFrames(Resources.Image, s.fw, s.fh, s.frames);
-        this.lure.graphics.use(glow(22, "150,255,190", 0.7));
+        const dark = this.variant === "dark";
+        this.frames = paintedFrames(dark ? Resources.Dark : Resources.Image, s.fw, s.fh, s.frames);
+        this.lure.graphics.use(glow(22, dark ? "215,235,255" : "150,255,190", dark ? 0.85 : 0.7));
         this.addChild(this.lure);
         this.show(0);
     }
@@ -68,7 +76,8 @@ export default class Gloomfin extends OkaCreature {
             const dx = hero.x - this.pos.x;
             const heroAbove = hero.y < w.y + 4 && hero.y > w.y - 200;
             const heroOverWater = hero.x > w.x - 60 && hero.x < w.x + w.w + 60;
-            if (this.cooldown <= 0 && heroAbove && heroOverWater && Math.abs(dx) < 240) {
+            const reach = this.variant === "dark" ? 270 : 240;
+            if (this.cooldown <= 0 && heroAbove && heroOverWater && Math.abs(dx) < reach) {
                 this.mode = "leap";
                 this.vy = -640;
                 const air = 1.15;
@@ -86,7 +95,7 @@ export default class Gloomfin extends OkaCreature {
             this.show(this.vy < 0 ? 2 : 3);
             if (this.vy > 0 && this.pos.y > w.y + 10) {
                 this.mode = "swim";
-                this.cooldown = 2.6 + Math.random() * 1.5;
+                this.cooldown = (this.variant === "dark" ? 2.0 : 2.6) + Math.random() * 1.5;
                 this.pos.x = Math.max(w.x + 40, Math.min(w.x + w.w - 40, this.pos.x));
                 this.hooks.sfx("splash", this.pos.x, 0.9);
                 this.hooks.burst("splash", this.pos.x, w.y, 14);
@@ -94,6 +103,7 @@ export default class Gloomfin extends OkaCreature {
             }
         }
         const [lx, ly] = LURE[this.frameIndex];
+        this.lurePos = { x: this.pos.x + (this.facing === 1 ? lx : -lx), y: this.pos.y + ly };
         this.lure.pos = vec(this.facing === 1 ? lx : -lx, ly);
         this.lure.graphics.opacity = 0.7 + Math.sin(this.t * 3) * 0.25;
     }
