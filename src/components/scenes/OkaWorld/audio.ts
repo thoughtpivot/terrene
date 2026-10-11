@@ -7,42 +7,61 @@ import SplashSfx from "./sfx/splash.mp3";
 import StompSfx from "./sfx/stomp.mp3";
 import WinSfx from "./sfx/win.mp3";
 
+export type OkaSfx = "jump" | "crystal" | "heart" | "hurt" | "stomp" | "splash" | "win" | "lantern" | "rumble";
+
 /**
- * "Lanternlight Under Stone", rendered by tools/oka-world/compose_music.py.
- * The file holds the loop plus a 2 s copy of its start, so looping between
- * LOOP_START and LOOP_START + LOOP_LENGTH is seamless even if the MP3 decoder
- * shifts the audio by its priming delay.
+ * A scene's music and sound effects. Each music file holds the loop plus a
+ * 2 s copy of its start, so looping between `loopStart` and
+ * `loopStart + loopLength` is seamless even if the MP3 decoder shifts the
+ * audio by its priming delay. A scene may leave out effects it never plays.
  */
-const LOOP_LENGTH = (32 * 4 * 60) / 72;
-const LOOP_START = 1;
-const MUSIC_LEVEL = 0.62;
+export interface OkaSoundtrack {
+    name: string;
+    music: string;
+    loopStart: number;
+    loopLength: number;
+    level: number;
+    sfx: Partial<Record<OkaSfx, string>>;
+    sfxLevel: Partial<Record<OkaSfx, number>>;
+}
 
-export type OkaSfx = "jump" | "crystal" | "heart" | "hurt" | "stomp" | "splash" | "win";
-
-const SFX_URLS: Record<OkaSfx, string> = {
-    jump: JumpSfx,
-    crystal: CrystalSfx,
-    heart: HeartSfx,
-    hurt: HurtSfx,
-    stomp: StompSfx,
-    splash: SplashSfx,
-    win: WinSfx,
+/** "Lanternlight Under Stone", rendered by tools/oka-world/compose_music.py. */
+export const OKA_SOUNDTRACK: OkaSoundtrack = {
+    name: "Lanternlight Under Stone",
+    music: OkaMusic,
+    loopStart: 1,
+    loopLength: (32 * 4 * 60) / 72,
+    level: 0.62,
+    sfx: {
+        jump: JumpSfx,
+        crystal: CrystalSfx,
+        heart: HeartSfx,
+        hurt: HurtSfx,
+        stomp: StompSfx,
+        splash: SplashSfx,
+        win: WinSfx,
+    },
+    sfxLevel: {
+        jump: 0.35,
+        crystal: 0.5,
+        heart: 0.6,
+        hurt: 0.6,
+        stomp: 0.6,
+        splash: 0.45,
+        win: 0.8,
+    },
 };
 
-const SFX_LEVEL: Record<OkaSfx, number> = {
-    jump: 0.35,
-    crystal: 0.5,
-    heart: 0.6,
-    hurt: 0.6,
-    stomp: 0.6,
-    splash: 0.45,
-    win: 0.8,
-};
+interface MusicVoice {
+    source: AudioBufferSourceNode;
+    gain: GainNode;
+    track: OkaSoundtrack;
+}
 
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
-let musicGain: GainNode | null = null;
-let musicSource: AudioBufferSourceNode | null = null;
+let voice: MusicVoice | null = null;
+let track: OkaSoundtrack = OKA_SOUNDTRACK;
 let wantMusic = false;
 const buffers = new Map<string, AudioBuffer>();
 const pending = new Map<string, Promise<AudioBuffer | null>>();
@@ -57,9 +76,6 @@ function context(): AudioContext | null {
     master = ctx.createGain();
     master.gain.value = 1;
     master.connect(ctx.destination);
-    musicGain = ctx.createGain();
-    musicGain.gain.value = 0;
-    musicGain.connect(master);
     return ctx;
 }
 
@@ -88,9 +104,16 @@ function load(url: string): Promise<AudioBuffer | null> {
     return job;
 }
 
-/** Fetch and decode everything up front so the first jump is not silent. */
-export function preloadOkaAudio(): Promise<void> {
-    const urls = [OkaMusic, ...Object.values(SFX_URLS)];
+/** Switch the soundtrack that music and effects come from. Stops music from another track. */
+export function useOkaSoundtrack(next: OkaSoundtrack): void {
+    if (next === track) return;
+    stopOkaMusic();
+    track = next;
+}
+
+/** Fetch and decode a soundtrack up front so the first jump is not silent. */
+export function preloadOkaAudio(soundtrack: OkaSoundtrack = track): Promise<void> {
+    const urls = [soundtrack.music, ...Object.values(soundtrack.sfx)];
     return Promise.all(urls.map(load)).then(() => undefined);
 }
 
@@ -116,68 +139,86 @@ export function startOkaMusic(): void {
 
 function beginMusic(): void {
     const ac = context();
-    if (!ac || !musicGain || musicSource || ac.state !== "running") return;
-    const buffer = buffers.get(OkaMusic);
+    if (!ac || !master || voice || ac.state !== "running") return;
+    const t = track;
+    const buffer = buffers.get(t.music);
     if (!buffer) {
-        void load(OkaMusic).then(() => {
-            if (wantMusic) beginMusic();
+        void load(t.music).then(() => {
+            if (wantMusic && track === t) beginMusic();
         });
         return;
     }
-    const src = ac.createBufferSource();
-    src.buffer = buffer;
-    src.loop = true;
-    src.loopStart = LOOP_START;
-    src.loopEnd = Math.min(buffer.duration, LOOP_START + LOOP_LENGTH);
-    src.connect(musicGain);
+    const source = ac.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    source.loopStart = t.loopStart;
+    source.loopEnd = Math.min(buffer.duration, t.loopStart + t.loopLength);
+    const gain = ac.createGain();
+    source.connect(gain);
+    gain.connect(master);
     const now = ac.currentTime;
-    musicGain.gain.cancelScheduledValues(now);
-    musicGain.gain.setValueAtTime(0, now);
-    musicGain.gain.linearRampToValueAtTime(MUSIC_LEVEL, now + 2.5);
-    src.start(now);
-    musicSource = src;
-    console.log("🏰 Oka World music started");
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(t.level, now + 2.5);
+    source.start(now);
+    voice = { source, gain, track: t };
+    console.log(`🏰 Oka World music started: ${t.name}`);
 }
 
 export function stopOkaMusic(): void {
     wantMusic = false;
     const ac = ctx;
-    const src = musicSource;
-    musicSource = null;
-    if (!ac || !src || !musicGain) return;
+    const v = voice;
+    voice = null;
+    if (!ac || !v) return;
     const now = ac.currentTime;
-    musicGain.gain.cancelScheduledValues(now);
-    musicGain.gain.setValueAtTime(musicGain.gain.value, now);
-    musicGain.gain.linearRampToValueAtTime(0, now + 0.4);
-    src.stop(now + 0.45);
+    v.gain.gain.cancelScheduledValues(now);
+    v.gain.gain.setValueAtTime(v.gain.gain.value, now);
+    v.gain.gain.linearRampToValueAtTime(0, now + 0.4);
+    v.source.stop(now + 0.45);
 }
 
 /** Dip the music under a sting such as the win fanfare. */
 export function duckOkaMusic(level: number, seconds: number): void {
     const ac = ctx;
-    if (!ac || !musicGain || !musicSource) return;
+    const v = voice;
+    if (!ac || !v) return;
+    const full = v.track.level;
+    const g = v.gain.gain;
     const now = ac.currentTime;
-    musicGain.gain.cancelScheduledValues(now);
-    musicGain.gain.setValueAtTime(musicGain.gain.value, now);
-    musicGain.gain.linearRampToValueAtTime(MUSIC_LEVEL * level, now + 0.3);
-    musicGain.gain.setValueAtTime(MUSIC_LEVEL * level, now + seconds);
-    musicGain.gain.linearRampToValueAtTime(MUSIC_LEVEL, now + seconds + 2);
+    g.cancelScheduledValues(now);
+    g.setValueAtTime(g.value, now);
+    g.linearRampToValueAtTime(full * level, now + 0.3);
+    g.setValueAtTime(full * level, now + seconds);
+    g.linearRampToValueAtTime(full, now + seconds + 2);
+}
+
+/** Fade the music out over `seconds`, e.g. while the screen fades to the next scene. */
+export function fadeOkaMusic(seconds: number): void {
+    const ac = ctx;
+    const v = voice;
+    if (!ac || !v) return;
+    const g = v.gain.gain;
+    const now = ac.currentTime;
+    g.cancelScheduledValues(now);
+    g.setValueAtTime(g.value, now);
+    g.linearRampToValueAtTime(0, now + seconds);
 }
 
 export function isOkaMusicPlaying(): boolean {
-    return musicSource !== null;
+    return voice !== null;
 }
 
 export function playOkaSfx(name: OkaSfx, pan = 0, rate = 1): void {
     const ac = ctx;
     if (!ac || !master || ac.state !== "running") return;
-    const buffer = buffers.get(SFX_URLS[name]);
+    const url = track.sfx[name];
+    const buffer = url ? buffers.get(url) : undefined;
     if (!buffer) return;
     const src = ac.createBufferSource();
     src.buffer = buffer;
     src.playbackRate.value = rate;
     const gain = ac.createGain();
-    gain.gain.value = SFX_LEVEL[name];
+    gain.gain.value = track.sfxLevel[name] ?? 0.5;
     src.connect(gain);
     if (typeof ac.createStereoPanner === "function") {
         const panner = ac.createStereoPanner();

@@ -4,6 +4,46 @@ import { VIEW_H, VIEW_W } from "./parallax";
 
 const SERIF = "'Palatino Linotype', Palatino, 'Book Antiqua', 'URW Palladio L', Georgia, serif";
 
+/** Words and colours of a scene's HUD, title card, win panel and loading card. */
+export interface HudStyle {
+    title: string;
+    subtitle: string;
+    hints: string[];
+    /** main text */
+    text: string;
+    /** subtitles and panel lines */
+    accent: string;
+    /** "r,g,b" of the shade behind cards and of text shadows */
+    shade: string;
+    loading: { text: string; background: string; label: string; bar: string };
+    /** "r,g,b" of an empty heart */
+    emptyHeart: string;
+}
+
+export const OKA_HUD: HudStyle = {
+    title: "Oka World",
+    subtitle: "Lanternlight Under Stone",
+    hints: [
+        "Arrows or A / D to move   ·   Space, W or Up to jump and swim   ·   Down + Jump drops through",
+        "Gather the cave crystals and wake the Heartstone",
+    ],
+    text: "#eafff2",
+    accent: "#bfeee0",
+    shade: "6,24,26",
+    loading: { text: "Entering Oka World…", background: "#0f2427", label: "#cdeee2", bar: "#9ff0d8" },
+    emptyHeart: "20,40,40",
+};
+
+/** A full-screen chapter card, shown while one scene hands over to the next. */
+export interface ChapterCard {
+    title: string;
+    subtitle: string;
+    line: string;
+    background: string;
+    text: string;
+    accent: string;
+}
+
 function font(size: number, color = "#f4fff6", align = TextAlign.Left): Font {
     return new Font({
         family: SERIF,
@@ -39,7 +79,7 @@ export class OkaHud {
     private panel: ScreenElement | null = null;
     private elements: ScreenElement[] = [];
 
-    constructor(private scene: Scene, crystalImage: ImageSource, private total: number) {
+    constructor(private scene: Scene, crystalImage: ImageSource, private total: number, private style: HudStyle = OKA_HUD) {
         this.heartCanvas = new Canvas({
             width: 5 * 34 + 10,
             height: 40,
@@ -67,7 +107,7 @@ export class OkaHud {
         this.add(this.toast);
 
         this.title = new ScreenElement({ x: 0, y: 0, z: 101 });
-        this.title.graphics.use(titleCard());
+        this.title.graphics.use(titleCard(style));
         this.add(this.title);
         this.titleTime = 5.5;
     }
@@ -100,7 +140,7 @@ export class OkaHud {
     showPanel(lines: string[]): void {
         this.panel?.kill();
         this.panel = new ScreenElement({ x: 0, y: 0, z: 102 });
-        this.panel.graphics.use(winPanel(lines));
+        this.panel.graphics.use(winPanel(lines, this.style));
         this.panel.graphics.opacity = 0;
         this.scene.add(this.panel);
         this.elements.push(this.panel);
@@ -146,7 +186,7 @@ export class OkaHud {
                 g.addColorStop(1, "#9c1f45");
                 ctx.fillStyle = g;
             } else {
-                ctx.fillStyle = "rgba(20,40,40,0.55)";
+                ctx.fillStyle = `rgba(${this.style.emptyHeart},0.55)`;
             }
             ctx.fill();
             ctx.lineWidth = 2.5;
@@ -162,7 +202,7 @@ export class OkaHud {
     }
 }
 
-function titleCard(): Canvas {
+function titleCard(style: HudStyle): Canvas {
     return new Canvas({
         width: VIEW_W,
         height: VIEW_H,
@@ -171,29 +211,29 @@ function titleCard(): Canvas {
         filtering: ImageFiltering.Blended,
         draw: (ctx) => {
             const g = ctx.createRadialGradient(VIEW_W / 2, 200, 40, VIEW_W / 2, 200, 420);
-            g.addColorStop(0, "rgba(6,24,26,0.55)");
-            g.addColorStop(1, "rgba(6,24,26,0)");
+            g.addColorStop(0, `rgba(${style.shade},0.55)`);
+            g.addColorStop(1, `rgba(${style.shade},0)`);
             ctx.fillStyle = g;
             ctx.fillRect(0, 0, VIEW_W, VIEW_H);
             ctx.textAlign = "center";
-            ctx.shadowColor = "rgba(0,30,30,0.9)";
+            ctx.shadowColor = `rgba(${style.shade},0.9)`;
             ctx.shadowBlur = 18;
-            ctx.fillStyle = "#eafff2";
+            ctx.fillStyle = style.text;
             ctx.font = `italic 78px ${SERIF}`;
-            ctx.fillText("Oka World", VIEW_W / 2, 196);
+            ctx.fillText(style.title, VIEW_W / 2, 196);
             ctx.shadowBlur = 8;
             ctx.font = `24px ${SERIF}`;
-            ctx.fillStyle = "#bfeee0";
-            ctx.fillText("Lanternlight Under Stone", VIEW_W / 2, 238);
+            ctx.fillStyle = style.accent;
+            ctx.fillText(style.subtitle, VIEW_W / 2, 238);
             ctx.font = `18px ${SERIF}`;
-            ctx.fillStyle = "#d8f5ea";
-            ctx.fillText("Arrows or A / D to move   ·   Space, W or Up to jump and swim   ·   Down + Jump drops through", VIEW_W / 2, 292);
-            ctx.fillText("Gather the cave crystals and wake the Heartstone", VIEW_W / 2, 320);
+            ctx.fillStyle = style.text;
+            ctx.globalAlpha = 0.9;
+            style.hints.forEach((hint, i) => ctx.fillText(hint, VIEW_W / 2, 292 + i * 28));
         },
     });
 }
 
-function winPanel(lines: string[]): Canvas {
+function winPanel(lines: string[], style: HudStyle): Canvas {
     return new Canvas({
         width: VIEW_W,
         height: VIEW_H,
@@ -201,24 +241,71 @@ function winPanel(lines: string[]): Canvas {
         quality: 2,
         filtering: ImageFiltering.Blended,
         draw: (ctx) => {
-            ctx.fillStyle = "rgba(4,20,22,0.55)";
+            ctx.fillStyle = `rgba(${style.shade},0.6)`;
             ctx.fillRect(0, 0, VIEW_W, VIEW_H);
             ctx.textAlign = "center";
-            ctx.shadowColor = "rgba(0,40,40,0.9)";
+            ctx.shadowColor = `rgba(${style.shade},0.9)`;
             ctx.shadowBlur = 16;
-            ctx.fillStyle = "#e8fff6";
+            ctx.fillStyle = style.text;
             ctx.font = `italic 56px ${SERIF}`;
             ctx.fillText(lines[0], VIEW_W / 2, 210);
             ctx.shadowBlur = 6;
             ctx.font = `24px ${SERIF}`;
-            ctx.fillStyle = "#c4f2e4";
+            ctx.fillStyle = style.accent;
             lines.slice(1).forEach((line, i) => ctx.fillText(line, VIEW_W / 2, 262 + i * 36));
         },
     });
 }
 
-/** Simple progress bar while the painted art streams in. */
-export function loadingCard(progress: () => number): Canvas {
+function paintChapter(ctx: CanvasRenderingContext2D, card: ChapterCard): void {
+    ctx.fillStyle = card.background;
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+    ctx.textAlign = "center";
+    ctx.shadowColor = "rgba(0,0,0,0.9)";
+    ctx.shadowBlur = 20;
+    ctx.fillStyle = card.text;
+    ctx.font = `italic 72px ${SERIF}`;
+    ctx.fillText(card.title, VIEW_W / 2, 230);
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = card.accent;
+    ctx.font = `26px ${SERIF}`;
+    ctx.fillText(card.subtitle, VIEW_W / 2, 276);
+    ctx.globalAlpha = 0.75;
+    ctx.font = `italic 19px ${SERIF}`;
+    ctx.fillText(card.line, VIEW_W / 2, 336);
+    ctx.globalAlpha = 1;
+    // a thin rule with a lantern-spark at its centre
+    const g = ctx.createLinearGradient(VIEW_W / 2 - 140, 0, VIEW_W / 2 + 140, 0);
+    g.addColorStop(0, "rgba(255,255,255,0)");
+    g.addColorStop(0.5, card.accent);
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(VIEW_W / 2 - 140, 300, 280, 1.5);
+    const spark = ctx.createRadialGradient(VIEW_W / 2, 300, 0, VIEW_W / 2, 300, 10);
+    spark.addColorStop(0, "rgba(255,214,150,0.95)");
+    spark.addColorStop(1, "rgba(255,180,90,0)");
+    ctx.fillStyle = spark;
+    ctx.fillRect(VIEW_W / 2 - 10, 290, 20, 20);
+}
+
+/** The card one scene fades to before it hands over to the next. */
+export function chapterCard(card: ChapterCard): Canvas {
+    return new Canvas({
+        width: VIEW_W,
+        height: VIEW_H,
+        cache: true,
+        quality: 2,
+        filtering: ImageFiltering.Blended,
+        draw: (ctx) => paintChapter(ctx, card),
+    });
+}
+
+/**
+ * Progress bar while the painted art streams in. With a chapter card it
+ * draws that card, so a scene reached through a transition keeps showing it.
+ */
+export function loadingCard(progress: () => number, style: HudStyle = OKA_HUD, card?: ChapterCard): Canvas {
+    const l = style.loading;
     return new Canvas({
         width: VIEW_W,
         height: VIEW_H,
@@ -226,16 +313,40 @@ export function loadingCard(progress: () => number): Canvas {
         quality: 1,
         filtering: ImageFiltering.Blended,
         draw: (ctx) => {
-            ctx.fillStyle = "#0f2427";
+            const p = Math.max(0, Math.min(1, progress()));
+            if (card) {
+                paintChapter(ctx, card);
+                ctx.fillStyle = "rgba(255,255,255,0.08)";
+                ctx.fillRect(VIEW_W / 2 - 120, 400, 240, 3);
+                ctx.fillStyle = l.bar;
+                ctx.fillRect(VIEW_W / 2 - 120, 400, 240 * p, 3);
+                return;
+            }
+            ctx.fillStyle = l.background;
             ctx.fillRect(0, 0, VIEW_W, VIEW_H);
             ctx.textAlign = "center";
-            ctx.fillStyle = "#cdeee2";
+            ctx.fillStyle = l.label;
             ctx.font = `italic 34px ${SERIF}`;
-            ctx.fillText("Entering Oka World…", VIEW_W / 2, VIEW_H / 2 - 20);
+            ctx.fillText(l.text, VIEW_W / 2, VIEW_H / 2 - 20);
             ctx.fillStyle = "rgba(205,238,226,0.2)";
             ctx.fillRect(VIEW_W / 2 - 160, VIEW_H / 2 + 10, 320, 6);
-            ctx.fillStyle = "#9ff0d8";
-            ctx.fillRect(VIEW_W / 2 - 160, VIEW_H / 2 + 10, 320 * Math.max(0, Math.min(1, progress())), 6);
+            ctx.fillStyle = l.bar;
+            ctx.fillRect(VIEW_W / 2 - 160, VIEW_H / 2 + 10, 320 * p, 6);
+        },
+    });
+}
+
+/** A solid veil for fades in and out of a scene. */
+export function veil(color: string): Canvas {
+    return new Canvas({
+        width: VIEW_W,
+        height: VIEW_H,
+        cache: true,
+        quality: 1,
+        filtering: ImageFiltering.Blended,
+        draw: (ctx) => {
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, VIEW_W, VIEW_H);
         },
     });
 }

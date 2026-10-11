@@ -22,6 +22,7 @@ interface Mote {
     phase: number;
     speed: number;
     depth: number;
+    sway: number;
 }
 
 function star(size: number, rgb: string): Canvas {
@@ -66,20 +67,47 @@ function drop(rgb: string, r: number): Canvas {
     });
 }
 
+/** "r,g,b" pairs for each burst kind: the main colour and a lighter second one. */
+export type BurstPalette = Record<BurstKind, [string, string]>;
+
+export const OKA_BURSTS: BurstPalette = {
+    sparkle: ["150,220,255", "200,240,255"],
+    heart: ["255,150,180", "255,180,200"],
+    splash: ["200,250,245", "150,230,230"],
+    dust: ["210,220,200", "190,200,180"],
+    poof: ["150,255,235", "180,255,240"],
+    glow: ["190,255,235", "230,255,250"],
+};
+
+/** Ambient motes: [radius, "r,g,b", strength] looks, and how they move. */
+export interface MoteStyle {
+    looks: [number, string, number][];
+    /** upward speed range in scene units per second; negative falls */
+    rise: [number, number];
+    /** sideways sway amplitude */
+    sway: number;
+}
+
+export const OKA_MOTES: MoteStyle = {
+    looks: [[6, "200,255,220", 0.8], [4, "255,240,190", 0.8], [9, "170,230,255", 0.5]],
+    rise: [3.6, 10.8],
+    sway: 6,
+};
+
 /** Short-lived particles and the ambient motes that float through the cave. */
 export class Effects {
     private particles: Particle[] = [];
     private motes: Mote[] = [];
     private looks: Record<string, Graphic[]>;
 
-    constructor(private scene: Scene) {
+    constructor(private scene: Scene, p: BurstPalette = OKA_BURSTS) {
         this.looks = {
-            sparkle: [star(16, "150,220,255"), star(10, "200,240,255")],
-            heart: [star(14, "255,150,180"), glow(8, "255,180,200", 0.9, 2)],
-            splash: [drop("200,250,245", 2.2), drop("150,230,230", 1.6)],
-            dust: [glow(7, "210,220,200", 0.55, 2), glow(5, "190,200,180", 0.5, 2)],
-            poof: [star(14, "150,255,235"), glow(8, "180,255,240", 0.9, 2)],
-            glow: [glow(5, "190,255,235", 0.9, 2), glow(3, "230,255,250", 1, 2)],
+            sparkle: [star(16, p.sparkle[0]), star(10, p.sparkle[1])],
+            heart: [star(14, p.heart[0]), glow(8, p.heart[1], 0.9, 2)],
+            splash: [drop(p.splash[0], 2.2), drop(p.splash[1], 1.6)],
+            dust: [glow(7, p.dust[0], 0.55, 2), glow(5, p.dust[1], 0.5, 2)],
+            poof: [star(14, p.poof[0]), glow(8, p.poof[1], 0.9, 2)],
+            glow: [glow(5, p.glow[0], 0.9, 2), glow(3, p.glow[1], 1, 2)],
         };
     }
 
@@ -122,16 +150,20 @@ export class Effects {
         }
     }
 
-    /** Glowing spores drifting in the air, wrapped around the view. */
-    seedMotes(count: number): void {
-        const looks = [glow(6, "200,255,220", 0.8, 2), glow(4, "255,240,190", 0.8, 2), glow(9, "170,230,255", 0.5, 2)];
+    /** Glowing spores (or falling dust) drifting in the air, wrapped around the view. */
+    seedMotes(count: number, style: MoteStyle = OKA_MOTES): void {
+        const looks = style.looks.map(([r, rgb, strength]) => glow(r, rgb, strength, 2));
+        const [lo, hi] = style.rise;
         for (let i = 0; i < count; i++) {
             const depth = 0.6 + Math.random() * 0.8;
             const actor = new Actor({ z: depth > 1.15 ? 16 : -60 });
             actor.graphics.use(looks[i % looks.length]);
             actor.scale = vec(depth, depth);
             this.scene.add(actor);
-            this.motes.push({ actor, x: Math.random() * VIEW_W, y: Math.random() * VIEW_H, phase: Math.random() * 10, speed: 6 + Math.random() * 12, depth });
+            this.motes.push({
+                actor, x: Math.random() * VIEW_W, y: Math.random() * VIEW_H, phase: Math.random() * 10,
+                speed: lo + Math.random() * (hi - lo), depth, sway: style.sway,
+            });
         }
     }
 
@@ -155,9 +187,10 @@ export class Effects {
         for (const m of this.motes) {
             m.phase += dt;
             m.x -= dx * (m.depth - 1);
-            m.x += Math.sin(m.phase * 0.5) * 6 * dt;
-            m.y -= m.speed * dt * 0.6;
+            m.x += Math.sin(m.phase * 0.5) * m.sway * dt;
+            m.y -= m.speed * dt;
             if (m.y < -10) m.y = VIEW_H + 10;
+            if (m.y > VIEW_H + 10) m.y = -10;
             if (m.x < -10) m.x += VIEW_W + 20;
             if (m.x > VIEW_W + 10) m.x -= VIEW_W + 20;
             m.actor.pos = vec(left + m.x, m.y + Math.sin(m.phase * 1.3) * 4);

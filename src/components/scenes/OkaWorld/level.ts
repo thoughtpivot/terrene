@@ -9,7 +9,8 @@
 export type PieceName = "slab" | "floatS" | "floatM" | "floatL" | "isle";
 export type FixtureName =
     | "BonsaiTree" | "Boulders" | "MossyBoulder" | "Stalagmite"
-    | "Kelp" | "Fern" | "GrassTuft" | "MossDrip" | "GlowShrooms";
+    | "Kelp" | "Fern" | "GrassTuft" | "MossDrip" | "GlowShrooms"
+    | "DeadTree" | "PaleShrooms" | "HangingLantern";
 
 export interface Piece {
     name: PieceName;
@@ -39,7 +40,32 @@ export interface Pool {
     floor: number;
 }
 
-export const LEVEL = {
+/** A whole Oka World layout. Oka World 2 has its own in 2/level.ts. */
+export interface OkaLevel {
+    width: number;
+    start: { x: number; y: number };
+    /** solid ground runs: [left, right, top] */
+    ground: [number, number, number][];
+    pools: Pool[];
+    /** tall crystal walls standing on the ground: [left, top] */
+    walls: [number, number][];
+    pieces: Piece[];
+    fixtures: FixturePlacement[];
+    /** checkpoints: [x, y of the ground] */
+    checkpoints: [number, number][];
+    crystals: [number, number][];
+    hearts: [number, number][];
+    /** [x, minX, maxX] patrol on the ground below y 400, or [x, minX, maxX, y] on a ledge at y */
+    mossbacks: ([number, number, number] | [number, number, number, number])[];
+    /** [homeX, homeY, radiusX, radiusY] */
+    glimmerflies: [number, number, number, number][];
+    /** pool index for each gloomfin */
+    gloomfins: number[];
+    /** where the goal (Heartstone, Soul Shrine) stands */
+    heartstone: { x: number; y: number };
+}
+
+export const LEVEL: OkaLevel = {
     width: 7400,
     start: { x: 120, y: 430 },
 
@@ -50,19 +76,19 @@ export const LEVEL = {
         [3640, 4480, 400],
         [5300, 6100, 430],
         [6380, 7400, 430],
-    ] as [number, number, number][],
+    ],
 
     pools: [
         { x0: 900, x1: 1230, surface: 452, floor: 540 },
         { x0: 2060, x1: 3640, surface: 458, floor: 540 },
         { x0: 6100, x1: 6380, surface: 452, floor: 540 },
-    ] as Pool[],
+    ],
 
     /** tall crystal walls standing on the ground: [left, top] */
     walls: [
         [1680, 282],
         [6700, 300],
-    ] as [number, number][],
+    ],
 
     pieces: [
         { name: "floatM", x: 560, top: 330 },
@@ -79,7 +105,7 @@ export const LEVEL = {
         { name: "floatM", x: 5650, top: 320, flip: true },
         { name: "floatS", x: 6185, top: 360 },
         { name: "floatM", x: 6530, top: 362 },
-    ] as Piece[],
+    ],
 
     fixtures: [
         { name: "BonsaiTree", x: 170, y: 434 },
@@ -120,7 +146,7 @@ export const LEVEL = {
         { name: "GlowShrooms", x: 7055, y: 432 },
         { name: "GlowShrooms", x: 7245, y: 432, flip: true },
         { name: "BonsaiTree", x: 7330, y: 434, flip: true },
-    ] as FixturePlacement[],
+    ],
 
     /** glowing mushroom checkpoints */
     checkpoints: [
@@ -128,7 +154,7 @@ export const LEVEL = {
         [3705, 402],
         [5370, 432],
         [6440, 432],
-    ] as [number, number][],
+    ],
 
     crystals: [
         [300, 382], [345, 368], [390, 382], [610, 296], [670, 296], [800, 390],
@@ -141,12 +167,12 @@ export const LEVEL = {
         [5420, 390], [5700, 286], [5960, 390], [6020, 390],
         [6240, 326], [6300, 505],
         [6600, 328], [6735, 266], [6900, 390], [7000, 390],
-    ] as [number, number][],
+    ],
 
     hearts: [
         [2410, 318],
         [5770, 286],
-    ] as [number, number][],
+    ],
 
     mossbacks: [
         [600, 480, 860],
@@ -154,7 +180,7 @@ export const LEVEL = {
         [4000, 3800, 4300],
         [5560, 5450, 5700],
         [5990, 5900, 6080],
-    ] as [number, number, number][],
+    ],
 
     /** [homeX, homeY, radiusX, radiusY] */
     glimmerflies: [
@@ -163,7 +189,7 @@ export const LEVEL = {
         [3370, 226, 60, 40],
         [4840, 186, 50, 20],
         [5160, 252, 46, 46],
-    ] as [number, number, number, number][],
+    ],
 
     /** pool index for each gloomfin */
     gloomfins: [0, 1, 1, 2],
