@@ -45,7 +45,9 @@ On touch screens, on-screen buttons appear for move and jump.
   Shroom checkpoint.
 - At 0 hearts Mori rests for a moment, then comes back at the checkpoint with
   3 hearts. Crystals already collected are kept.
-- Touching the Heartstone wins the level and shows your crystal count.
+- Touching the Heartstone wins the level and shows your crystal count. Enter,
+  Space or Jump (or waiting 9 seconds) then leads down into
+  [Oka World 2](./oka-world-2.md); R explores Oka World again.
 
 ## Code Layout
 
@@ -57,7 +59,8 @@ src/
 ├── common/BaseItem.ts                    # BaseItem, PickupItem, FixtureItem
 └── components/
     ├── scenes/OkaWorld/
-    │   ├── OkaWorld.ts                   # scene: HD switch, loading, build, loop
+    │   ├── OkaScene.ts                   # shared scene: HD switch, loading, build, loop
+    │   ├── OkaWorld.ts                   # Oka World's config: level, art, music, styles
     │   ├── level.ts                      # the whole layout as data
     │   ├── physics.ts                    # surfaces, solids, water, body movement
     │   ├── terrain.ts                    # places painted pieces + their surfaces
@@ -67,7 +70,8 @@ src/
     │   ├── hud.ts                        # hearts, crystals, cards, touch buttons
     │   ├── audio.ts                      # gapless music loop and positional SFX
     │   ├── OkaCreature.ts / hooks.ts     # shared creature base and scene hooks
-    │   └── art/atlas.ts                  # generated: frames, anchors, surfaces
+    │   ├── art/atlas.ts                  # generated: frames, anchors, surfaces
+    │   └── 2/                            # Oka World 2, see oka-world-2.md
     ├── characters/player/Mori/           # the hero
     ├── creatures/{Mossback,Glimmerfly,Gloomfin}/
     └── items/cave/                       # pickups and fixtures
@@ -87,7 +91,7 @@ Every object you can put in a scene extends `BaseItem`:
 
 To add a fixture, create it under `items/cave/<Name>/`, add the name to
 `FixtureName` in `level.ts`, register it in the `FIXTURES` map in
-`OkaWorld.ts`, then place it in `LEVEL.fixtures`.
+`OkaScene.ts`, then place it in `LEVEL.fixtures`.
 
 ### HD rendering
 
