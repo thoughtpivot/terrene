@@ -24,7 +24,7 @@ export { Resources };
 export default class Glimmerfly extends OkaCreature {
     readonly stompable = true;
     readonly creatureName = "Glimmerfly";
-    private halo = new Actor({ z: 8.5 });
+    private halo = new Actor({ z: -0.5 });
     private phase = Math.random() * Math.PI * 2;
     private gone = 0;
     private lastX: number;

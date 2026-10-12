@@ -1,4 +1,4 @@
-import { Actor, Color, Engine, ImageFiltering, ImageSource, Physics, Scene, vec } from "excalibur";
+import { Actor, Color, Engine, ImageFiltering, ImageSource, Scene, vec } from "excalibur";
 import Briar from "../../creatures/Briar/Briar";
 import Skipper from "../../creatures/Skipper/Skipper";
 import Spout from "../../creatures/Spout/Spout";
@@ -60,7 +60,7 @@ export default class ZeldaLand extends Scene implements RoomHooks {
     }
 
     onActivate(): void {
-        Physics.acc = vec(0, 0);
+        this.physics.config.gravity = vec(0, 0);
         this.engine.backgroundColor = Color.fromHex("#000000");
         this.camera.clearAllStrategies();
         this.camera.pos = vec(VIEW_W / 2, VIEW_H / 2);

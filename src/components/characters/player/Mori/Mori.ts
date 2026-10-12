@@ -55,8 +55,8 @@ export default class Mori extends Actor implements OkaHero {
     private runClock = 0;
     private squash = 0;
     private t = 0;
-    private lamp = new Actor({ z: 10.5 });
-    private aura = new Actor({ z: 3 });
+    private lamp = new Actor({ z: 0.5 });
+    private aura = new Actor({ z: -7 });
     private stepClock = 0;
     /** set by the scene: called when Mori's feet touch down after a fall */
     onLand?: (speed: number) => void;

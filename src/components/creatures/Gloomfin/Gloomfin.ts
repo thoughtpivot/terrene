@@ -34,7 +34,7 @@ export default class Gloomfin extends OkaCreature {
     private vy = 0;
     private dir: -1 | 1 = 1;
     private cooldown = 1.5 + Math.random() * 2;
-    private lure = new Actor({ z: 8.5 });
+    private lure = new Actor({ z: -0.5 });
     private depth: number;
     /** World position of the lure, for lighting. */
     lurePos = { x: 0, y: 0 };

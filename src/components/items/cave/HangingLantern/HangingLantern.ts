@@ -50,12 +50,11 @@ export default class HangingLantern extends FixtureItem {
             },
         });
         this.pendulum.pos = vec(0, CEILING - this.pos.y);
-        this.pendulum.z = this.z;
         this.pendulum.graphics.use(chain);
-        const lamp = new Actor({ anchor: vec(0.5, 0), pos: vec(0, this.length - 4), z: this.z });
+        const lamp = new Actor({ anchor: vec(0.5, 0), pos: vec(0, this.length - 4) });
         lamp.graphics.use(paintedSprite(Resources.Image));
-        this.cold.z = this.z - 0.5;
-        this.warm.z = this.z - 0.4;
+        this.cold.z = -0.5;
+        this.warm.z = -0.4;
         this.pendulum.addChild(lamp);
         this.cold.graphics.use(glow(46, "150,200,255", 0.55));
         this.warm.graphics.use(glow(110, "255,186,104", 0.6));

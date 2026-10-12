@@ -19,7 +19,7 @@ const ORB = 112;
 export default class SoulShrine extends FixtureItem {
     readonly itemName = "SoulShrine";
     awake = false;
-    private halo = new Actor({ z: -1, pos: vec(0, -ORB) });
+    private halo = new Actor({ z: -0.5, pos: vec(0, -ORB) });
     private core = new Actor({ z: 0.5, pos: vec(0, -ORB) });
     private t = 0;
 
@@ -32,8 +32,6 @@ export default class SoulShrine extends FixtureItem {
         this.wear(paintedSprite(Resources.Image));
         this.halo.graphics.use(glow(110, "150,215,255", 0.7));
         this.core.graphics.use(glow(26, "235,248,255", 0.9));
-        this.halo.z = this.z - 0.5;
-        this.core.z = this.z + 0.5;
         this.addChild(this.halo);
         this.addChild(this.core);
     }

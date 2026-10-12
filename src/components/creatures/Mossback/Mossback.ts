@@ -45,7 +45,7 @@ export default class Mossback extends OkaCreature {
         const g = this.hooks.physics.groundBelow(this.pos.x, this.pos.y - 40, 0);
         if (g) this.pos.y = g.y;
         if (this.variant === "dark") {
-            this.eyes = new Actor({ z: this.z + 0.1 });
+            this.eyes = new Actor({ z: 0.1 });
             this.eyes.graphics.use(glow(14, "190,255,110", 0.85, 2));
             this.addChild(this.eyes);
         }

@@ -704,7 +704,7 @@ class Bubble extends Actor {
         this.vel = vec(dir * 76, -120);
         this.graphics.use(sprite("bubble"));
         this.on("postcollision", (evt) => {
-            const other = evt.other;
+            const other = evt.other.owner;
             if (other.hasTag("player") || other.hasTag("enemy")) return;
             if (evt.side === Side.Left || evt.side === Side.Right) {
                 this.pop(false);

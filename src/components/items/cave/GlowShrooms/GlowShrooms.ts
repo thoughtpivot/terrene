@@ -16,7 +16,7 @@ export { Resources };
 export default class GlowShrooms extends FixtureItem {
     readonly itemName = "GlowShrooms";
     lit = false;
-    private halo = new Actor({ z: -1, pos: vec(0, -22) });
+    private halo = new Actor({ z: -0.5, pos: vec(0, -22) });
     private t = Math.random() * 5;
 
     constructor(options: ItemOptions, readonly checkpoint = false) {
@@ -27,7 +27,6 @@ export default class GlowShrooms extends FixtureItem {
     onInitialize(): void {
         this.wear(paintedSprite(Resources.Image));
         this.halo.graphics.use(glow(60, "80,170,255", 0.5));
-        this.halo.z = this.z - 0.5;
         this.addChild(this.halo);
     }
 

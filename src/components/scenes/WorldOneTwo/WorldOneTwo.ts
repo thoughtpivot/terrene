@@ -5,7 +5,6 @@ import {
     Color,
     CollisionType,
     Engine,
-    Physics,
     Rectangle,
     Scene,
     ScreenElement,
@@ -118,7 +117,7 @@ export default class WorldOneTwo extends Scene implements WorldApi {
     }
 
     onActivate(context: { data?: unknown; engine: Engine }): void {
-        setGravity(1700);
+        setGravity(this, 1700);
         context.engine.backgroundColor = Color.fromHex("#100e16");
         this.bindMusicInput();
         this.tryMusic();
@@ -136,7 +135,7 @@ export default class WorldOneTwo extends Scene implements WorldApi {
 
     onDeactivate(): void {
         this.unbindMusicInput();
-        setGravity(0);
+        setGravity(this, 0);
         stopMusic();
         this.musicStarted = false;
     }
@@ -331,7 +330,7 @@ export default class WorldOneTwo extends Scene implements WorldApi {
     }
 
     private spawnWorld(): void {
-        setGravity(1700);
+        setGravity(this, 1700);
         this.mode = "play";
         this.modeTime = 0;
         this.time = 400;
@@ -640,8 +639,8 @@ function readCarry(value: unknown): RunCarry | null {
     return { points: row.points, coins: row.coins, lives: row.lives, big: row.big };
 }
 
-function setGravity(y: number): void {
-    Physics.acc = vec(0, y);
+function setGravity(scene: Scene, y: number): void {
+    scene.physics.config.gravity = vec(0, y);
 }
 
 function clamp(value: number, min: number, max: number): number {
