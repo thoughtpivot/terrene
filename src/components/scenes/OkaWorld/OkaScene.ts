@@ -498,9 +498,6 @@ export default class OkaScene extends Scene {
             this.effects?.burst("splash", x, water.y, Math.round(6 + strength * 8));
             this.sfx("splash", x, 1.1 - strength * 0.15);
         };
-        mori.onLand = (speed) => {
-            if (speed > 420) this.effects?.burst("dust", mori.rig.x, mori.rig.y, 6);
-        };
         this.mori = this.put(mori);
 
         for (const [x, minX, maxX, y] of L.mossbacks) {
