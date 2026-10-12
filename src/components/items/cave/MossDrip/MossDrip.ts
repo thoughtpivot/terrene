@@ -1,10 +1,12 @@
 import { vec } from "excalibur";
 import { FixtureItem, type ItemOptions } from "../../../../common/BaseItem";
 import { paintedImage, paintedSprite } from "../../../scenes/OkaWorld/paint";
+import MossDripDarkImage from "./MossDrip-dark.png";
 import MossDripImage from "./MossDrip.png";
 
 const Resources = {
     Image: paintedImage(MossDripImage),
+    Dark: paintedImage(MossDripDarkImage),
 };
 
 export { Resources };
@@ -20,6 +22,6 @@ export default class MossDrip extends FixtureItem {
     }
 
     onInitialize(): void {
-        this.wear(paintedSprite(Resources.Image));
+        this.wear(paintedSprite(this.dark ? Resources.Dark : Resources.Image));
     }
 }

@@ -19,6 +19,8 @@ export interface ItemOptions {
     /** Horizontal mirror. */
     flip?: boolean;
     scale?: number;
+    /** "dark" wears the Hollow's recolored art where an item has one (Oka World 2). */
+    variant?: "light" | "dark";
 }
 
 export default abstract class BaseItem extends Actor {
@@ -38,9 +40,12 @@ export default abstract class BaseItem extends Actor {
         });
         if (options.scale) this.scale = vec(options.scale, options.scale);
         this.flip = options.flip ?? false;
+        this.dark = options.variant === "dark";
     }
 
     protected flip: boolean;
+    /** Wear the dark recolor. */
+    protected dark: boolean;
 
     protected wear(graphic: Graphic): void {
         graphic.flipHorizontal = this.flip;

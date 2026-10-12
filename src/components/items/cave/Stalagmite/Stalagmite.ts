@@ -1,10 +1,12 @@
 import { vec } from "excalibur";
 import { FixtureItem, type ItemOptions } from "../../../../common/BaseItem";
 import { paintedImage, paintedSprite } from "../../../scenes/OkaWorld/paint";
+import StalagmiteDarkImage from "./Stalagmite-dark.png";
 import StalagmiteImage from "./Stalagmite.png";
 
 const Resources = {
     Image: paintedImage(StalagmiteImage),
+    Dark: paintedImage(StalagmiteDarkImage),
 };
 
 export { Resources };
@@ -18,6 +20,6 @@ export default class Stalagmite extends FixtureItem {
     }
 
     onInitialize(): void {
-        this.wear(paintedSprite(Resources.Image));
+        this.wear(paintedSprite(this.dark ? Resources.Dark : Resources.Image));
     }
 }

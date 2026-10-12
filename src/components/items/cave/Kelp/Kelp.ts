@@ -1,10 +1,12 @@
 import { vec } from "excalibur";
 import { FixtureItem, type ItemOptions } from "../../../../common/BaseItem";
 import { paintedImage, paintedSprite } from "../../../scenes/OkaWorld/paint";
+import KelpDarkImage from "./Kelp-dark.png";
 import KelpImage from "./Kelp.png";
 
 const Resources = {
     Image: paintedImage(KelpImage),
+    Dark: paintedImage(KelpDarkImage),
 };
 
 export { Resources };
@@ -20,6 +22,6 @@ export default class Kelp extends FixtureItem {
     }
 
     onInitialize(): void {
-        this.wear(paintedSprite(Resources.Image));
+        this.wear(paintedSprite(this.dark ? Resources.Dark : Resources.Image));
     }
 }

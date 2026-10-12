@@ -1,5 +1,6 @@
 import { Color, DisplayMode, Engine, Loader, Physics, PointerScope, vec } from "excalibur";
 import OkaWorld, { OKA_WORLD_SCENE } from "./scenes/OkaWorld/OkaWorld";
+import OkaWorldTwo, { OKA_WORLD_TWO_SCENE } from "./scenes/OkaWorld/2/OkaWorldTwo";
 import ZeldaCave from "./scenes/ZeldaCave/ZeldaCave";
 import ZeldaLand from "./scenes/ZeldaLand/ZeldaLand";
 import { ZELDA_CAVE_SCENE, ZELDA_LAND_SCENE } from "./scenes/ZeldaLand/run";
@@ -10,10 +11,11 @@ const WORLD_ONE_SCENE = "worldone";
 const DEFAULT_SCENE = OKA_WORLD_SCENE;
 
 /** Scenes that can be opened straight from the URL, e.g. /#worldone. An empty or unknown hash opens the default. */
-const ROUTED_SCENES = [OKA_WORLD_SCENE, WORLD_ONE_SCENE];
+const ROUTED_SCENES = [OKA_WORLD_SCENE, OKA_WORLD_TWO_SCENE, WORLD_ONE_SCENE];
 
 const SCENE_TITLES: Record<string, string> = {
     [OKA_WORLD_SCENE]: "Oka World",
+    [OKA_WORLD_TWO_SCENE]: "Oka World 2",
     [WORLD_ONE_SCENE]: "World 1-1",
 };
 
@@ -52,6 +54,7 @@ class Terrene extends Engine {
             this.addScene(ZELDA_LAND_SCENE, new ZeldaLand());
             this.addScene(ZELDA_CAVE_SCENE, new ZeldaCave());
             this.addScene(OKA_WORLD_SCENE, new OkaWorld());
+            this.addScene(OKA_WORLD_TWO_SCENE, new OkaWorldTwo());
             const first = sceneFromHash();
             console.log(first === DEFAULT_SCENE
                 ? `🏰 Engine started, loading ${SCENE_TITLES[first]} as the default scene`

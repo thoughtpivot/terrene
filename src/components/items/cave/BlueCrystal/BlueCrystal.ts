@@ -1,10 +1,12 @@
 import { Actor, vec } from "excalibur";
 import { PickupItem, type ItemOptions } from "../../../../common/BaseItem";
 import { glow, paintedImage, paintedSprite } from "../../../scenes/OkaWorld/paint";
+import BlueCrystalDarkImage from "./BlueCrystal-dark.png";
 import BlueCrystalImage from "./BlueCrystal.png";
 
 const Resources = {
     Image: paintedImage(BlueCrystalImage),
+    Dark: paintedImage(BlueCrystalDarkImage),
 };
 
 export { Resources };
@@ -21,8 +23,8 @@ export default class BlueCrystal extends PickupItem {
     }
 
     onInitialize(): void {
-        this.wear(paintedSprite(Resources.Image));
-        this.halo.graphics.use(glow(30, "140,210,255", 0.55));
+        this.wear(paintedSprite(this.dark ? Resources.Dark : Resources.Image));
+        this.halo.graphics.use(glow(30, this.dark ? "200,240,255" : "140,210,255", this.dark ? 0.7 : 0.55));
         this.halo.z = this.z - 0.5;
         this.addChild(this.halo);
     }

@@ -40,6 +40,8 @@ export default abstract class OkaCreature extends Actor {
     }
 
     onPreUpdate(_engine: unknown, delta: number): void {
+        // a scene hand-over tears the level down mid-frame; killed actors still get this frame's update
+        if (this.isKilled()) return;
         const dt = Math.min(delta / 1000, 1 / 30);
         this.t += dt;
         this.step(dt);

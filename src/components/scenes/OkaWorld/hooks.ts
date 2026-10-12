@@ -12,6 +12,9 @@ export interface OkaHero {
 
 export type BurstKind = "sparkle" | "heart" | "splash" | "dust" | "poof" | "glow";
 
+/** Which paint a creature or item wears: Oka World's own, or the Hollow's dark recolor. */
+export type OkaVariant = "light" | "dark";
+
 /** Everything a creature needs from the scene, so creatures stay scene-agnostic. */
 export interface OkaHooks {
     readonly physics: OkaPhysics;

@@ -1,10 +1,12 @@
 import { Actor, vec } from "excalibur";
 import { PickupItem, type ItemOptions } from "../../../../common/BaseItem";
 import { glow, paintedImage, paintedSprite } from "../../../scenes/OkaWorld/paint";
+import HeartMossDarkImage from "./HeartMoss-dark.png";
 import HeartMossImage from "./HeartMoss.png";
 
 const Resources = {
     Image: paintedImage(HeartMossImage),
+    Dark: paintedImage(HeartMossDarkImage),
 };
 
 export { Resources };
@@ -21,8 +23,8 @@ export default class HeartMoss extends PickupItem {
     }
 
     onInitialize(): void {
-        this.wear(paintedSprite(Resources.Image));
-        this.halo.graphics.use(glow(34, "255,140,170", 0.5));
+        this.wear(paintedSprite(this.dark ? Resources.Dark : Resources.Image));
+        this.halo.graphics.use(glow(34, this.dark ? "255,70,100" : "255,140,170", 0.5));
         this.halo.z = this.z - 0.5;
         this.addChild(this.halo);
     }

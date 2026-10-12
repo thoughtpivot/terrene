@@ -1,10 +1,12 @@
 import { vec } from "excalibur";
 import { FixtureItem, type ItemOptions } from "../../../../common/BaseItem";
 import { paintedImage, paintedSprite } from "../../../scenes/OkaWorld/paint";
+import MossyBoulderDarkImage from "./MossyBoulder-dark.png";
 import MossyBoulderImage from "./MossyBoulder.png";
 
 const Resources = {
     Image: paintedImage(MossyBoulderImage),
+    Dark: paintedImage(MossyBoulderDarkImage),
 };
 
 export { Resources };
@@ -18,6 +20,6 @@ export default class MossyBoulder extends FixtureItem {
     }
 
     onInitialize(): void {
-        this.wear(paintedSprite(Resources.Image));
+        this.wear(paintedSprite(this.dark ? Resources.Dark : Resources.Image));
     }
 }

@@ -77,6 +77,21 @@ export default class Mori extends Actor implements OkaHero {
         this.addChild(this.aura);
     }
 
+    /** World position of the lantern flame and how bright it burns this frame (about 0.8 to 1). */
+    get lantern(): { x: number; y: number; flicker: number } {
+        return {
+            x: this.pos.x + this.lamp.pos.x * this.scale.x,
+            y: this.pos.y + this.lamp.pos.y * this.scale.y,
+            flicker: this.lamp.graphics.opacity,
+        };
+    }
+
+    /** Burn the lantern brighter and warmer, for scenes where it is the main light. */
+    brightenLantern(): void {
+        this.lamp.graphics.use(glow(52, "255,196,110", 0.8));
+        this.aura.graphics.use(glow(190, "255,176,96", 0.2));
+    }
+
     get invulnerable(): boolean {
         return this.invuln > 0;
     }
