@@ -305,10 +305,10 @@ export const TERRAIN: Record<string, TerrainFrame> = {
 
 export const SHEETS: Record<string, SheetInfo> = {
     "mori": {
-        "fw": 165,
+        "fw": 210,
         "fh": 148,
-        "frames": 8,
-        "ax": 104
+        "frames": 16,
+        "ax": 105
     },
     "mossback": {
         "fw": 196,
@@ -329,6 +329,130 @@ export const SHEETS: Record<string, SheetInfo> = {
         "ax": 88
     }
 };
+
+/** Mori's frame names, lantern flame and lowest foot per frame (scene units from the anchor at his feet). */
+export const MORI = {
+    "frames": {
+        "idle": 0,
+        "run0": 1,
+        "run1": 2,
+        "run2": 3,
+        "run3": 4,
+        "run4": 5,
+        "run5": 6,
+        "run6": 7,
+        "run7": 8,
+        "jump": 9,
+        "fall": 10,
+        "swim": 11,
+        "start": 12,
+        "skid": 13,
+        "land": 14,
+        "stop": 15
+    },
+    "lamps": [
+        [
+            16.1,
+            -15.7
+        ],
+        [
+            20.2,
+            -21.3
+        ],
+        [
+            18.4,
+            -21.5
+        ],
+        [
+            18.8,
+            -23.2
+        ],
+        [
+            19.3,
+            -22.4
+        ],
+        [
+            19.7,
+            -22.0
+        ],
+        [
+            20.7,
+            -23.1
+        ],
+        [
+            19.7,
+            -23.0
+        ],
+        [
+            21.3,
+            -22.6
+        ],
+        [
+            23.8,
+            -33.6
+        ],
+        [
+            21.5,
+            -18.4
+        ],
+        [
+            23.0,
+            -15.0
+        ],
+        [
+            14.4,
+            -16.2
+        ],
+        [
+            26.8,
+            -34.0
+        ],
+        [
+            16.7,
+            -22.2
+        ],
+        [
+            15.4,
+            -21.7
+        ]
+    ],
+    "feet": [
+        1.0,
+        11.0,
+        -2.2,
+        1.8,
+        -23.5,
+        8.8,
+        -1.2,
+        -22.5,
+        -26.5,
+        -9.8,
+        -8.5,
+        -34.0,
+        -9.9,
+        -4.5,
+        -16.8,
+        -3.2
+    ],
+    "heights": [
+        72.0,
+        70.5,
+        71.0,
+        72.0,
+        71.5,
+        71.0,
+        71.5,
+        72.0,
+        70.5,
+        62.5,
+        69.0,
+        60.5,
+        65.5,
+        67.5,
+        67.5,
+        72.0
+    ]
+} as const;
 
 export const ITEMS: Record<string, { w: number; h: number }> = {
     "BlueCrystal": {

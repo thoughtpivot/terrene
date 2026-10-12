@@ -37,9 +37,19 @@ import CrystalSfx from "./sfx/crystal.mp3";
 import HeartSfx from "./sfx/heart.mp3";
 import HurtSfx from "./sfx/hurt.mp3";
 import JumpSfx from "./sfx/jump.mp3";
+import LandSfx from "./sfx/land.mp3";
 import LanternSfx from "./sfx/lantern.mp3";
 import RumbleSfx from "./sfx/rumble.mp3";
+import SkidSfx from "./sfx/skid.mp3";
 import SplashSfx from "./sfx/splash.mp3";
+import Step1Sfx from "./sfx/step-1.mp3";
+import Step2Sfx from "./sfx/step-2.mp3";
+import Step3Sfx from "./sfx/step-3.mp3";
+import Step4Sfx from "./sfx/step-4.mp3";
+import Step5Sfx from "./sfx/step-5.mp3";
+import StepWet1Sfx from "./sfx/step-wet-1.mp3";
+import StepWet2Sfx from "./sfx/step-wet-2.mp3";
+import StepWet3Sfx from "./sfx/step-wet-3.mp3";
 import StompSfx from "./sfx/stomp.mp3";
 import WinSfx from "./sfx/win.mp3";
 
@@ -78,6 +88,10 @@ const SOUNDTRACK: OkaSoundtrack = {
         win: WinSfx,
         lantern: LanternSfx,
         rumble: RumbleSfx,
+        step: [Step1Sfx, Step2Sfx, Step3Sfx, Step4Sfx, Step5Sfx],
+        stepWet: [StepWet1Sfx, StepWet2Sfx, StepWet3Sfx],
+        land: LandSfx,
+        skid: SkidSfx,
     },
     sfxLevel: {
         jump: 0.3,
@@ -89,6 +103,10 @@ const SOUNDTRACK: OkaSoundtrack = {
         win: 0.85,
         lantern: 0.6,
         rumble: 0.5,
+        step: 0.13,
+        stepWet: 0.14,
+        land: 0.26,
+        skid: 0.18,
     },
 };
 

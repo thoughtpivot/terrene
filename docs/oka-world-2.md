@@ -115,7 +115,11 @@ parallax layers below the overlay, so the darkness swallows them too.
 python3 tools/oka-world/build_art.py      # Oka World art first: 2 reuses its output
 python3 tools/oka-world/2/build_art.py    # recolours and new art for Oka World 2
 python3 tools/oka-world/2/compose_music.py
+python3 tools/oka-world/footsteps.py      # renders both worlds' footsteps
 ```
+
+Mori is not recoloured: both worlds use the same sprite, and the darkness
+overlay and his lantern light set his look in the Hollow.
 
 `2/build_art.py` imports the Oka World script for keying and cutting. It reads
 four new painted sources in `tools/oka-world/2/source` (ruined-city backdrop,

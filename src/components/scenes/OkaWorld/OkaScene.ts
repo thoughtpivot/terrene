@@ -417,15 +417,15 @@ export default class OkaScene extends Scene {
             get hero() {
                 return scene.mori as Mori;
             },
-            sfx: (name: OkaSfx, x?: number, rate?: number) => scene.sfx(name, x, rate),
+            sfx: (name: OkaSfx, x?: number, rate?: number, gain?: number) => scene.sfx(name, x, rate, gain),
             burst: (kind: BurstKind, x: number, y: number, count?: number) => scene.effects?.burst(kind, x, y, count),
             ripple: (water: WaterRegion, x: number, strength: number) => scene.ripple(water, x, strength),
         };
     }
 
-    protected sfx(name: OkaSfx, x?: number, rate = 1): void {
+    protected sfx(name: OkaSfx, x?: number, rate = 1, gain = 1): void {
         const pan = x === undefined ? 0 : Math.max(-0.8, Math.min(0.8, (x - this.camX) / (VIEW_W / 2)));
-        playOkaSfx(name, pan, rate);
+        playOkaSfx(name, pan, rate, gain);
     }
 
     private ripple(region: WaterRegion, x: number, strength: number): void {
@@ -516,9 +516,6 @@ export default class OkaScene extends Scene {
             this.ripple(water, x, strength);
             this.effects?.burst("splash", x, water.y, Math.round(6 + strength * 8));
             this.sfx("splash", x, 1.1 - strength * 0.15);
-        };
-        mori.onLand = (speed) => {
-            if (speed > 420) this.effects?.burst("dust", mori.rig.x, mori.rig.y, 6);
         };
         this.mori = this.put(mori);
 

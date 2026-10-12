@@ -19,7 +19,8 @@ export type OkaVariant = "light" | "dark";
 export interface OkaHooks {
     readonly physics: OkaPhysics;
     readonly hero: OkaHero;
-    sfx(name: OkaSfx, x?: number, rate?: number): void;
+    /** `gain` scales the effect's mix level, e.g. for softer footsteps at low speed */
+    sfx(name: OkaSfx, x?: number, rate?: number, gain?: number): void;
     burst(kind: BurstKind, x: number, y: number, count?: number): void;
     ripple(water: Water, x: number, strength: number): void;
 }

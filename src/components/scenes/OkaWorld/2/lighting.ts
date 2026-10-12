@@ -46,7 +46,7 @@ const WRAP = 2600;
  * cut where light falls: Mori's lantern, lit lanterns, pale mushrooms, the
  * creatures' own glow. Lantern light also spills warm colour. Around the
  * edges a vignette closes in, and from the dark between the pillars pairs of
- * eyes watch Mori, closing whenever her light comes near.
+ * eyes watch Mori, closing whenever his light comes near.
  *
  * Drawn above the world and its foreground silhouettes, below the HUD.
  */
