@@ -13,6 +13,7 @@ import {
     Text,
     Font,
     FontUnit,
+    BaseAlign,
 } from "excalibur";
 import axios from "axios";
 import SallyImage from "./Sally.png";
@@ -453,6 +454,7 @@ export default class Sally extends Actor implements DialogueNPC {
                         text: "...",
                         color: Color.fromHex("#FFD700"),
                         font: new Font({
+                            baseAlign: BaseAlign.Alphabetic,
                             family: "Arial, sans-serif",
                             size: 2,
                             unit: FontUnit.Px,

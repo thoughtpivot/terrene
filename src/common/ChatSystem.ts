@@ -11,6 +11,7 @@ import {
     CoordPlane,
     GraphicsGroup,
     Keys,
+    BaseAlign,
 } from "excalibur";
 
 export interface ChatMessage {
@@ -293,6 +294,7 @@ export class ChatSystem {
             text: "",
             color: Color.fromHex("#F5F5F5"),
             font: new Font({
+                baseAlign: BaseAlign.Alphabetic,
                 family: "Arial, sans-serif",
                 size: 14,
                 unit: FontUnit.Px,
@@ -343,6 +345,7 @@ export class ChatSystem {
             text: displayText,
             color: Color.fromHex("#F5F5F5"),
             font: new Font({
+                baseAlign: BaseAlign.Alphabetic,
                 family: "Arial, sans-serif",
                 size: 14,
                 unit: FontUnit.Px,
@@ -573,6 +576,7 @@ export class ChatSystem {
             text: "",
             color: Color.fromHex("#FFD700"), // Gold color for speaker names
             font: new Font({
+                baseAlign: BaseAlign.Alphabetic,
                 family: "Arial, sans-serif",
                 size: 18, // Slightly larger for better prominence
                 unit: FontUnit.Px,
@@ -584,6 +588,7 @@ export class ChatSystem {
             text: "",
             color: Color.fromHex("#F5F5F5"), // Brighter white for better contrast
             font: new Font({
+                baseAlign: BaseAlign.Alphabetic,
                 family: "Arial, sans-serif",
                 size: 15, // Slightly larger for better readability
                 unit: FontUnit.Px,

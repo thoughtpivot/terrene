@@ -12,6 +12,7 @@ import {
     ImageSource,
     CollisionType,
     Shape,
+    BaseAlign,
 } from "excalibur";
 import { TiledResource } from "@excaliburjs/plugin-tiled";
 import You from "../../characters/player/You/You";
@@ -475,6 +476,7 @@ export default class Eldergrove extends Scene {
                 text: `[E] ${text}`,
                 color: Color.White,
                 font: new Font({
+                    baseAlign: BaseAlign.Alphabetic,
                     family: "Arial",
                     size: 12,
                     unit: FontUnit.Px,
