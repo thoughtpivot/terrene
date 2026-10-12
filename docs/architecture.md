@@ -2,7 +2,7 @@
 
 ## Project Structure
 
-Terrene is a 2D RPG built with ExcaliburJS 0.28.x, TypeScript, and Webpack. The architecture emphasizes modularity, reusability, and clean separation of concerns.
+Terrene is a 2D RPG built with ExcaliburJS 0.32.x, TypeScript, and Webpack. The architecture emphasizes modularity, reusability, and clean separation of concerns.
 
 ```
 terrene/
@@ -345,7 +345,7 @@ Future: Consider automated testing for core systems.
 
 ## Technology Stack
 
-- **Engine:** ExcaliburJS 0.28.x
+- **Engine:** ExcaliburJS 0.32.x
 - **Language:** TypeScript 4.8.3
 - **Build:** Webpack 5.74.0
 - **Dev Server:** webpack-dev-server

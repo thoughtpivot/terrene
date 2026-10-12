@@ -96,9 +96,13 @@ To add a fixture, create it under `items/cave/<Name>/`, add the name to
 ### HD rendering
 
 The engine boots at 256x240 pixel art. When Oka World activates, it switches
-the screen to 960x540 with antialiasing and pixel ratio 1.5–2, and turns off
-pixel snapping. `onDeactivate()` puts the previous settings back, so the pixel
-art scenes are unaffected. Painted images are stored at 2x and drawn at half
+the screen to 960x540 with antialiasing and a pixel ratio of 1–2 (picked from
+the window size and device pixel ratio), and turns off pixel snapping. It uses
+`screen.pixelRatioOverride` and a window resize to refit the canvas. Excalibur
+0.32 fixes the canvas `image-rendering` to `pixelated` when the engine is built,
+so the switch also adds a `terrene-hd` class that sets it back to `auto`.
+`onDeactivate()` puts the previous settings back, so the pixel art scenes are
+unaffected. Painted images are stored at 2x and drawn at half
 size, so they stay sharp on high-density screens.
 
 Oka World's art and audio load when the scene first activates, behind a loading

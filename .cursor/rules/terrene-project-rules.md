@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a 2D RPG game built with ExcaliburJS 0.28.x. These rules enforce consistent code patterns, architecture, and best practices across the codebase.
+This project is a 2D RPG game built with ExcaliburJS 0.32.x. These rules enforce consistent code patterns, architecture, and best practices across the codebase.
 
 ## Component Architecture
 
@@ -285,9 +285,9 @@ try {
 
 ## ExcaliburJS Version
 
-**ALWAYS use ExcaliburJS 0.28.x**
-- Do not use or recommend features from versions newer than 0.28.x
-- When in doubt, reference: https://excaliburjs.com/docs/0.28.0/
+**ALWAYS use ExcaliburJS 0.32.x**
+- Do not use or recommend features from 0.33.0 or later
+- When in doubt, reference: https://excaliburjs.com/docs/
 
 ## Documentation
 

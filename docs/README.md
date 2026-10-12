@@ -47,7 +47,7 @@ All documentation files should:
 ## Project Resources
 
 - **Repository**: [github.com/thoughtpivot/terrene](https://github.com/thoughtpivot/terrene)
-- **ExcaliburJS Docs**: [excaliburjs.com/docs/0.28.0/](https://excaliburjs.com/docs/0.28.0/)
+- **ExcaliburJS Docs**: [excaliburjs.com/docs/](https://excaliburjs.com/docs/) (0.32.x)
 
 ## Contributing to Documentation
 
