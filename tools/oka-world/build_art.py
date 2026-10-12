@@ -186,6 +186,91 @@ def sheet(frames, ref_index, target, axis, align, anchor_head=False, pad=2):
     return out, cw, ch, int(round(left))
 
 
+HERO_HEIGHT = 72  # the idle pose, in scene units
+# (source sheet, objects on it, frame name per object or None to skip, size fix).
+# The run frames (two steps: contact, down, passing, flight) are one painting so
+# they match each other exactly. The pose sheets shade the hood darker, which
+# shrinks its measured size; the fix brings their upright "stop" to idle height.
+HERO_SOURCES = [
+    ("hero.jpg", 8, ["idle", None, None, None, None, "jump", "fall", "swim"], 1.0),
+    ("hero-run.jpg", 8, [f"run{i}" for i in range(8)], 1.0),
+    ("hero-moves.jpg", 4, ["start", None, None, "stop"], 0.84),
+    ("hero-skid.jpg", 2, ["skid", "land"], 0.84),
+]
+HERO_ORDER = ["idle"] + [f"run{i}" for i in range(8)] + ["jump", "fall", "swim", "start", "skid", "land", "stop"]
+
+
+def hood(rgba):
+    """Mask of the moss-green hood, the one part that keeps its size in every pose."""
+    a = rgba[..., :3].astype(np.float32) / 255
+    r, g, b = a[..., 0], a[..., 1], a[..., 2]
+    mx, d = a.max(-1), np.maximum(a.max(-1) - a.min(-1), 1e-6)
+    hue = np.where(mx == g, 60 * ((b - r) / d + 2), np.where(mx == r, 60 * (((g - b) / d) % 6), 0))
+    return (rgba[..., 3] > 128) & (hue > 52) & (hue < 110) & (d / np.maximum(mx, 1e-6) > 0.3) & (mx > 0.2)
+
+
+def flame(rgba):
+    """Centre of the lantern's brightest warm pixels, or None."""
+    c = rgba[..., :3].astype(int)
+    # saturated yellow, unlike the pale skin of the face and hands
+    hot = (rgba[..., 3] > 160) & (c[..., 0] > 230) & (c[..., 1] > 170) & (c[..., 2] < c[..., 1] * 0.62)
+    # the lantern always hangs below the head
+    rows = np.where((rgba[..., 3] > 128).any(1))[0]
+    hot[: int(rows[0] + (rows[-1] - rows[0]) * 0.42)] = False
+    lab, n = ndimage.label(hot)
+    if not n:
+        return None
+    sizes = ndimage.sum(hot, lab, range(1, n + 1))
+    ys, xs = np.where(lab == int(np.argmax(sizes)) + 1)
+    return float(xs.mean()), float(ys.mean())
+
+
+def hero_sheet():
+    """Mori's strip from several painted sheets, all scaled to one hood size.
+
+    Each frame is centred on its head so the body does not wobble between
+    frames, and the anchor sits in the middle of the cell so flipping him
+    to face left mirrors him in place. Every frame stands on the cell floor.
+    """
+    frames = {}
+    for name, count, names, fix in HERO_SOURCES:
+        objs = objects(key(os.path.join(SRC, name)), count)
+        hoods = [np.sqrt(hood(o).sum()) for o, n in zip(objs, names) if n]
+        frames.update({n: (o, float(np.median(hoods)) / fix) for o, n in zip(objs, names) if n})
+    idle, idle_hood = frames["idle"]
+    base_scale = HERO_HEIGHT * STORE / idle.shape[0]
+    scaled, heads = {}, {}
+    for n, (img, hood_size) in frames.items():
+        f = trim(resize(img, base_scale * idle_hood / hood_size))
+        ys, xs = np.where(f[: max(4, int(f.shape[0] * 0.45))][..., 3] > 128)
+        scaled[n], heads[n] = f, xs.mean()
+    pad = 2
+    half = int(np.ceil(max(max(heads[n], f.shape[1] - heads[n]) for n, f in scaled.items()))) + pad
+    cw = half * 2
+    ch = max(f.shape[0] for f in scaled.values()) + pad * 2
+    out = np.zeros((ch, cw * len(HERO_ORDER), 4), np.uint8)
+    lamps, feet = [], []
+    for i, n in enumerate(HERO_ORDER):
+        f = scaled[n]
+        x = int(round(i * cw + half - heads[n]))
+        y = ch - pad - f.shape[0]
+        out[y:y + f.shape[0], x:x + f.shape[1]] = f
+        cell = out[:, i * cw:(i + 1) * cw]
+        fl = flame(cell)
+        lamps.append(None if fl is None else [round((fl[0] - half) / STORE, 1), round((fl[1] - (ch - pad)) / STORE, 1)])
+        sole = cell[ch - pad - 3 * STORE: ch - pad, :, 3] > 128
+        xs = np.where(sole.any(0))[0]
+        feet.append(round((float(xs.mean()) - half) / STORE, 1))
+    save(out, COMP, "characters", "player", "Mori", "Mori.png")
+    tops = [round(float((ch - pad) - np.where((out[:, i * cw:(i + 1) * cw, 3] > 128).any(1))[0][0]) / STORE, 1)
+            for i in range(len(HERO_ORDER))]
+    print("mori heights", dict(zip(HERO_ORDER, tops)))
+    print("mori feet", dict(zip(HERO_ORDER, feet)))
+    info = {"fw": cw, "fh": ch, "frames": len(HERO_ORDER), "ax": half}
+    rig = {"frames": {n: i for i, n in enumerate(HERO_ORDER)}, "lamps": lamps, "feet": feet, "heights": tops}
+    return info, rig
+
+
 def pack(named, width=2048, pad=4):
     """Shelf-pack images, tallest first."""
     items = sorted(named.items(), key=lambda kv: -kv[1].shape[0])
@@ -262,10 +347,7 @@ def main():
         meta["terrain"][name] = entry
 
     # ---- characters and creatures
-    hero = objects(key(os.path.join(SRC, "hero.jpg")), 8)
-    img, cw, ch, ax = sheet(hero, 0, 72, "h", "bottom", anchor_head=True)
-    save(img, COMP, "characters", "player", "Mori", "Mori.png")
-    meta["sheets"]["mori"] = {"fw": cw, "fh": ch, "frames": 8, "ax": ax}
+    meta["sheets"]["mori"], meta["mori"] = hero_sheet()
 
     cre = objects(key(os.path.join(SRC, "creatures.jpg")), 8)
     img, cw, ch, ax = sheet(cre[:4], 0, 96, "w", "bottom")
@@ -312,6 +394,8 @@ def main():
         fh.write("export const LAYERS = " + json.dumps(meta["layers"]) + ";\n\n")
         fh.write("export const TERRAIN: Record<string, TerrainFrame> = " + json.dumps(meta["terrain"], indent=4) + ";\n\n")
         fh.write("export const SHEETS: Record<string, SheetInfo> = " + json.dumps(meta["sheets"], indent=4) + ";\n\n")
+        fh.write("/** Mori's frame names, lantern flame and lowest foot per frame (scene units from the anchor at his feet). */\n")
+        fh.write("export const MORI = " + json.dumps(meta["mori"], indent=4) + " as const;\n\n")
         fh.write("export const ITEMS: Record<string, { w: number; h: number }> = " + json.dumps(meta["items"], indent=4) + ";\n")
     print("wrote", os.path.relpath(ts, ROOT))
 
