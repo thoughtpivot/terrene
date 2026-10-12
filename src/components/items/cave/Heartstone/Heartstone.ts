@@ -16,7 +16,7 @@ export { Resources };
 export default class Heartstone extends FixtureItem {
     readonly itemName = "Heartstone";
     awake = false;
-    private halo = new Actor({ z: -1, pos: vec(0, -74) });
+    private halo = new Actor({ z: -0.5, pos: vec(0, -74) });
     private t = 0;
 
     constructor(options: ItemOptions) {
@@ -27,7 +27,6 @@ export default class Heartstone extends FixtureItem {
     onInitialize(): void {
         this.wear(paintedSprite(Resources.Image));
         this.halo.graphics.use(glow(90, "90,255,220", 0.75));
-        this.halo.z = this.z - 0.5;
         this.addChild(this.halo);
     }
 

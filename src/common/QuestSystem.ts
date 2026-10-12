@@ -298,7 +298,7 @@ export class QuestSystem {
                         radius: 8,
                         color: color,
                     }),
-                    pos: Vector.Zero,
+                    offset: Vector.Zero,
                 },
             ],
         });

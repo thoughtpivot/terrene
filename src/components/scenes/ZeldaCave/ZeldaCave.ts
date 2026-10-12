@@ -1,4 +1,4 @@
-import { Actor, Color, Engine, ImageFiltering, ImageSource, Physics, Scene, vec } from "excalibur";
+import { Actor, Color, Engine, ImageFiltering, ImageSource, Scene, vec } from "excalibur";
 import Clack from "../../creatures/Clack/Clack";
 import Drip from "../../creatures/Drip/Drip";
 import Sootwing from "../../creatures/Sootwing/Sootwing";
@@ -70,7 +70,7 @@ export default class ZeldaCave extends Scene implements RoomHooks {
     }
 
     onActivate(): void {
-        Physics.acc = vec(0, 0);
+        this.physics.config.gravity = vec(0, 0);
         this.engine.backgroundColor = Color.fromHex("#000000");
         this.camera.clearAllStrategies();
         this.camera.pos = vec(VIEW_W / 2, VIEW_H / 2);

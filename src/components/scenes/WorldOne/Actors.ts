@@ -202,7 +202,7 @@ export class Walker extends Actor {
         this.body.collisionType = CollisionType.Active;
         this.body.group = Groups.enemy;
         this.body.useGravity = true;
-        this.on("postcollision", (evt) => this.onHit(evt.other as Actor, evt.side));
+        this.on("postcollision", (evt) => this.onHit(evt.other.owner as Actor, evt.side));
     }
 
     receivePlayer(player: Player, stomp: boolean): void {
@@ -386,7 +386,7 @@ export class BonusCoin extends Actor {
         this.addTag("coin");
         this.graphics.use(sprite("coin-0"));
         this.on("collisionstart", (evt) => {
-            const other = evt.other as Actor;
+            const other = evt.other.owner as Actor;
             if (!other.hasTag("player")) return;
             this.world.coin(this.pos.x, this.pos.y);
             this.kill();

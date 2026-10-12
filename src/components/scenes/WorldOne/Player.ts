@@ -76,7 +76,7 @@ export default class Player extends Actor {
         this.graphics.add("big-crouch", sprite("pip-big-crouch"));
         this.useAnim("idle");
 
-        this.on("postcollision", (evt) => this.handleHit(evt.other as Actor, evt.side));
+        this.on("postcollision", (evt) => this.handleHit(evt.other.owner as Actor, evt.side));
     }
 
     private useAnim(name: string): void {
@@ -195,12 +195,12 @@ export default class Player extends Actor {
 
     private applyStarTint(): void {
         if (this.star <= 0) {
-            for (const shown of this.graphics.current) shown.graphic.tint = Color.White;
+            if (this.graphics.current) this.graphics.current.tint = Color.White;
             return;
         }
         const palette = [Color.fromHex("#fff07a"), Color.fromHex("#7CFFB2"), Color.fromHex("#8ec5ff"), Color.White];
         const tint = palette[Math.floor(this.starTint * 12) % palette.length];
-        for (const shown of this.graphics.current) shown.graphic.tint = tint;
+        if (this.graphics.current) this.graphics.current.tint = tint;
     }
 
     private handleHit(other: Actor, side: Side): void {

@@ -80,15 +80,32 @@ export interface OkaSceneConfig {
 interface SavedScreen {
     width: number;
     height: number;
-    pixelRatio: number | null;
+    pixelRatio: number | undefined;
     antialiasing: boolean;
     snap: boolean;
     background: Color;
 }
 
-interface ScreenInternals {
-    _pixelRatioOverride: number | null;
-    _resizeHandler: () => void;
+/**
+ * Excalibur fixes the canvas CSS `image-rendering` when the engine is built
+ * (pixelated, for the 256x240 scenes) and rewrites it on every resize, so the
+ * HD switch overrides it from a stylesheet instead.
+ */
+const HD_CANVAS_CLASS = "terrene-hd";
+
+function smoothCanvas(canvas: HTMLCanvasElement, smooth: boolean): void {
+    if (smooth && !document.getElementById(HD_CANVAS_CLASS)) {
+        const style = document.createElement("style");
+        style.id = HD_CANVAS_CLASS;
+        style.textContent = `canvas.${HD_CANVAS_CLASS} { image-rendering: auto !important; }`;
+        document.head.appendChild(style);
+    }
+    canvas.classList.toggle(HD_CANVAS_CLASS, smooth);
+}
+
+/** Re-run the display mode fit (FitScreen sizes the viewport from the resolution's aspect). */
+function refitScreen(): void {
+    window.dispatchEvent(new Event("resize"));
 }
 
 /** After a win with a next scene, go on by itself after this long. */
@@ -191,33 +208,35 @@ export default class OkaScene extends Scene {
     }
 
     private enterHd(engine: Engine): void {
-        const screen = engine.screen as unknown as ScreenInternals;
+        const screen = engine.screen;
         this.saved = {
-            width: engine.screen.resolution.width,
-            height: engine.screen.resolution.height,
-            pixelRatio: screen._pixelRatioOverride,
-            antialiasing: engine.screen.antialiasing,
+            width: screen.resolution.width,
+            height: screen.resolution.height,
+            pixelRatio: screen.pixelRatioOverride,
+            antialiasing: screen.antialiasing,
             snap: engine.snapToPixel,
             background: engine.backgroundColor,
         };
-        engine.screen.resolution = { width: VIEW_W, height: VIEW_H };
-        screen._pixelRatioOverride = this.pickPixelRatio();
-        engine.screen.antialiasing = true;
+        screen.resolution = { width: VIEW_W, height: VIEW_H };
+        screen.pixelRatioOverride = this.pickPixelRatio();
+        screen.antialiasing = true;
         engine.snapToPixel = false;
         engine.backgroundColor = Color.fromHex(this.config.background);
-        screen._resizeHandler();
+        smoothCanvas(engine.canvas, true);
+        refitScreen();
     }
 
     private leaveHd(engine: Engine): void {
         const s = this.saved;
         if (!s) return;
-        const screen = engine.screen as unknown as ScreenInternals;
-        engine.screen.resolution = { width: s.width, height: s.height };
-        screen._pixelRatioOverride = s.pixelRatio;
-        engine.screen.antialiasing = s.antialiasing;
+        const screen = engine.screen;
+        screen.resolution = { width: s.width, height: s.height };
+        screen.pixelRatioOverride = s.pixelRatio;
+        screen.antialiasing = s.antialiasing;
         engine.snapToPixel = s.snap;
         engine.backgroundColor = s.background;
-        screen._resizeHandler();
+        smoothCanvas(engine.canvas, false);
+        refitScreen();
         this.saved = null;
     }
 

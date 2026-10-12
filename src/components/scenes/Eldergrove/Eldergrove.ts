@@ -8,12 +8,13 @@ import {
     Text,
     Font,
     FontUnit,
-    Input,
+    Keys,
     ImageSource,
     CollisionType,
     Shape,
+    BaseAlign,
 } from "excalibur";
-import { TiledMapResource } from "@excaliburjs/plugin-tiled";
+import { TiledResource } from "@excaliburjs/plugin-tiled";
 import You from "../../characters/player/You/You";
 import ElderRowan from "../../characters/npc/ElderRowan/ElderRowan";
 import GuardCaptain from "../../characters/npc/GuardCaptain/GuardCaptain";
@@ -24,10 +25,10 @@ import { getDialogueFromNPC } from "../../../common/DialogueUtils";
 import { getQuestSystem } from "../../../common/QuestSystem";
 import backgroundImage from "./Eldergrove-sidescroll.png";
 
-const tiledMapResource = new TiledMapResource(
+const tiledMapResource = new TiledResource(
     "./src/components/scenes/Eldergrove/Eldergrove.tmx",
     {
-        startingLayerZIndex: -2,
+        startZIndex: -2,
     }
 );
 
@@ -293,17 +294,17 @@ export default class Eldergrove extends Scene {
 
         // Handle interaction key press (E key)
         engine.input.keyboard.on("press", async (evt) => {
-            if (evt.key === Input.Keys.E) {
+            if (evt.key === Keys.E) {
                 await this.handleInteraction(engine);
             }
             
             // Accept quest with Y key
-            if (evt.key === Input.Keys.Y) {
+            if (evt.key === Keys.Y) {
                 this.handleQuestAccept();
             }
             
             // Quest completion with Space key
-            if (evt.key === Input.Keys.Space && chatSystem.getIsActive()) {
+            if (evt.key === Keys.Space && chatSystem.getIsActive()) {
                 this.handleQuestCompletion(engine);
             }
         });
@@ -475,6 +476,7 @@ export default class Eldergrove extends Scene {
                 text: `[E] ${text}`,
                 color: Color.White,
                 font: new Font({
+                    baseAlign: BaseAlign.Alphabetic,
                     family: "Arial",
                     size: 12,
                     unit: FontUnit.Px,

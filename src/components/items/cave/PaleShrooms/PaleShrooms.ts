@@ -12,7 +12,7 @@ export { Resources };
 /** Ghost-pale mushrooms that glow by themselves in the deep. Fixture: scenery and a little light. */
 export default class PaleShrooms extends FixtureItem {
     readonly itemName = "PaleShrooms";
-    private halo = new Actor({ z: -1, pos: vec(0, -34) });
+    private halo = new Actor({ z: -0.5, pos: vec(0, -34) });
     private t = Math.random() * 10;
 
     constructor(options: ItemOptions) {
@@ -22,7 +22,6 @@ export default class PaleShrooms extends FixtureItem {
     onInitialize(): void {
         this.wear(paintedSprite(Resources.Image));
         this.halo.graphics.use(glow(70, "170,225,255", 0.45));
-        this.halo.z = this.z - 0.5;
         this.addChild(this.halo);
     }
 

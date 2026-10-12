@@ -73,8 +73,8 @@ export default class Mori extends Actor implements OkaHero {
     private squash = 0;
     private lean = 0;
     private t = 0;
-    private lamp = new Actor({ z: 10.5 });
-    private aura = new Actor({ z: 3 });
+    private lamp = new Actor({ z: 0.5 });
+    private aura = new Actor({ z: -7 });
     private skidding = false;
     private skidDust = 0;
     private startTime = 0;

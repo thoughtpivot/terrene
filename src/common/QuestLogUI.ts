@@ -2,7 +2,7 @@
  * Quest Log UI - Display active quests and objectives
  */
 
-import { Engine, Actor, Vector, Color, Text, Font, FontUnit, Rectangle, vec } from "excalibur";
+import { Engine, Actor, Vector, Color, Text, Font, FontUnit, Rectangle, vec, BaseAlign } from "excalibur";
 import { getQuestSystem, Quest, QuestStatus } from "./QuestSystem";
 
 export class QuestLogUI {
@@ -95,6 +95,7 @@ export class QuestLogUI {
         const titleText = new Text({
             text: "QUEST LOG",
             font: new Font({
+                baseAlign: BaseAlign.Alphabetic,
                 family: "Arial",
                 size: 24,
                 unit: FontUnit.Px,
@@ -115,6 +116,7 @@ export class QuestLogUI {
         const instructionsText = new Text({
             text: "Press Q to close | Press T near NPCs to interact",
             font: new Font({
+                baseAlign: BaseAlign.Alphabetic,
                 family: "Arial",
                 size: 12,
                 unit: FontUnit.Px,
@@ -135,6 +137,7 @@ export class QuestLogUI {
             const noQuestsText = new Text({
                 text: "No active quests.\n\nTalk to NPCs with '!' above them\nto receive quests.",
                 font: new Font({
+                    baseAlign: BaseAlign.Alphabetic,
                     family: "Arial",
                     size: 16,
                     unit: FontUnit.Px,
@@ -159,6 +162,7 @@ export class QuestLogUI {
                 const questTitleText = new Text({
                     text: `${quest.title}`,
                     font: new Font({
+                        baseAlign: BaseAlign.Alphabetic,
                         family: "Arial",
                         size: 18,
                         unit: FontUnit.Px,
@@ -181,6 +185,7 @@ export class QuestLogUI {
                 const questDescText = new Text({
                     text: this.wrapText(quest.description, 50),
                     font: new Font({
+                        baseAlign: BaseAlign.Alphabetic,
                         family: "Arial",
                         size: 13,
                         unit: FontUnit.Px,
@@ -207,6 +212,7 @@ export class QuestLogUI {
                     const objectiveText = new Text({
                         text: `${checkMark} ${objective.description}`,
                         font: new Font({
+                            baseAlign: BaseAlign.Alphabetic,
                             family: "Arial",
                             size: 14,
                             unit: FontUnit.Px,

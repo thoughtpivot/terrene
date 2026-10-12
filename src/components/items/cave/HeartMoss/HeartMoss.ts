@@ -14,7 +14,7 @@ export { Resources };
 /** A bloom of heart-leaf moss. Pickup: restores one heart. */
 export default class HeartMoss extends PickupItem {
     readonly itemName = "HeartMoss";
-    private halo = new Actor({ z: -1 });
+    private halo = new Actor({ z: -0.5 });
     private beat = 0;
 
     constructor(options: ItemOptions) {
@@ -25,7 +25,6 @@ export default class HeartMoss extends PickupItem {
     onInitialize(): void {
         this.wear(paintedSprite(this.dark ? Resources.Dark : Resources.Image));
         this.halo.graphics.use(glow(34, this.dark ? "255,70,100" : "255,140,170", 0.5));
-        this.halo.z = this.z - 0.5;
         this.addChild(this.halo);
     }
 

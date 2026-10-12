@@ -1,4 +1,4 @@
-import { Canvas, Color, Font, FontUnit, ImageFiltering, ImageSource, Scene, ScreenElement, Text, TextAlign, vec } from "excalibur";
+import { Canvas, Color, Font, FontUnit, ImageFiltering, ImageSource, Scene, ScreenElement, Text, TextAlign, vec, BaseAlign } from "excalibur";
 import { paintedSprite } from "./paint";
 import { VIEW_H, VIEW_W } from "./parallax";
 
@@ -46,6 +46,7 @@ export interface ChapterCard {
 
 function font(size: number, color = "#f4fff6", align = TextAlign.Left): Font {
     return new Font({
+        baseAlign: BaseAlign.Alphabetic,
         family: SERIF,
         size,
         unit: FontUnit.Px,

@@ -1,4 +1,4 @@
-import { Color, DisplayMode, Engine, Loader, Physics, PointerScope, vec } from "excalibur";
+import { Color, DisplayMode, Engine, Loader, PointerScope } from "excalibur";
 import OkaWorld, { OKA_WORLD_SCENE } from "./scenes/OkaWorld/OkaWorld";
 import OkaWorldTwo, { OKA_WORLD_TWO_SCENE } from "./scenes/OkaWorld/2/OkaWorldTwo";
 import ZeldaCave from "./scenes/ZeldaCave/ZeldaCave";
@@ -48,7 +48,6 @@ class Terrene extends Engine {
         loader.suppressPlayButton = true;
 
         this.start(loader).then(() => {
-            Physics.acc = vec(0, 0);
             this.addScene(WORLD_ONE_SCENE, new WorldOne());
             this.addScene(WORLD_ONE_TWO_SCENE, new WorldOneTwo());
             this.addScene(ZELDA_LAND_SCENE, new ZeldaLand());

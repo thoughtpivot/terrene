@@ -3,7 +3,6 @@ import {
     BodyComponent,
     Color,
     Engine,
-    Physics,
     CollisionType,
     Rectangle,
     Scene,
@@ -119,7 +118,7 @@ export default class WorldOne extends Scene implements WorldApi {
     }
 
     onActivate(): void {
-        setGravity(1700);
+        setGravity(this, 1700);
         this.engine.backgroundColor = Color.fromHex("#5c94fc");
         this.camera.pos = vec(VIEW_W / 2, VIEW_H / 2);
         this.bindMusicInput();
@@ -128,7 +127,7 @@ export default class WorldOne extends Scene implements WorldApi {
 
     onDeactivate(): void {
         this.unbindMusicInput();
-        setGravity(0);
+        setGravity(this, 0);
         stopMusic();
         this.musicStarted = false;
     }
@@ -333,7 +332,7 @@ export default class WorldOne extends Scene implements WorldApi {
     }
 
     private spawnWorld(): void {
-        setGravity(1700);
+        setGravity(this, 1700);
         this.mode = "play";
         this.modeTime = 0;
         this.time = 400;
@@ -783,10 +782,12 @@ export default class WorldOne extends Scene implements WorldApi {
         stopMusic();
         this.musicStarted = false;
         this.engine.goToScene(WORLD_ONE_TWO_SCENE, {
-            points: this.points,
-            coins: this.coins,
-            lives: this.lives,
-            big,
+            sceneActivationData: {
+                points: this.points,
+                coins: this.coins,
+                lives: this.lives,
+                big,
+            },
         });
     }
 
@@ -851,9 +852,9 @@ export default class WorldOne extends Scene implements WorldApi {
     }
 }
 
-function setGravity(y: number): void {
-    // Excalibur 0.28 applies gravity through the global acceleration vector.
-    Physics.acc = vec(0, y);
+function setGravity(scene: Scene, y: number): void {
+    // Scenes share the engine's physics config, so this is global like the old Physics.acc.
+    scene.physics.config.gravity = vec(0, y);
 }
 
 function clamp(value: number, min: number, max: number): number {
