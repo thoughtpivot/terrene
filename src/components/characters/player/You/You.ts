@@ -2,7 +2,7 @@ import {
     Engine,
     Actor,
     Die,
-    Input,
+    Keys,
     vec,
     Vector,
     ImageSource,
@@ -85,9 +85,9 @@ export default class You extends Actor {
             if (this.isPlatformerMode) {
                 const velocity = this.vel;
                 
-                if (press.key === Input.Keys.Left || press.key === Input.Keys.A) {
+                if (press.key === Keys.Left || press.key === Keys.A) {
                     velocity.x = -this.moveSpeed;
-                } else if (press.key === Input.Keys.Right || press.key === Input.Keys.D) {
+                } else if (press.key === Keys.Right || press.key === Keys.D) {
                     velocity.x = this.moveSpeed;
                 }
                 
@@ -100,24 +100,24 @@ export default class You extends Actor {
             this.targetPosition = null;
 
             switch (press.key) {
-                case Input.Keys.Up:
-                case Input.Keys.W:
+                case Keys.Up:
+                case Keys.W:
                     this.pos.y = this.pos.y - this.moveSpeed;
                     break;
-                case Input.Keys.Down:
-                case Input.Keys.S:
+                case Keys.Down:
+                case Keys.S:
                     this.pos.y = this.pos.y + this.moveSpeed;
                     break;
-                case Input.Keys.Left:
-                case Input.Keys.A:
+                case Keys.Left:
+                case Keys.A:
                     this.pos.x = this.pos.x - this.moveSpeed;
                     if (this.movementSound) {
                         this.movementSound.loop = true;
                         this.movementSound.play(1.0);
                     }
                     break;
-                case Input.Keys.Right:
-                case Input.Keys.D:
+                case Keys.Right:
+                case Keys.D:
                     this.pos.x = this.pos.x + this.moveSpeed;
                     break;
             }
@@ -126,8 +126,8 @@ export default class You extends Actor {
         // Stop horizontal movement when keys are released in platformer mode
         engine.input.keyboard.on("release", (press) => {
             if (this.isPlatformerMode) {
-                if (press.key === Input.Keys.Left || press.key === Input.Keys.A ||
-                    press.key === Input.Keys.Right || press.key === Input.Keys.D) {
+                if (press.key === Keys.Left || press.key === Keys.A ||
+                    press.key === Keys.Right || press.key === Keys.D) {
                     this.vel.x = 0;
                 }
             }
@@ -137,7 +137,7 @@ export default class You extends Actor {
             console.log("Key pressed:", press.key, "Key code:", press.key);
 
             // Q key for quest log
-            if (press.key === Input.Keys.Q) {
+            if (press.key === Keys.Q) {
                 const questLogUI = getQuestLogUI(engine);
                 questLogUI.toggle();
                 
@@ -149,7 +149,7 @@ export default class You extends Actor {
                 return;
             }
 
-            if (press.key === Input.Keys.Space) {
+            if (press.key === Keys.Space) {
                 // In platformer mode, Space is for jumping
                 if (this.isPlatformerMode) {
                     // Check if player is on the ground (simple collision check)
@@ -166,17 +166,17 @@ export default class You extends Actor {
 
                 // Get current movement direction from held keys
                 const isMovingUp =
-                    engine.input.keyboard.isHeld(Input.Keys.Up) ||
-                    engine.input.keyboard.isHeld(Input.Keys.W);
+                    engine.input.keyboard.isHeld(Keys.Up) ||
+                    engine.input.keyboard.isHeld(Keys.W);
                 const isMovingDown =
-                    engine.input.keyboard.isHeld(Input.Keys.Down) ||
-                    engine.input.keyboard.isHeld(Input.Keys.S);
+                    engine.input.keyboard.isHeld(Keys.Down) ||
+                    engine.input.keyboard.isHeld(Keys.S);
                 const isMovingLeft =
-                    engine.input.keyboard.isHeld(Input.Keys.Left) ||
-                    engine.input.keyboard.isHeld(Input.Keys.A);
+                    engine.input.keyboard.isHeld(Keys.Left) ||
+                    engine.input.keyboard.isHeld(Keys.A);
                 const isMovingRight =
-                    engine.input.keyboard.isHeld(Input.Keys.Right) ||
-                    engine.input.keyboard.isHeld(Input.Keys.D);
+                    engine.input.keyboard.isHeld(Keys.Right) ||
+                    engine.input.keyboard.isHeld(Keys.D);
 
                 // Skip in the direction of movement
                 if (isMovingUp) this.pos.y -= 10;
@@ -185,12 +185,12 @@ export default class You extends Actor {
                 if (isMovingRight) this.pos.x += 10;
             }
 
-            if (press.key === Input.Keys.X) {
+            if (press.key === Keys.X) {
                 this.swingSword();
             }
 
             // T key for talking to NPCs
-            if (press.key === Input.Keys.T) {
+            if (press.key === Keys.T) {
                 console.log("*** T KEY DETECTED! ***");
                 
                 // Close quest log if open before talking to NPCs
@@ -209,24 +209,24 @@ export default class You extends Actor {
             
             // Block movement if chat or quest log is open
             if (chatSystem.getIsActive() || questLogUI.getIsVisible()) {
-                if (press.key === Input.Keys.Right && chatSystem.getIsActive()) {
+                if (press.key === Keys.Right && chatSystem.getIsActive()) {
                     console.log("*** RIGHT ARROW DETECTED IN CHAT ***");
                     chatSystem.navigateToNextMessage();
                     return; // Don't process other movement when in chat
                 }
-                if (press.key === Input.Keys.Left && chatSystem.getIsActive()) {
+                if (press.key === Keys.Left && chatSystem.getIsActive()) {
                     console.log("*** LEFT ARROW DETECTED IN CHAT ***");
                     chatSystem.navigateToPreviousMessage();
                     return; // Don't process other movement when in chat
                 }
                 // Block all other movement when in chat or quest log
                 if (
-                    press.key === Input.Keys.Up ||
-                    press.key === Input.Keys.Down ||
-                    press.key === Input.Keys.W ||
-                    press.key === Input.Keys.A ||
-                    press.key === Input.Keys.S ||
-                    press.key === Input.Keys.D
+                    press.key === Keys.Up ||
+                    press.key === Keys.Down ||
+                    press.key === Keys.W ||
+                    press.key === Keys.A ||
+                    press.key === Keys.S ||
+                    press.key === Keys.D
                 ) {
                     console.log("Movement blocked during chat or quest log");
                     return;
@@ -234,7 +234,7 @@ export default class You extends Actor {
             }
 
             // Return to the scene selection menu on Escape key
-            if (press.key === Input.Keys.Escape) {
+            if (press.key === Keys.Escape) {
                 console.log(
                     "Escape key pressed - fading out audio and returning to the scene selection menu"
                 );

@@ -437,7 +437,7 @@ export default class Sally extends Actor implements DialogueNPC {
                         radius: 1,
                         color: Color.fromHex("#4A90E2"),
                     }),
-                    pos: Vector.Zero,
+                    offset: Vector.Zero,
                 },
                 // Inner background
                 {
@@ -445,7 +445,7 @@ export default class Sally extends Actor implements DialogueNPC {
                         radius: 0.75,
                         color: Color.fromHex("#1a1a1a"),
                     }),
-                    pos: Vector.Zero,
+                    offset: Vector.Zero,
                 },
                 // Loading text
                 {
@@ -459,7 +459,7 @@ export default class Sally extends Actor implements DialogueNPC {
                             bold: true,
                         }),
                     }),
-                    pos: Vector.Zero,
+                    offset: Vector.Zero,
                 },
             ],
         });
