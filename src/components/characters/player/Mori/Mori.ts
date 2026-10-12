@@ -1,5 +1,5 @@
 import { Actor, Sprite, vec } from "excalibur";
-import { SHEETS } from "../../../scenes/OkaWorld/art/atlas";
+import { MORI, SHEETS } from "../../../scenes/OkaWorld/art/atlas";
 import type { OkaHero, OkaHooks } from "../../../scenes/OkaWorld/hooks";
 import { glow, paintedFrames, paintedImage } from "../../../scenes/OkaWorld/paint";
 import { GRAVITY, MAX_FALL, type Body, type Water } from "../../../scenes/OkaWorld/physics";
@@ -20,11 +20,11 @@ export interface MoriInput {
     jumpPressed: boolean;
 }
 
-const IDLE = 0;
-const RUN = [1, 2, 3, 4];
-const JUMP = 5;
-const FALL = 6;
-const SWIM = 7;
+const IDLE = MORI.frames.idle;
+const RUN = [MORI.frames.run0, MORI.frames.run2, MORI.frames.run4, MORI.frames.run6];
+const JUMP = MORI.frames.jump;
+const FALL = MORI.frames.fall;
+const SWIM = MORI.frames.swim;
 
 const RUN_SPEED = 235;
 const GROUND_ACCEL = 2100;
