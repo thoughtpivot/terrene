@@ -67,10 +67,10 @@ export const OKA_SOUNDTRACK: OkaSoundtrack = {
         stomp: 0.6,
         splash: 0.45,
         win: 0.8,
-        step: 0.2,
-        stepWet: 0.22,
-        land: 0.34,
-        skid: 0.24,
+        step: 0.13,
+        stepWet: 0.14,
+        land: 0.26,
+        skid: 0.18,
     },
 };
 

@@ -149,7 +149,7 @@ A soundtrack effect can be a list of takes, and `audio.ts` plays a random
 take without repeating the last one. Near a pool, or for a few seconds after
 a swim, the steps are wet. Landing plays a thud scaled by fall speed, and a
 skid plays a scrape. Oka World 2 has its own darker, echoing set. All of
-these sit well under the music (mix levels 0.2–0.34).
+these sit well under the music (mix levels 0.13–0.26, about 4 dB below the music at their loudest).
 
 ## Asset Pipeline
 
