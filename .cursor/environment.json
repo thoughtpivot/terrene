@@ -1,4 +1,4 @@
 {
-  "install": "source ~/.nvm/nvm.sh\nnvm install 16\nnvm use 16\nnpm install",
-  "start": "docker compose up -d redis-stack"
+  "install": "npm ci",
+  "start": "set -euo pipefail\nif node -e 'fetch(\"http://127.0.0.1:9000/\").then(() => process.exit(0)).catch(() => process.exit(1))'; then\n  echo \"Terrene dev server already listening on port 9000\"\n  exit 0\nfi\n./node_modules/.bin/tsc -p tsconfig.json\nexec ./node_modules/.bin/webpack serve --config webpack.development.js --host 0.0.0.0 --port 9000\n"
 }
