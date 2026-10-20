@@ -607,97 +607,117 @@ def finish_sfx(buf: np.ndarray, verb_send: float = 0.28, peak: float = 0.78) -> 
 
 def render_sfx() -> dict[str, np.ndarray]:
     sfx: dict[str, np.ndarray] = {}
+    swing_sec = 0.016
 
-    # 1. grab: Picking up a sap glob -> warm C3 sub droplet + C4/G4 minimal pluck
-    b = sfx_bus(0.55)
-    place_sfx(b, wood_click(midi("C4"), 1.0), 0.0, pan=-0.1, gain=0.9)
-    place_sfx(b, minimal_arp_pluck(midi("C4"), 0.9, 0.7), 0.0, pan=-0.15, gain=0.8)
-    place_sfx(b, minimal_arp_pluck(midi("G4"), 0.8, 0.8), 0.035, pan=0.15, gain=0.75)
-    sfx["grab"] = finish_sfx(b, 0.22, 0.72)
+    # All sound effects have their internal transients, arpeggios, and dub echoes
+    # locked to exact 106 BPM subdivisions:
+    #   SIXTEENTH = 0.1415s, EIGHTH = 0.2830s, DOTTED_EIGHTH = 3 * SIXTEENTH = 0.4245s, BEAT = 0.5660s.
 
-    # 2. attach: Weaving a sap node into the structure -> lush Cm9 Detroit dub chord pluck
-    b = sfx_bus(1.15)
-    place_sfx(b, wood_click(midi("C5"), 0.9), 0.0, gain=0.7)
-    place_sfx(b, detroit_dub_stab(chord("C4", "Eb4", "G4", "Bb4", "D5"), dur=0.36, cutoff_peak=2900.0), 0.0, gain=0.95)
-    place_sfx(b, minimal_arp_pluck(midi("G5"), 0.75, 0.85), 0.045, pan=0.25, gain=0.6)
-    sfx["attach"] = finish_sfx(b, 0.34, 0.78)
+    # 1. grab: Picking up a Goo ball -> 16th-note syncopated C4 -> G4 -> Eb5 pluck (3 sixteenth steps)
+    b = sfx_bus(4.0 * SIXTEENTH)
+    place_sfx(b, wood_click(midi("C4"), 1.0), 0.0, pan=-0.12, gain=0.92)
+    place_sfx(b, minimal_arp_pluck(midi("C4"), 0.9, 0.72), 0.0, pan=-0.15, gain=0.82)
+    place_sfx(b, minimal_arp_pluck(midi("G4"), 0.85, 0.82), 1.0 * SIXTEENTH + swing_sec, pan=0.15, gain=0.78)
+    place_sfx(b, minimal_arp_pluck(midi("Eb5"), 0.72, 0.88), 2.0 * SIXTEENTH, pan=0.0, gain=0.62)
+    sfx["grab"] = finish_sfx(b, 0.22, 0.74)
 
-    # 3. detach: Releasing a detachable Ivy/Balloon sap node -> downward G4 -> Eb4 -> C4 pluck
-    b = sfx_bus(0.75)
+    # 2. attach: Weaving a Goo node into the structure -> Cm9 Detroit dub stab + 16th-note pulse echo
+    b = sfx_bus(2.0 * BEAT + 0.2)
+    place_sfx(b, wood_click(midi("C5"), 0.95), 0.0, gain=0.78)
+    stab_att = detroit_dub_stab(chord("C4", "Eb4", "G4", "Bb4", "D5"), dur=2.0 * SIXTEENTH, cutoff_peak=2900.0)
+    echo_att = dub_tape_delay(stab_att, delay_sec=2.0 * SIXTEENTH, feedback=0.42, taps=3)
+    place_sfx(b, echo_att, 0.0, gain=0.92)
+    place_sfx(b, minimal_arp_pluck(midi("G5"), 0.80, 0.85), 1.0 * SIXTEENTH + swing_sec, pan=0.25, gain=0.65)
+    place_sfx(b, minimal_arp_pluck(midi("C6"), 0.68, 0.90), 2.0 * SIXTEENTH, pan=-0.20, gain=0.55)
+    sfx["attach"] = finish_sfx(b, 0.30, 0.80)
+
+    # 3. detach: Releasing a detachable Ivy/Balloon Goo node -> 16th-note descending G4 -> Eb4 -> C4
+    b = sfx_bus(5.0 * SIXTEENTH)
     for i, note in enumerate(("G4", "Eb4", "C4")):
-        place_sfx(b, minimal_arp_pluck(midi(note), 0.8, 0.55), i * 0.045, pan=0.2 - i * 0.2, gain=0.8)
-    sfx["detach"] = finish_sfx(b, 0.24, 0.68)
+        t_step = i * SIXTEENTH + (swing_sec if i % 2 == 1 else 0.0)
+        place_sfx(b, minimal_arp_pluck(midi(note), 0.84, 0.58), t_step, pan=0.22 - i * 0.22, gain=0.82)
+        place_sfx(b, wood_click(midi(note), 0.65), t_step, pan=0.22 - i * 0.22, gain=0.48)
+    sfx["detach"] = finish_sfx(b, 0.24, 0.70)
 
-    # 4. wake: Waking a dormant cluster of sap globs -> shimmering Cm9 arpeggio
-    b = sfx_bus(1.65)
-    for i, note in enumerate(("C4", "Eb4", "G4", "Bb4", "D5", "G5", "C6")):
-        place_sfx(b, minimal_arp_pluck(midi(note), 0.88, 0.85), i * 0.055, pan=-0.45 + i * 0.15, gain=0.78)
-    place_sfx(b, detroit_dub_stab(chord("C3", "G3", "Eb4", "D4"), dur=0.55, cutoff_peak=2400.0), 0.05, gain=0.7)
-    sfx["wake"] = finish_sfx(b, 0.38, 0.76)
+    # 4. wake: Waking a dormant cluster of Goo balls -> 16th-note swung Cm9 arpeggio over 1 bar (106 BPM)
+    b = sfx_bus(BAR)
+    wake_notes = ("C4", "Eb4", "G4", "Bb4", "D5", "Eb5", "G5", "C6")
+    for i, note in enumerate(wake_notes):
+        t_step = i * SIXTEENTH + (swing_sec if i % 2 == 1 else 0.0)
+        place_sfx(b, minimal_arp_pluck(midi(note), 0.90, 0.86), t_step, pan=-0.45 + i * 0.13, gain=0.80)
+    stab_wake = detroit_dub_stab(chord("C3", "G3", "Eb4", "D4"), dur=BEAT, cutoff_peak=2500.0)
+    place_sfx(b, dub_tape_delay(stab_wake, delay_sec=3.0 * SIXTEENTH, feedback=0.45, taps=3), 0.0, gain=0.72)
+    sfx["wake"] = finish_sfx(b, 0.36, 0.78)
 
-    # 5. strain: Overstretched strand warning -> tense G7(b9)/Cm metallic pulse in C minor
-    b = sfx_bus(0.85)
+    # 5. strain: Overstretched strand warning -> 16th-note rhythmic G7(b9)/Cm tension pulse at 106 BPM
+    b = sfx_bus(2.0 * BEAT)
     for i, note in enumerate(("G4", "Ab4", "D5", "F5")):
-        place_sfx(b, wood_click(midi(note), 0.85), i * 0.035, pan=(-0.3 if i % 2 == 0 else 0.3), gain=0.75)
-    place_sfx(b, minimal_arp_pluck(midi("Ab4"), 0.85, 0.9), 0.02, gain=0.7)
-    place_sfx(b, minimal_arp_pluck(midi("G4"), 0.85, 0.9), 0.12, gain=0.7)
-    sfx["strain"] = finish_sfx(b, 0.25, 0.68)
+        t_step = i * SIXTEENTH + (swing_sec if i % 2 == 1 else 0.0)
+        place_sfx(b, wood_click(midi(note), 0.88), t_step, pan=(-0.32 if i % 2 == 0 else 0.32), gain=0.78)
+        place_sfx(b, minimal_arp_pluck(midi(note), 0.78, 0.9), t_step, pan=(-0.25 if i % 2 == 0 else 0.25), gain=0.65)
+    sfx["strain"] = finish_sfx(b, 0.25, 0.70)
 
-    # 6. snap: Strand breaking -> C2->C1 sub thud + dark Cm(b6) snap
-    b = sfx_bus(1.05)
+    # 6. snap: Strand breaking -> Downbeat C2->C1 sub thud + off-beat 16th Cm(b6) rim echo
+    b = sfx_bus(2.0 * BEAT)
     place_sfx(b, kick_909_cm(1.0), 0.0, gain=0.95)
-    place_sfx(b, minimal_clap_rim(1.0), 0.0, gain=0.85)
-    for note in ("Ab3", "Eb4", "C4"):
-        place_sfx(b, minimal_arp_pluck(midi(note), 0.85, 0.45), 0.015, gain=0.65)
-    sfx["snap"] = finish_sfx(b, 0.30, 0.80)
+    place_sfx(b, minimal_clap_rim(1.0), 0.0, gain=0.88)
+    for i, note in enumerate(("Ab3", "Eb4", "C4")):
+        t_step = i * SIXTEENTH + (swing_sec if i % 2 == 1 else 0.0)
+        place_sfx(b, minimal_arp_pluck(midi(note), 0.85, 0.48), t_step, gain=0.68)
+    sfx["snap"] = finish_sfx(b, 0.30, 0.82)
 
-    # 7. launch: Gust / spore lift -> filtered C3 -> G4 -> C5 synth rise
-    b = sfx_bus(1.1)
-    n_sw = int(0.65 * SR)
+    # 7. launch: Gust / Balloon lift / Whistle -> 1-beat C3->C5 filter sweep + eighth-note C5 -> G5 plucks
+    b = sfx_bus(2.0 * BEAT)
+    n_sw = int(BEAT * SR)
     t_sw = np.arange(n_sw) / SR
-    f_sw = hz(midi("C3")) * (4.0 ** (t_sw / 0.65))
+    f_sw = hz(midi("C3")) * (4.0 ** (t_sw / BEAT))
     ph_sw = 2.0 * np.pi * np.cumsum(f_sw) / SR
-    sweep = (np.sin(ph_sw) + 0.4 * np.sin(1.5 * ph_sw)) * np.sin(np.pi * t_sw / 0.65) ** 1.4
+    sweep = (np.sin(ph_sw) + 0.4 * np.sin(1.5 * ph_sw)) * np.sin(np.pi * t_sw / BEAT) ** 1.4
     place_sfx(b, sweep * 0.4, 0.0, gain=0.8)
-    place_sfx(b, minimal_arp_pluck(midi("C5"), 0.85, 0.85), 0.18, pan=-0.2, gain=0.7)
-    place_sfx(b, minimal_arp_pluck(midi("G5"), 0.85, 0.9), 0.28, pan=0.2, gain=0.75)
-    sfx["launch"] = finish_sfx(b, 0.32, 0.72)
+    place_sfx(b, minimal_arp_pluck(midi("C5"), 0.85, 0.85), 1.0 * SIXTEENTH + swing_sec, pan=-0.22, gain=0.74)
+    place_sfx(b, minimal_arp_pluck(midi("Eb5"), 0.85, 0.88), 2.0 * SIXTEENTH, pan=0.0, gain=0.74)
+    place_sfx(b, minimal_arp_pluck(midi("G5"), 0.88, 0.92), 3.0 * SIXTEENTH + swing_sec, pan=0.22, gain=0.78)
+    sfx["launch"] = finish_sfx(b, 0.32, 0.74)
 
-    # 8. signpost: Opening a Forest Watcher signpost -> deep Fm9 -> Cm9 dub chord + Eb5 bell
-    b = sfx_bus(1.8)
-    place_sfx(b, detroit_dub_stab(chord("F3", "Ab3", "C4", "Eb4", "G4"), dur=0.55, cutoff_peak=2200.0), 0.0, gain=0.85)
-    place_sfx(b, minimal_arp_pluck(midi("Eb5"), 0.8, 0.75), 0.08, pan=-0.25, gain=0.7)
-    place_sfx(b, minimal_arp_pluck(midi("D5"), 0.75, 0.75), 0.24, pan=0.25, gain=0.7)
-    place_sfx(b, minimal_arp_pluck(midi("C5"), 0.85, 0.8), 0.40, pan=0.0, gain=0.75)
-    sfx["signpost"] = finish_sfx(b, 0.42, 0.72)
+    # 8. signpost: Opening a Sign Painter sign -> 106 BPM Fm9 dub chord + 8th-note Eb5 -> D5 -> C5 bells
+    b = sfx_bus(BAR)
+    stab_sp = detroit_dub_stab(chord("F3", "Ab3", "C4", "Eb4", "G4"), dur=BEAT, cutoff_peak=2200.0)
+    place_sfx(b, dub_tape_delay(stab_sp, delay_sec=3.0 * SIXTEENTH, feedback=0.45, taps=3), 0.0, gain=0.85)
+    place_sfx(b, minimal_arp_pluck(midi("Eb5"), 0.82, 0.78), 0.0, pan=-0.25, gain=0.74)
+    place_sfx(b, minimal_arp_pluck(midi("D5"), 0.78, 0.78), 2.0 * SIXTEENTH, pan=0.25, gain=0.74)
+    place_sfx(b, minimal_arp_pluck(midi("C5"), 0.88, 0.82), 4.0 * SIXTEENTH, pan=0.0, gain=0.78)
+    sfx["signpost"] = finish_sfx(b, 0.40, 0.74)
 
-    # 9. suck: Sap glob sucked into the Heartwood Cistern Pipe -> vacuum whoosh + C5-Eb5-G5-C6 chime
-    b = sfx_bus(1.35)
-    n_w = int(0.32 * SR)
+    # 9. suck: Goo ball sucked into the Pipe -> 16th-note C5-Eb5-G5-C6 chime locked to 106 BPM
+    b = sfx_bus(2.5 * BEAT)
+    n_w = int(2.0 * SIXTEENTH * SR)
     t_w = np.arange(n_w) / SR
-    whoosh = bp(rng.standard_normal(n_w), 500, 3200) * np.sin(np.pi * t_w / 0.32) ** 2
+    whoosh = bp(rng.standard_normal(n_w), 500, 3200) * np.sin(np.pi * t_w / (2.0 * SIXTEENTH)) ** 2
     place_sfx(b, whoosh * 0.45, 0.0, gain=0.75)
     for i, note in enumerate(("C5", "Eb5", "G5", "C6")):
-        place_sfx(b, minimal_arp_pluck(midi(note), 0.92, 0.9), 0.04 + i * 0.055, pan=-0.3 + i * 0.2, gain=0.85)
-    place_sfx(b, wood_click(midi("C6"), 0.9), 0.22, gain=0.7)
-    sfx["suck"] = finish_sfx(b, 0.36, 0.78)
+        t_step = i * SIXTEENTH + (swing_sec if i % 2 == 1 else 0.0)
+        place_sfx(b, minimal_arp_pluck(midi(note), 0.92, 0.9), t_step, pan=-0.3 + i * 0.2, gain=0.86)
+    place_sfx(b, wood_click(midi("C6"), 0.92), 2.0 * SIXTEENTH, gain=0.74)
+    sfx["suck"] = finish_sfx(b, 0.36, 0.80)
 
-    # 10. win: Level Clear -> Euphoric Detroit Techno C-minor chord resolution (Cm9 -> Abmaj9 -> Fm9 -> Cm11)
-    b = sfx_bus(6.5)
+    # 10. win: Level Clear -> 4-bar 106 BPM Detroit Techno C-minor chord resolution (beat-exact chords & 16th arp)
+    b = sfx_bus(4.0 * BAR)
     prog_win = [
-        (0.0, chord("C3", "Eb3", "G3", "Bb3", "D4"), "C2"),
-        (1.1, chord("Ab2", "Eb3", "G3", "Bb3", "C4"), "Ab1"),
-        (2.2, chord("F2", "C3", "Eb3", "Ab3", "C4"), "F1"),
-        (3.3, chord("C3", "G3", "Bb3", "D4", "Eb4", "G4"), "C2"),
+        (0.0 * BEAT, chord("C3", "Eb3", "G3", "Bb3", "D4"), "C2"),
+        (2.0 * BEAT, chord("Ab2", "Eb3", "G3", "Bb3", "C4"), "Ab1"),
+        (4.0 * BEAT, chord("F2", "C3", "Eb3", "Ab3", "C4"), "F1"),
+        (6.0 * BEAT, chord("C3", "G3", "Bb3", "D4", "Eb4", "G4"), "C2"),
     ]
     for t0, ch_notes, rt in prog_win:
-        stab = detroit_dub_stab(ch_notes, dur=0.7, cutoff_peak=3200.0)
-        echo = dub_tape_delay(stab, delay_sec=3.0 * SIXTEENTH, feedback=0.45, taps=4)
+        stab = detroit_dub_stab(ch_notes, dur=1.2 * BEAT, cutoff_peak=3200.0)
+        echo = dub_tape_delay(stab, delay_sec=3.0 * SIXTEENTH, feedback=0.48, taps=4)
         place_sfx(b, echo, t0, gain=0.85)
-        place_sfx(b, sub_bass_note(midi(rt), 0.9, accent=0.95, bright=0.6), t0, gain=0.75)
-    arp_win = ["C5", "Eb5", "G5", "Bb5", "D6", "C6", "G5", "Eb5", "G5", "C6"]
+        place_sfx(b, sub_bass_note(midi(rt), 1.5 * BEAT, accent=0.95, bright=0.6), t0, gain=0.75)
+        place_sfx(b, kick_909_cm(0.95), t0, gain=0.80)
+    arp_win = ["C5", "Eb5", "G5", "Bb5", "D6", "C6", "G5", "Eb5", "G5", "C6", "Eb6", "C6"]
     for i, note in enumerate(arp_win):
-        place_sfx(b, minimal_arp_pluck(midi(note), 0.9, 0.9), 3.3 + i * 0.11, pan=-0.45 + (i % 5) * 0.22, gain=0.8)
+        t_step = 6.0 * BEAT + i * SIXTEENTH + (swing_sec if i % 2 == 1 else 0.0)
+        place_sfx(b, minimal_arp_pluck(midi(note), 0.9, 0.9), t_step, pan=-0.45 + (i % 5) * 0.22, gain=0.8)
     sfx["win"] = finish_sfx(b, 0.45, 0.84)
 
     return sfx
@@ -724,33 +744,39 @@ def to_mp3(stereo: np.ndarray, path: str, bitrate: str = "192k") -> None:
 
 
 def write_scene_png(path: str) -> None:
-    """Render a crisp 64x64 RGBA PNG badge for SapWorld (glowing amber sap glob with C-minor cyan ring)."""
+    """Render a crisp 64x64 RGBA PNG badge for SapWorld (World-of-Goo style pitch-black Goo Ball against golden sky)."""
     w = h = 64
     y, x = np.mgrid[0:h, 0:w]
-    cx, cy = 31.5, 31.5
+    cx, cy = 31.5, 32.5
     r = np.hypot(x - cx, y - cy)
     rgba = np.zeros((h, w, 4), dtype=np.uint8)
 
-    # Outer twilight forest halo
-    halo = np.clip(1.0 - r / 30.0, 0.0, 1.0) ** 1.8
-    # Core amber sap sphere
-    body = np.clip((22.0 - r) / 1.5, 0.0, 1.0)
-    # Specular highlight top-left
-    spec = np.exp(-((x - 24.0) ** 2 + (y - 22.0) ** 2) / 34.0)
+    # Outer warm golden-amber World of Goo halo
+    halo = np.clip(1.0 - r / 30.5, 0.0, 1.0) ** 1.6
+    # Core pitch-black glossy Goo sphere
+    body = np.clip((22.5 - r) / 1.4, 0.0, 1.0)
+    # Wet white specular highlight top-left
+    spec = np.exp(-((x - 24.0) ** 2 + (y - 21.5) ** 2) / 18.0) * body
 
-    red = np.clip(28 * halo + 238 * body + 55 * spec, 0, 255)
-    green = np.clip(64 * halo + 168 * body + 75 * spec, 0, 255)
-    blue = np.clip(78 * halo + 38 * body + 110 * spec, 0, 255)
-    alpha = np.clip(halo * 190 + body * 255, 0, 255)
+    red = np.clip(242 * halo * (1 - body) + 22 * body + 210 * spec, 0, 255)
+    green = np.clip(178 * halo * (1 - body) + 22 * body + 215 * spec, 0, 255)
+    blue = np.clip(68 * halo * (1 - body) + 25 * body + 220 * spec, 0, 255)
+    alpha = np.clip(halo * 225 + body * 255, 0, 255)
 
-    # Two expressive World-of-Goo-style eyes
-    for ex, ey, er in ((25.5, 30.0, 4.2), (37.5, 29.0, 3.6)):
+    # Two asymmetric, oversized bulging white World-of-Goo eyes with tiny black pupils
+    for ex, ey, er in ((24.5, 31.0, 5.8), (38.0, 29.5, 4.7)):
         de = np.hypot(x - ex, y - ey)
+        eye_rim = np.clip((er + 1.1 - de) / 0.9, 0.0, 1.0)
         eye_w = np.clip((er - de) / 0.9, 0.0, 1.0)
-        pupil = np.clip((1.7 - np.hypot(x - (ex + 0.8), y - (ey - 0.4))) / 0.8, 0.0, 1.0)
-        red = red * (1 - eye_w) + 250 * eye_w * (1 - pupil) + 15 * pupil
-        green = green * (1 - eye_w) + 248 * eye_w * (1 - pupil) + 22 * pupil
-        blue = blue * (1 - eye_w) + 235 * eye_w * (1 - pupil) + 30 * pupil
+        pupil = np.clip((1.8 - np.hypot(x - (ex + 0.9), y - (ey - 0.3))) / 0.8, 0.0, 1.0)
+        # Black outline around eye
+        red = red * (1 - eye_rim) + 10 * eye_rim
+        green = green * (1 - eye_rim) + 10 * eye_rim
+        blue = blue * (1 - eye_rim) + 12 * eye_rim
+        # White sclera + black pupil
+        red = red * (1 - eye_w) + 252 * eye_w * (1 - pupil) + 12 * pupil
+        green = green * (1 - eye_w) + 250 * eye_w * (1 - pupil) + 12 * pupil
+        blue = blue * (1 - eye_w) + 242 * eye_w * (1 - pupil) + 15 * pupil
 
     rgba[..., 0] = red.astype(np.uint8)
     rgba[..., 1] = green.astype(np.uint8)

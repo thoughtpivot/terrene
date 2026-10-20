@@ -21,27 +21,29 @@ export interface RenderState {
     bannerAlpha: number;
 }
 
-interface ForestMote {
+interface FloatingLeaf {
     x: number;
     y: number;
-    r: number;
+    size: number;
+    speedX: number;
     speedY: number;
-    drift: number;
-    hue: string;
+    phase: number;
+    kind: "leaf" | "pollen" | "fly";
 }
 
-const MOTES: ForestMote[] = Array.from({ length: 85 }, (_, i) => ({
-    x: (i * 197.3) % 3600,
-    y: (i * 83.7) % VIEW_H,
-    r: 1.4 + (i % 4) * 0.85,
-    speedY: 9 + (i % 5) * 4.5,
-    drift: (i * 1.13) % (Math.PI * 2),
-    hue: i % 4 === 0 ? "#ffd479" : i % 4 === 1 ? "#4be39b" : i % 4 === 2 ? "#99f2ff" : "#d3a8ff",
+const FLOATING_PARTICLES: FloatingLeaf[] = Array.from({ length: 95 }, (_, i) => ({
+    x: (i * 183.7) % 3600,
+    y: 35 + ((i * 79.3) % (VIEW_H - 90)),
+    size: 2.2 + (i % 4) * 1.3,
+    speedX: 12 + (i % 5) * 6,
+    speedY: 7 + (i % 4) * 3.5,
+    phase: (i * 1.19) % (Math.PI * 2),
+    kind: i % 5 === 0 ? "leaf" : i % 3 === 0 ? "fly" : "pollen",
 }));
 
 /**
- * Draw the entire Forest Last Sap World scene onto a 2D canvas context in 960x540 HD coordinates.
- * Returns interactive HUD button rectangles in screen coordinates so pointer clicks can trigger them.
+ * Draw the entire Forest Last Sap World scene in 2D Boy's *World of Goo* hand-painted storybook style
+ * onto a 960x540 HD canvas context, rhythmically synced to the 106 BPM C-minor score.
  */
 export function renderSapWorld(ctx: CanvasRenderingContext2D, state: RenderState): UiButtonRect[] {
     const { solver, camX, pointerScreenX, pointerScreenY, beatPulse } = state;
@@ -50,70 +52,39 @@ export function renderSapWorld(ctx: CanvasRenderingContext2D, state: RenderState
 
     ctx.save();
 
-    // 1. Deep C-minor twilight forest sky backdrop
-    const sky = ctx.createLinearGradient(0, 0, 0, VIEW_H);
-    sky.addColorStop(0, "#071018");
-    sky.addColorStop(0.45, "#0d2029");
-    sky.addColorStop(0.82, "#152b2e");
-    sky.addColorStop(1, "#091317");
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+    // 1. Iconic World of Goo Chapter 1/2 warm golden-amber / chartreuse sky & god-rays
+    drawWorldOfGooSky(ctx, camX, t, beatPulse);
 
-    // Subtle 106-BPM techno sub-pulse horizon glow
-    const pulseGlow = ctx.createRadialGradient(
-        VIEW_W * 0.5,
-        VIEW_H * 0.62,
-        20,
-        VIEW_W * 0.5,
-        VIEW_H * 0.62,
-        460
-    );
-    const glowAlpha = 0.08 + 0.07 * Math.pow(beatPulse, 2);
-    pulseGlow.addColorStop(0, `rgba(75, 227, 155, ${glowAlpha.toFixed(3)})`);
-    pulseGlow.addColorStop(0.55, `rgba(245, 166, 35, ${(glowAlpha * 0.55).toFixed(3)})`);
-    pulseGlow.addColorStop(1, "rgba(7, 16, 24, 0)");
-    ctx.fillStyle = pulseGlow;
-    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-
-    // 2. Parallax Layer 1 (far ancient heartwood trunks & mist Rays)
-    drawParallaxForest(ctx, camX, t, beatPulse);
+    // 2. Parallax silhouette hills, whimsical swirling Truffula/lollipop trees, industrial pipes & windmills
+    drawWorldOfGooParallax(ctx, camX, t, beatPulse);
 
     // 3. World-space layer (translated by -camX)
     ctx.save();
     ctx.translate(-camX, 0);
 
-    drawCanopyBoughsAndArches(ctx, solver, camX, t);
+    drawCanopyBoughsAndBambooStalks(ctx, solver, camX, t, beatPulse);
     drawWindZones(ctx, solver, t, beatPulse);
-    drawTerrains(ctx, solver, t);
-    drawGroves(ctx, solver, t, beatPulse);
-    drawThorns(ctx, solver, t);
-    drawCisternPipe(ctx, solver, t, beatPulse);
-    drawGhostTies(ctx, solver, t);
-    drawStrands(ctx, solver, t, beatPulse);
-    drawBlobs(ctx, solver, t, beatPulse);
-    drawSignposts(ctx, solver, state.activeSignpost, t);
+    drawWorldOfGooTerrains(ctx, solver, t, beatPulse);
+    drawSleepingGooTotemsAndGroves(ctx, solver, t, beatPulse);
+    drawSpikyGears(ctx, solver, t, beatPulse);
+    drawGooCorpPipe(ctx, solver, t, beatPulse);
+    drawSignposts(ctx, solver, state.activeSignpost, t, beatPulse);
+    drawGhostTies(ctx, solver, t, beatPulse);
+    drawGooStrands(ctx, solver, t, beatPulse);
+    drawGooBalls(ctx, solver, t, beatPulse);
     drawWhistleWaves(ctx, solver, t);
-
-    // Drifting bioluminescent forest motes in world space
-    for (const m of MOTES) {
-        const mx = m.x + Math.sin(t * 0.7 + m.drift) * 18;
-        if (mx < camX - 30 || mx > camX + VIEW_W + 30) continue;
-        const my = (m.y - t * m.speedY % VIEW_H + VIEW_H) % VIEW_H;
-        ctx.fillStyle = m.hue;
-        ctx.globalAlpha = 0.28 + 0.25 * Math.sin(t * 2.1 + m.drift);
-        ctx.beginPath();
-        ctx.arc(mx, my, m.r, 0, Math.PI * 2);
-        ctx.fill();
-    }
-    ctx.globalAlpha = 1;
+    drawFloatingLeavesAndFlies(ctx, camX, t, beatPulse);
 
     ctx.restore();
 
-    // 4. Screen-space HUD, Zone Minimap Bar, Pipe Compass, Signpost Modal, and Win Overlay
+    // 4. Soft painterly vignette around the edges of the screen (signature World of Goo framing)
+    drawStorybookVignette(ctx);
+
+    // 5. Hand-drawn World of Goo HUD, Zone tabs, Sign Painter Modal, and Win Overlay
     drawHudAndMinimap(ctx, state, buttons, pointerScreenX, pointerScreenY);
 
     if (state.activeSignpost) {
-        drawSignpostModal(ctx, state.activeSignpost, buttons);
+        drawSignPainterModal(ctx, state.activeSignpost, buttons);
     }
 
     if (solver.won) {
@@ -124,108 +95,255 @@ export function renderSapWorld(ctx: CanvasRenderingContext2D, state: RenderState
     return buttons;
 }
 
-function drawParallaxForest(
+function drawWorldOfGooSky(
     ctx: CanvasRenderingContext2D,
     camX: number,
     t: number,
     beatPulse: number
 ): void {
-    // Distant silhouetted redwood trunks (parallax factor 0.22)
-    ctx.fillStyle = "#09171e";
-    for (let i = 0; i < 26; i++) {
-        const wx = i * 165 + ((i * 53) % 45) - camX * 0.22;
-        const x = ((wx % (VIEW_W + 240)) + (VIEW_W + 240)) % (VIEW_W + 240) - 120;
-        const w = 36 + (i % 4) * 14;
-        ctx.fillRect(x, 0, w, VIEW_H);
+    // Rich warm golden-ochre to creamy-chartreuse sky gradient (like World of Goo Chapter 1 & 2)
+    // subtly shifting hue across the 3,600-unit forest journey
+    const progress = Math.max(0, Math.min(1, camX / 2700));
+    const sky = ctx.createLinearGradient(0, 0, 0, VIEW_H);
+    if (progress < 0.5) {
+        sky.addColorStop(0, "#d9822b");
+        sky.addColorStop(0.32, "#ebb046");
+        sky.addColorStop(0.68, "#f7dc7c");
+        sky.addColorStop(1, "#c7d45b");
+    } else {
+        sky.addColorStop(0, "#b86b25");
+        sky.addColorStop(0.35, "#e59f3d");
+        sky.addColorStop(0.7, "#f5d776");
+        sky.addColorStop(1, "#a6c95d");
     }
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 
-    // Diagonal shafts of twilight filtering through the canopy
+    // Glowing radial sun / bloom in the background that pulses gently on the 106 BPM kick
+    const sunX = VIEW_W * 0.58 - (camX * 0.06) % 240;
+    const sunY = VIEW_H * 0.42;
+    const sunR = 320 + beatPulse * 28;
+    const sunGlow = ctx.createRadialGradient(sunX, sunY, 12, sunX, sunY, sunR);
+    sunGlow.addColorStop(0, `rgba(255, 252, 224, ${(0.68 + 0.14 * beatPulse).toFixed(3)})`);
+    sunGlow.addColorStop(0.45, "rgba(255, 232, 148, 0.34)");
+    sunGlow.addColorStop(1, "rgba(235, 176, 70, 0)");
+    ctx.fillStyle = sunGlow;
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+
+    // Broad radial god-rays rotating slowly from the sun
     ctx.save();
-    for (let i = 0; i < 9; i++) {
-        const rx = ((i * 210 - camX * 0.32) % (VIEW_W + 300) + (VIEW_W + 300)) % (VIEW_W + 300) - 150;
-        const grad = ctx.createLinearGradient(rx, 0, rx + 110, VIEW_H);
-        const a = 0.035 + 0.02 * Math.sin(t * 0.8 + i) + 0.015 * beatPulse;
-        grad.addColorStop(0, `rgba(153, 242, 255, ${a.toFixed(3)})`);
-        grad.addColorStop(0.65, `rgba(75, 227, 155, ${(a * 0.6).toFixed(3)})`);
-        grad.addColorStop(1, "rgba(15, 35, 42, 0)");
-        ctx.fillStyle = grad;
+    ctx.translate(sunX, sunY);
+    const rayCount = 12;
+    for (let i = 0; i < rayCount; i++) {
+        const ang = (i / rayCount) * Math.PI * 2 + t * 0.03;
+        ctx.fillStyle = `rgba(255, 250, 210, ${(0.065 + 0.03 * beatPulse).toFixed(3)})`;
         ctx.beginPath();
-        ctx.moveTo(rx, 0);
-        ctx.lineTo(rx + 68, 0);
-        ctx.lineTo(rx + 190, VIEW_H);
-        ctx.lineTo(rx + 95, VIEW_H);
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, 720, ang, ang + 0.13);
         ctx.closePath();
         ctx.fill();
     }
     ctx.restore();
 
-    // Midground gnarled trees with glowing C-minor cyan/amber sap veins (parallax 0.48)
-    for (let i = 0; i < 22; i++) {
-        const wx = i * 210 - camX * 0.48;
-        const x = ((wx % (VIEW_W + 280)) + (VIEW_W + 280)) % (VIEW_W + 280) - 140;
-        const w = 48 + (i % 3) * 18;
-        ctx.fillStyle = "#0e2028";
-        ctx.fillRect(x, 0, w, VIEW_H);
-
-        // Glowing sap vein along trunk
-        ctx.strokeStyle = i % 2 === 0 ? "rgba(245, 166, 35, 0.22)" : "rgba(75, 227, 155, 0.20)";
-        ctx.lineWidth = 2;
+    // Swirling hand-drawn cream cloud curlicues in the upper sky
+    ctx.save();
+    ctx.strokeStyle = "rgba(255, 248, 220, 0.38)";
+    ctx.lineWidth = 5;
+    ctx.lineCap = "round";
+    for (let i = 0; i < 7; i++) {
+        const cx = ((i * 220 - camX * 0.12 + t * 6) % (VIEW_W + 260) + (VIEW_W + 260)) % (VIEW_W + 260) - 130;
+        const cy = 58 + (i % 3) * 36;
         ctx.beginPath();
-        ctx.moveTo(x + w * 0.45, 40);
-        ctx.bezierCurveTo(
-            x + w * 0.25,
-            190,
-            x + w * 0.72,
-            340,
-            x + w * 0.4,
-            VIEW_H - 40
-        );
+        ctx.moveTo(cx - 55, cy);
+        ctx.bezierCurveTo(cx - 20, cy - 22, cx + 25, cy + 18, cx + 62, cy - 4);
+        ctx.arc(cx + 62, cy - 16, 12, Math.PI * 0.5, Math.PI * 2.1);
         ctx.stroke();
     }
+    ctx.restore();
 }
 
-function drawCanopyBoughsAndArches(
+function drawWorldOfGooParallax(
+    ctx: CanvasRenderingContext2D,
+    camX: number,
+    t: number,
+    beatPulse: number
+): void {
+    // Far layer (parallax 0.18): Distant olive-charcoal rolling hills + giant slow-turning windmills & gears
+    ctx.save();
+    ctx.fillStyle = "rgba(56, 62, 34, 0.42)";
+    ctx.beginPath();
+    ctx.moveTo(0, VIEW_H);
+    for (let x = -40; x <= VIEW_W + 40; x += 40) {
+        const wx = x + camX * 0.18;
+        const hy = 315 + Math.sin(wx * 0.0055) * 48 + Math.cos(wx * 0.012) * 24;
+        ctx.lineTo(x, hy);
+    }
+    ctx.lineTo(VIEW_W + 40, VIEW_H);
+    ctx.closePath();
+    ctx.fill();
+
+    // Distant silhouetted World-of-Goo windmills & giant factory gears turning on the 106 BPM pulse
+    for (let i = 0; i < 8; i++) {
+        const wx = i * 260 - camX * 0.22;
+        const x = ((wx % (VIEW_W + 320)) + (VIEW_W + 320)) % (VIEW_W + 320) - 160;
+        const baseY = 320 + Math.sin(i * 1.7) * 28;
+
+        // Tilted crooked tower post
+        ctx.strokeStyle = "rgba(38, 42, 24, 0.55)";
+        ctx.lineWidth = 7;
+        ctx.beginPath();
+        ctx.moveTo(x, baseY + 120);
+        ctx.quadraticCurveTo(x + (i % 2 === 0 ? 12 : -12), baseY + 40, x, baseY - 42);
+        ctx.stroke();
+
+        // Spinning 4-blade crooked windmill or silhouette gear
+        ctx.save();
+        ctx.translate(x, baseY - 42);
+        ctx.rotate(t * (i % 2 === 0 ? 0.45 : -0.4) + beatPulse * 0.06);
+        ctx.fillStyle = "rgba(34, 38, 22, 0.58)";
+        if (i % 2 === 0) {
+            for (let b = 0; b < 4; b++) {
+                ctx.save();
+                ctx.rotate((b * Math.PI) / 2);
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(-8, -54);
+                ctx.lineTo(10, -50);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+        } else {
+            const teeth = 10;
+            ctx.beginPath();
+            for (let k = 0; k < teeth * 2; k++) {
+                const a = (k * Math.PI) / teeth;
+                const r = k % 2 === 0 ? 34 : 24;
+                if (k === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+                else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+    ctx.restore();
+
+    // Midground layer (parallax 0.38): Spindly pitch-black Truffula / pom-pom silhouette trees & curly ferns
+    ctx.save();
+    for (let i = 0; i < 18; i++) {
+        const wx = i * 155 - camX * 0.38;
+        const x = ((wx % (VIEW_W + 260)) + (VIEW_W + 260)) % (VIEW_W + 260) - 130;
+        const sway = Math.sin(t * 1.4 + i) * 6 + (beatPulse - 0.5) * 4;
+        const topY = 135 + (i % 4) * 38;
+        const lean = ((i % 3) - 1) * 26 + sway;
+
+        // Thin curving black stem
+        ctx.strokeStyle = "#161912";
+        ctx.lineWidth = 5.5 + (i % 3) * 1.5;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(x, VIEW_H);
+        ctx.bezierCurveTo(x - lean * 0.6, 360, x + lean * 0.9, 240, x + lean, topY);
+        ctx.stroke();
+
+        // Fluffy scalloped pom-pom / lollipop tree crown silhouette
+        const crownX = x + lean;
+        const crownY = topY;
+        const crownR = 26 + (i % 3) * 8 + beatPulse * 2.5;
+        ctx.fillStyle = "#141710";
+        ctx.beginPath();
+        ctx.arc(crownX, crownY, crownR, 0, Math.PI * 2);
+        const puffs = 9;
+        for (let p = 0; p < puffs; p++) {
+            const pa = (p / puffs) * Math.PI * 2 + t * 0.15;
+            const px = crownX + Math.cos(pa) * (crownR * 0.78);
+            const py = crownY + Math.sin(pa) * (crownR * 0.78);
+            ctx.arc(px, py, crownR * 0.42, 0, Math.PI * 2);
+        }
+        ctx.fill();
+
+        // Subtle inner swirl line on the pom-pom top
+        ctx.strokeStyle = "rgba(182, 212, 84, 0.24)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(crownX - 4, crownY - 4, crownR * 0.45, 0.2, Math.PI * 1.4);
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
+function drawCanopyBoughsAndBambooStalks(
     ctx: CanvasRenderingContext2D,
     solver: SapSolver,
     camX: number,
-    t: number
+    t: number,
+    beatPulse: number
 ): void {
-    // Draw overhead timber arches & root tethers for every elevated anchor so nothing floats in thin air
+    // Segmented bent bamboo/root stalks & riveted stone spheres for elevated anchors (matching World of Goo SS 0 & SS 1)
     for (const a of solver.blobs) {
         if (a.state !== "pinned") continue;
-        if (a.x < camX - 180 || a.x > camX + VIEW_W + 180) continue;
+        if (a.x < camX - 200 || a.x > camX + VIEW_W + 200) continue;
         if (a.y < 305) {
-            // Overhead canopy branch descending from top of forest to this anchor
             ctx.save();
-            ctx.strokeStyle = "#1c3330";
-            ctx.lineWidth = 22;
+            // Thick black outline + fleshy tan/brown segmented stalk descending from the upper canopy
+            const ctrlX = a.x + ((a.id % 2 === 0 ? 1 : -1) * 28);
             ctx.lineCap = "round";
+            ctx.strokeStyle = "#080907";
+            ctx.lineWidth = 28;
             ctx.beginPath();
-            ctx.moveTo(a.x - 28, -10);
-            ctx.quadraticCurveTo(a.x + 12, a.y * 0.5, a.x, a.y);
+            ctx.moveTo(a.x - 18, -12);
+            ctx.quadraticCurveTo(ctrlX, a.y * 0.5, a.x, a.y);
             ctx.stroke();
 
-            ctx.strokeStyle = "#355e4b";
-            ctx.lineWidth = 6;
+            ctx.strokeStyle = "#705335";
+            ctx.lineWidth = 20;
             ctx.beginPath();
-            ctx.moveTo(a.x - 22, -10);
-            ctx.quadraticCurveTo(a.x + 8, a.y * 0.5, a.x, a.y);
+            ctx.moveTo(a.x - 18, -12);
+            ctx.quadraticCurveTo(ctrlX, a.y * 0.5, a.x, a.y);
+            ctx.stroke();
+
+            ctx.strokeStyle = "#9e7b52";
+            ctx.lineWidth = 7;
+            ctx.beginPath();
+            ctx.moveTo(a.x - 21, -12);
+            ctx.quadraticCurveTo(ctrlX - 4, a.y * 0.5, a.x - 4, a.y);
+            ctx.stroke();
+
+            // Bulbous gray/stone riveted anchor sphere at the tip (like the stacked spheres in SS 0)
+            const sr = 18 + beatPulse * 1.2;
+            const sphGrad = ctx.createRadialGradient(a.x - 5, a.y - 6, 3, a.x, a.y, sr);
+            sphGrad.addColorStop(0, "#9ca398");
+            sphGrad.addColorStop(0.65, "#5c635a");
+            sphGrad.addColorStop(1, "#272b26");
+            ctx.fillStyle = sphGrad;
+            ctx.strokeStyle = "#080907";
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.arc(a.x, a.y, sr, 0, Math.PI * 2);
+            ctx.fill();
             ctx.stroke();
             ctx.restore();
         }
     }
 
-    // Hanging moss vines along the upper canopy
-    ctx.strokeStyle = "rgba(58, 138, 100, 0.35)";
-    ctx.lineWidth = 2;
-    for (let x = 80; x < solver.level.worldWidth; x += 115) {
-        if (x < camX - 60 || x > camX + VIEW_W + 60) continue;
-        const len = 45 + ((x * 17) % 65);
-        const sway = Math.sin(t * 1.4 + x * 0.02) * 8;
+    // Silhouette hanging vines & spiky black fern leaves from the top border
+    ctx.fillStyle = "#0d0f0a";
+    ctx.strokeStyle = "#0d0f0a";
+    ctx.lineWidth = 3;
+    for (let x = 60; x < solver.level.worldWidth; x += 105) {
+        if (x < camX - 80 || x > camX + VIEW_W + 80) continue;
+        const len = 38 + ((x * 19) % 58);
+        const sway = Math.sin(t * 1.7 + x * 0.02) * 9;
         ctx.beginPath();
-        ctx.moveTo(x, 0);
+        ctx.moveTo(x, -4);
         ctx.quadraticCurveTo(x + sway * 0.5, len * 0.5, x + sway, len);
         ctx.stroke();
+
+        // Little teardrop silhouette leaf at tip
+        ctx.beginPath();
+        ctx.arc(x + sway, len, 4.5, 0, Math.PI * 2);
+        ctx.fill();
     }
 }
 
@@ -236,37 +354,47 @@ function drawWindZones(
     beatPulse: number
 ): void {
     for (const w of solver.level.winds) {
+        // Soft creamy golden-white thermal column
         const grad = ctx.createLinearGradient(w.x, w.y + w.h, w.x, w.y);
-        grad.addColorStop(0, "rgba(182, 120, 255, 0.0)");
-        grad.addColorStop(0.35, `rgba(153, 242, 255, ${(0.09 + 0.04 * beatPulse).toFixed(3)})`);
-        grad.addColorStop(0.85, "rgba(182, 120, 255, 0.07)");
-        grad.addColorStop(1, "rgba(182, 120, 255, 0.0)");
+        grad.addColorStop(0, "rgba(255, 248, 200, 0.0)");
+        grad.addColorStop(0.35, `rgba(255, 250, 215, ${(0.16 + 0.06 * beatPulse).toFixed(3)})`);
+        grad.addColorStop(0.85, "rgba(255, 245, 190, 0.10)");
+        grad.addColorStop(1, "rgba(255, 245, 190, 0.0)");
         ctx.fillStyle = grad;
         ctx.fillRect(w.x, w.y, w.w, w.h);
 
-        // Rising wind streaks
-        ctx.strokeStyle = "rgba(182, 235, 255, 0.34)";
-        ctx.lineWidth = 1.6;
-        const cols = Math.max(4, Math.floor(w.w / 55));
+        // Swirling hand-drawn wind curlicues rising upward
+        ctx.save();
+        ctx.strokeStyle = "rgba(255, 252, 230, 0.52)";
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = "round";
+        const cols = Math.max(4, Math.floor(w.w / 62));
         for (let i = 0; i < cols; i++) {
-            const sx = w.x + (i + 0.5) * (w.w / cols) + Math.sin(t * 2 + i) * 10;
-            const travel = ((t * 120 + i * 67) % w.h);
+            const sx = w.x + (i + 0.5) * (w.w / cols) + Math.sin(t * 2.2 + i) * 12;
+            const travel = (t * 135 + i * 73) % w.h;
             const sy = w.y + w.h - travel;
             ctx.beginPath();
             ctx.moveTo(sx, sy);
-            ctx.lineTo(sx + w.ax * 0.06, Math.max(w.y, sy - 34));
+            ctx.bezierCurveTo(sx - 10, sy - 16, sx + 12, sy - 30, sx + w.ax * 0.05, Math.max(w.y + 8, sy - 46));
             ctx.stroke();
         }
+        ctx.restore();
     }
 }
 
-function drawTerrains(ctx: CanvasRenderingContext2D, solver: SapSolver, t: number): void {
-    void t;
+function drawWorldOfGooTerrains(
+    ctx: CanvasRenderingContext2D,
+    solver: SapSolver,
+    t: number,
+    beatPulse: number
+): void {
     for (const poly of solver.level.terrains) {
         const pts = poly.pts;
         if (pts.length < 2) continue;
 
         ctx.save();
+
+        // 1. Earthy brown cliff cross-section with undulating strata bands & Swiss-cheese soil pores (matching SS 2)
         ctx.beginPath();
         ctx.moveTo(pts[0].x, poly.bottomY);
         for (const p of pts) {
@@ -275,45 +403,128 @@ function drawTerrains(ctx: CanvasRenderingContext2D, solver: SapSolver, t: numbe
         ctx.lineTo(pts[pts.length - 1].x, poly.bottomY);
         ctx.closePath();
 
-        const fill = ctx.createLinearGradient(0, 300, 0, poly.bottomY);
+        const earthGrad = ctx.createLinearGradient(0, 310, 0, poly.bottomY);
         if (poly.style === "stone") {
-            fill.addColorStop(0, "#243842");
-            fill.addColorStop(0.4, "#16242c");
-            fill.addColorStop(1, "#091015");
-        } else if (poly.style === "amber-arch") {
-            fill.addColorStop(0, "#3a2d1d");
-            fill.addColorStop(0.45, "#231b12");
-            fill.addColorStop(1, "#0d0b08");
+            earthGrad.addColorStop(0, "#5c6158");
+            earthGrad.addColorStop(0.45, "#3d423b");
+            earthGrad.addColorStop(1, "#1c1f1b");
         } else {
-            fill.addColorStop(0, "#1c362e");
-            fill.addColorStop(0.4, "#11221f");
-            fill.addColorStop(1, "#071012");
+            earthGrad.addColorStop(0, "#754f29");
+            earthGrad.addColorStop(0.5, "#523519");
+            earthGrad.addColorStop(1, "#261709");
         }
-        ctx.fillStyle = fill;
+        ctx.fillStyle = earthGrad;
         ctx.fill();
 
-        // Glowing top moss / amber ridge cap along walkable segments
-        ctx.strokeStyle =
-            poly.style === "amber-arch"
-                ? "#f5a623"
-                : poly.style === "stone"
-                  ? "#6ec6d9"
-                  : "#4be39b";
-        ctx.lineWidth = 4.5;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        for (let i = 1; i < pts.length; i++) {
-            ctx.lineTo(pts[i].x, pts[i].y);
+        // Clip to the terrain polygon to paint internal horizontal brown strata bands and circular soil spots
+        ctx.save();
+        ctx.clip();
+        const minX = pts[0].x;
+        const maxX = pts[pts.length - 1].x;
+
+        // Undulating darker brown bands across the cliff face
+        ctx.fillStyle = poly.style === "stone" ? "rgba(25, 28, 24, 0.42)" : "rgba(54, 32, 12, 0.45)";
+        for (let by = 365; by < poly.bottomY; by += 34) {
+            ctx.beginPath();
+            ctx.moveTo(minX - 10, by);
+            for (let x = minX; x <= maxX + 20; x += 35) {
+                ctx.lineTo(x, by + Math.sin(x * 0.03 + by) * 6);
+            }
+            ctx.lineTo(maxX + 20, by + 16);
+            ctx.lineTo(minX - 10, by + 16);
+            ctx.closePath();
+            ctx.fill();
         }
+
+        // Porous circular soil/pebble spots of varying sizes (signature World of Goo cross-section detail)
+        ctx.fillStyle = poly.style === "stone" ? "rgba(20, 22, 18, 0.55)" : "rgba(38, 21, 7, 0.55)";
+        for (let x = minX + 18; x < maxX - 14; x += 27) {
+            for (let y = 370; y < poly.bottomY - 12; y += 31) {
+                const jx = x + ((y * 13) % 17) - 8;
+                const jy = y + ((x * 7) % 15) - 7;
+                const pr = 3.5 + ((x + y) % 5) * 1.8;
+                ctx.beginPath();
+                ctx.arc(jx, jy, pr, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        ctx.restore();
+
+        // Heavy hand-drawn black ink outline around cliff walls
+        ctx.strokeStyle = "#080906";
+        ctx.lineWidth = 6;
+        ctx.lineJoin = "round";
         ctx.stroke();
+
+        // 2. Thick, drippy, vibrant lime-green moss/grass cap sitting atop the cliff like viscous frosting (matching Header & SS 2)
+        const surfacePts = pts.filter((p) => p.y < 480);
+        if (surfacePts.length >= 2) {
+            // Black silhouette bush puffs and spiky grass blades along the ridge
+            ctx.fillStyle = "#10140b";
+            for (let i = 0; i < surfacePts.length - 1; i++) {
+                const p0 = surfacePts[i];
+                const p1 = surfacePts[i + 1];
+                const segLen = Math.hypot(p1.x - p0.x, p1.y - p0.y);
+                const steps = Math.max(2, Math.floor(segLen / 22));
+                for (let s = 0; s <= steps; s++) {
+                    const u = s / steps;
+                    const gx = p0.x + (p1.x - p0.x) * u;
+                    const gy = p0.y + (p1.y - p0.y) * u;
+                    if ((i + s) % 3 === 0) {
+                        // Scalloped bush silhouette puff
+                        ctx.beginPath();
+                        ctx.arc(gx, gy - 4, 8 + (s % 3) * 2.5, Math.PI, 0);
+                        ctx.fill();
+                    }
+                    // Pointed grass blade silhouette swaying with the 106 BPM beat
+                    const sway = Math.sin(t * 2.5 + gx * 0.05) * 3 + (beatPulse - 0.5) * 2;
+                    ctx.beginPath();
+                    ctx.moveTo(gx - 3, gy);
+                    ctx.lineTo(gx + sway, gy - 11 - (s % 3) * 4);
+                    ctx.lineTo(gx + 3, gy);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+
+            // Thick black under-outline for the drippy moss lip
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.strokeStyle = "#080906";
+            ctx.lineWidth = 20;
+            ctx.beginPath();
+            ctx.moveTo(surfacePts[0].x, surfacePts[0].y + 3);
+            for (let i = 1; i < surfacePts.length; i++) {
+                ctx.lineTo(surfacePts[i].x, surfacePts[i].y + 3);
+            }
+            ctx.stroke();
+
+            // Vibrant lime-chartreuse moss body
+            ctx.strokeStyle = poly.style === "stone" ? "#78b833" : "#8cd926";
+            ctx.lineWidth = 13;
+            ctx.beginPath();
+            ctx.moveTo(surfacePts[0].x, surfacePts[0].y + 2);
+            for (let i = 1; i < surfacePts.length; i++) {
+                ctx.lineTo(surfacePts[i].x, surfacePts[i].y + 2);
+            }
+            ctx.stroke();
+
+            // Bright yellow-lime top highlight along the moss lip
+            ctx.strokeStyle = "#d4fc56";
+            ctx.lineWidth = 4.5;
+            ctx.beginPath();
+            ctx.moveTo(surfacePts[0].x, surfacePts[0].y - 2);
+            for (let i = 1; i < surfacePts.length; i++) {
+                ctx.lineTo(surfacePts[i].x, surfacePts[i].y - 2);
+            }
+            ctx.stroke();
+        }
 
         ctx.restore();
     }
 }
 
-function drawGroves(
+function drawSleepingGooTotemsAndGroves(
     ctx: CanvasRenderingContext2D,
     solver: SapSolver,
     t: number,
@@ -321,30 +532,55 @@ function drawGroves(
 ): void {
     for (const g of solver.level.groves) {
         ctx.save();
-        // Wake radius ring
+
+        // Subtle hand-drawn dotted wake ring
         ctx.strokeStyle = g.woken
-            ? `rgba(75, 227, 155, ${(0.25 + 0.12 * beatPulse).toFixed(3)})`
-            : "rgba(245, 166, 35, 0.20)";
-        ctx.lineWidth = g.woken ? 2 : 1.5;
+            ? `rgba(140, 217, 38, ${(0.45 + 0.25 * beatPulse).toFixed(3)})`
+            : "rgba(20, 24, 14, 0.35)";
+        ctx.lineWidth = 2;
         ctx.setLineDash(g.woken ? [] : [6, 6]);
         ctx.beginPath();
-        ctx.arc(g.x, g.y - 16, g.wakeRadius, Math.PI * 1.05, Math.PI * 1.95);
+        ctx.arc(g.x, g.y - 16, g.wakeRadius, Math.PI * 1.08, Math.PI * 1.92);
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // Lantern shrine totem at grove center
-        ctx.fillStyle = "#1f3632";
-        ctx.fillRect(g.x - 5, g.y - 46, 10, 46);
-        const orbColor = g.woken ? "#4be39b" : "#f5a623";
-        ctx.fillStyle = orbColor;
-        ctx.beginPath();
-        ctx.arc(g.x, g.y - 50, 7 + (g.woken ? beatPulse * 2.5 : Math.sin(t * 3) * 1), 0, Math.PI * 2);
-        ctx.fill();
+        // World of Goo style OCD / Checkpoint Tattered Pennant Flag on a crooked stick
+        const sway = Math.sin(t * 2.5 + g.x) * 0.05;
+        ctx.translate(g.x, g.y);
+        ctx.rotate(sway);
 
-        ctx.font = "600 11px system-ui, -apple-system, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillStyle = g.woken ? "#a2ffcf" : "#ffd479";
-        ctx.fillText(g.woken ? `${g.name} · Awakened` : `${g.name} (Sleeping)`, g.x, g.y - 66);
+        ctx.strokeStyle = "#080906";
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, -54);
+        ctx.stroke();
+
+        // Pennant flag (crimson when sleeping, bright lime-gold when awakened)
+        ctx.fillStyle = g.woken ? "#8cd926" : "#d93829";
+        ctx.strokeStyle = "#080906";
+        ctx.lineWidth = 2.8;
+        ctx.beginPath();
+        ctx.moveTo(0, -52);
+        ctx.lineTo(32 + beatPulse * 4, -42);
+        ctx.lineTo(0, -31);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Floating sleeping "Zzz" above un-woken groves (iconic World of Goo sleeping Goo detail)
+        if (!g.woken) {
+            ctx.font = "900 13px Georgia, serif";
+            ctx.fillStyle = "#11130d";
+            for (let z = 0; z < 3; z++) {
+                const zy = -58 - ((t * 18 + z * 12) % 28);
+                const zx = 10 + z * 8 + Math.sin(t * 3 + z) * 4;
+                ctx.globalAlpha = Math.max(0.15, 1 - ((-58 - zy) / 28));
+                ctx.fillText("z", zx, zy);
+            }
+            ctx.globalAlpha = 1;
+        }
+
         ctx.restore();
     }
 }
@@ -353,60 +589,77 @@ function drawSignposts(
     ctx: CanvasRenderingContext2D,
     solver: SapSolver,
     activeSignpost: Signpost | null,
-    t: number
+    t: number,
+    beatPulse: number
 ): void {
     for (const sp of solver.level.signposts) {
         const isOpen = activeSignpost?.id === sp.id;
-        const sway = Math.sin(t * 2.2 + sp.x * 0.01) * 0.04;
+        const sway = Math.sin(t * 2.1 + sp.x * 0.01) * 0.045 + (beatPulse - 0.5) * 0.02;
         ctx.save();
         ctx.translate(sp.x, sp.y);
-        ctx.rotate(sway);
+        ctx.rotate(-0.08 + sway);
 
-        // Post
-        ctx.fillStyle = "#4a321c";
-        ctx.fillRect(-3, -38, 6, 38);
-        // Board
-        ctx.fillStyle = isOpen ? "#f5a623" : "#2c4a3e";
-        ctx.strokeStyle = "#ffd479";
-        ctx.lineWidth = 2;
+        // Crooked wooden stake with heavy black ink outline
+        ctx.fillStyle = "#5c3b1e";
+        ctx.strokeStyle = "#080906";
+        ctx.lineWidth = 3.5;
+        ctx.fillRect(-4, -44, 8, 44);
+        ctx.strokeRect(-4, -44, 8, 44);
+
+        // Tilted weathered wooden plank / yellowed parchment board (The Sign Painter's sign)
+        ctx.fillStyle = isOpen ? "#fff3b8" : "#d8b878";
+        ctx.strokeStyle = "#080906";
+        ctx.lineWidth = 3.8;
         ctx.beginPath();
-        ctx.roundRect(-22, -56, 44, 24, 5);
+        ctx.moveTo(-26, -66);
+        ctx.lineTo(28, -62);
+        ctx.lineTo(25, -34);
+        ctx.lineTo(-24, -37);
+        ctx.closePath();
         ctx.fill();
         ctx.stroke();
 
-        // Exclamation / lore glyph
-        ctx.fillStyle = isOpen ? "#0b1519" : "#ffd479";
-        ctx.font = "bold 14px system-ui, sans-serif";
+        // Wood grain lines & nail heads
+        ctx.strokeStyle = "rgba(82, 51, 22, 0.45)";
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(-18, -56);
+        ctx.lineTo(20, -54);
+        ctx.moveTo(-16, -43);
+        ctx.lineTo(18, -41);
+        ctx.stroke();
+
+        // Bold hand-painted exclamation / question mark by The Sign Painter
+        ctx.fillStyle = "#14120e";
+        ctx.font = "900 18px Georgia, serif";
         ctx.textAlign = "center";
-        ctx.fillText("?", 0, -39);
+        ctx.fillText("!", 1, -43);
+
         ctx.restore();
     }
 }
 
-function drawThorns(ctx: CanvasRenderingContext2D, solver: SapSolver, t: number): void {
+function drawSpikyGears(
+    ctx: CanvasRenderingContext2D,
+    solver: SapSolver,
+    t: number,
+    beatPulse: number
+): void {
     for (const th of solver.level.thorns) {
         ctx.save();
         ctx.translate(th.x, th.y);
-        ctx.rotate(t * th.spinSpeed);
+        // Spin rhythmically with a subtle 106 BPM pulse kick
+        ctx.rotate(t * th.spinSpeed + beatPulse * 0.08 * Math.sign(th.spinSpeed));
 
-        // Danger halo
-        const grad = ctx.createRadialGradient(0, 0, th.radius * 0.3, 0, 0, th.radius * 1.45);
-        grad.addColorStop(0, "rgba(255, 72, 72, 0.32)");
-        grad.addColorStop(1, "rgba(255, 72, 72, 0)");
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(0, 0, th.radius * 1.45, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Spiky bramble gear teeth
-        const spikes = 12;
-        ctx.fillStyle = "#261219";
-        ctx.strokeStyle = "#ff5e6c";
-        ctx.lineWidth = 2;
+        // Heavy silhouetted industrial World-of-Goo gear with sharp white/iron conical teeth
+        const spikes = 14;
+        ctx.fillStyle = "#161814";
+        ctx.strokeStyle = "#050604";
+        ctx.lineWidth = 3.5;
         ctx.beginPath();
         for (let i = 0; i < spikes * 2; i++) {
             const ang = (i * Math.PI) / spikes;
-            const r = i % 2 === 0 ? th.radius + 7 : th.radius * 0.68;
+            const r = i % 2 === 0 ? th.radius + 9 : th.radius * 0.72;
             const px = Math.cos(ang) * r;
             const py = Math.sin(ang) * r;
             if (i === 0) ctx.moveTo(px, py);
@@ -416,15 +669,31 @@ function drawThorns(ctx: CanvasRenderingContext2D, solver: SapSolver, t: number)
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = "#ff5e6c";
+        // Inner dark iron hub ring & rivet holes (matching World of Goo industrial gears)
+        ctx.fillStyle = "#3a3e35";
         ctx.beginPath();
-        ctx.arc(0, 0, 6, 0, Math.PI * 2);
+        ctx.arc(0, 0, th.radius * 0.56, 0, Math.PI * 2);
         ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#c9cfbe";
+        for (let r = 0; r < 6; r++) {
+            const ra = (r * Math.PI) / 3;
+            ctx.beginPath();
+            ctx.arc(Math.cos(ra) * (th.radius * 0.36), Math.sin(ra) * (th.radius * 0.36), 2.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.fillStyle = "#0b0c09";
+        ctx.beginPath();
+        ctx.arc(0, 0, 7, 0, Math.PI * 2);
+        ctx.fill();
+
         ctx.restore();
     }
 }
 
-function drawCisternPipe(
+function drawGooCorpPipe(
     ctx: CanvasRenderingContext2D,
     solver: SapSolver,
     t: number,
@@ -433,153 +702,202 @@ function drawCisternPipe(
     const c = solver.level.cistern;
     ctx.save();
 
-    // Wake / suction aura rings
-    const ringRadius = c.open ? c.suckRadius : c.wakeRadius;
-    ctx.strokeStyle = c.open
-        ? `rgba(75, 227, 155, ${(0.42 + 0.25 * beatPulse).toFixed(3)})`
-        : "rgba(255, 212, 121, 0.26)";
-    ctx.lineWidth = c.open ? 2.5 : 1.5;
-    ctx.setLineDash([8, 6]);
-    ctx.beginPath();
-    ctx.arc(c.x, c.y, ringRadius, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
+    // Suction / wake rings pulsing in 106 BPM sync
     if (c.open) {
-        // Animated inward suction rings
         for (let i = 0; i < 3; i++) {
-            const frac = 1 - (((t * 1.4 + i / 3) % 1));
+            const frac = 1 - ((t * (106 / 60) * 0.5 + i / 3) % 1);
             const r = 18 + frac * (c.suckRadius - 18);
-            ctx.strokeStyle = `rgba(153, 242, 255, ${((1 - frac) * 0.55).toFixed(3)})`;
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = `rgba(255, 252, 220, ${((1 - frac) * 0.65).toFixed(3)})`;
+            ctx.lineWidth = 2.8;
             ctx.beginPath();
-            ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+            ctx.arc(c.x, c.y + 8, r, 0, Math.PI * 2);
             ctx.stroke();
+        }
+    } else {
+        ctx.strokeStyle = `rgba(20, 22, 14, ${(0.28 + 0.18 * beatPulse).toFixed(3)})`;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([7, 6]);
+        ctx.beginPath();
+        ctx.arc(c.x, c.y + 8, c.wakeRadius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    // Heavy riveted World-of-Goo Corporation suction pipe descending from the upper canopy
+    const pipeW = 54;
+    const pipeGrad = ctx.createLinearGradient(c.x - pipeW / 2, 0, c.x + pipeW / 2, 0);
+    pipeGrad.addColorStop(0, "#232620");
+    pipeGrad.addColorStop(0.32, "#6c7366");
+    pipeGrad.addColorStop(0.55, "#8f9688");
+    pipeGrad.addColorStop(1, "#1b1d18");
+
+    ctx.fillStyle = pipeGrad;
+    ctx.strokeStyle = "#070806";
+    ctx.lineWidth = 4.5;
+    ctx.fillRect(c.x - pipeW / 2, -12, pipeW, c.y + 4);
+    ctx.strokeRect(c.x - pipeW / 2, -12, pipeW, c.y + 4);
+
+    // Horizontal riveted collar bands along the pipe shaft
+    for (let py = 32; py < c.y - 24; py += 52) {
+        ctx.fillStyle = "#3f443b";
+        ctx.fillRect(c.x - pipeW / 2 - 4, py, pipeW + 8, 12);
+        ctx.strokeRect(c.x - pipeW / 2 - 4, py, pipeW + 8, 12);
+        // Rivet dots
+        ctx.fillStyle = "#b8bfb0";
+        for (const rx of [-pipeW * 0.36, 0, pipeW * 0.36]) {
+            ctx.beginPath();
+            ctx.arc(c.x + rx, py + 6, 2.2, 0, Math.PI * 2);
+            ctx.fill();
         }
     }
 
-    // Pipe trunk ascending into the upper canopy
-    ctx.fillStyle = "#2b3d3c";
-    ctx.strokeStyle = "#f5a623";
-    ctx.lineWidth = 3;
-    ctx.fillRect(c.x - 24, -10, 48, c.y + 6);
-    ctx.strokeRect(c.x - 24, -10, 48, c.y + 6);
-
-    // Brass collar & flared suction bell mouth
-    ctx.fillStyle = c.open ? "#4be39b" : "#d98a26";
+    // Flared iron nozzle lip at the pipe mouth (bobbing on the 106 BPM beat when open)
+    const nozzleBob = c.open ? beatPulse * 4 : 0;
+    ctx.fillStyle = c.open ? "#7ab82e" : "#4a4f44";
     ctx.beginPath();
-    ctx.roundRect(c.x - 36, c.y - 16, 72, 28, 8);
+    ctx.roundRect(c.x - 38, c.y - 14 - nozzleBob, 76, 28, 10);
     ctx.fill();
     ctx.stroke();
 
-    // Dark intake opening
-    ctx.fillStyle = "#061014";
+    // Cavernous pitch-black intake opening
+    ctx.fillStyle = "#050604";
     ctx.beginPath();
-    ctx.ellipse(c.x, c.y + 6, 26, 11, 0, 0, Math.PI * 2);
+    ctx.ellipse(c.x, c.y + 8 - nozzleBob, 28, 11, 0, 0, Math.PI * 2);
     ctx.fill();
-
-    ctx.font = "bold 12px system-ui, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillStyle = c.open ? "#a2ffcf" : "#ffd479";
-    ctx.fillText(
-        c.open ? "HEARTWOOD CISTERN · OPEN" : "HEARTWOOD CISTERN · BUILD HERE",
-        c.x,
-        c.y - 28
-    );
 
     ctx.restore();
 }
 
-function drawGhostTies(ctx: CanvasRenderingContext2D, solver: SapSolver, t: number): void {
-    if (solver.draggedId === null) return;
-    const dragged = solver.getBlob(solver.draggedId);
-    if (!dragged) return;
-    const rule = SPECIES_RULES[dragged.species];
-    const candidates = solver.getGhostCandidates(dragged.x, dragged.y, dragged.species, dragged.id);
-
-    ctx.save();
-    // Reach circle around dragged blob
-    ctx.strokeStyle = "rgba(255, 212, 121, 0.22)";
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.arc(dragged.x, dragged.y, rule.reach, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Ghost strands to each candidate anchor/node
-    ctx.strokeStyle = rule.colorGlow;
-    ctx.lineWidth = 3;
-    ctx.setLineDash([7, 5]);
-    ctx.lineDashOffset = -t * 36;
-    for (const c of candidates) {
-        ctx.beginPath();
-        ctx.moveTo(dragged.x, dragged.y);
-        ctx.lineTo(c.x, c.y);
-        ctx.stroke();
-
-        ctx.fillStyle = rule.colorGlow;
-        ctx.beginPath();
-        ctx.arc(c.x, c.y, 5, 0, Math.PI * 2);
-        ctx.fill();
-    }
-    ctx.restore();
-}
-
-function drawStrands(
+function drawGhostTies(
     ctx: CanvasRenderingContext2D,
     solver: SapSolver,
     t: number,
     beatPulse: number
 ): void {
+    if (solver.draggedId === null) return;
+    const dragged = solver.getBlob(solver.draggedId);
+    if (!dragged) return;
+    const candidates = solver.getGhostCandidates(dragged.x, dragged.y, dragged.species, dragged.id);
+
+    ctx.save();
+    // Fading beige/cream dotted circle trail and candidate connection lines (matching SS 2)
+    for (const c of candidates) {
+        const steps = 7;
+        for (let i = 1; i <= steps; i++) {
+            const u = i / (steps + 1);
+            const gx = dragged.x + (c.x - dragged.x) * u;
+            const gy = dragged.y + (c.y - dragged.y) * u;
+            const gr = 3.2 + (1 - Math.abs(u - 0.5)) * 2.5 + beatPulse * 1.2;
+            ctx.fillStyle = "rgba(255, 250, 224, 0.78)";
+            ctx.strokeStyle = "#080906";
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            ctx.arc(gx, gy, gr, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        // Highlight ring around target structural Goo node
+        ctx.strokeStyle = "rgba(255, 250, 220, 0.9)";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, 19 + Math.sin(t * 8) * 2, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
+function drawGooStrands(
+    ctx: CanvasRenderingContext2D,
+    solver: SapSolver,
+    t: number,
+    beatPulse: number
+): void {
+    void t;
     for (const s of solver.strands) {
         const a = solver.getBlob(s.a);
         const b = solver.getBlob(s.b);
         if (!a || !b) continue;
 
-        const rule = SPECIES_RULES[s.species];
         const mx = (a.x + b.x) * 0.5;
         const my = (a.y + b.y) * 0.5;
-        const dist = Math.hypot(b.x - a.x, b.y - a.y);
-        // Slight organic sag when slack, straight and taut when stretched
-        const sag = Math.max(0, (s.rest - dist) * 0.22);
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        const nx = -dy / dist;
+        const ny = dx / dist;
 
+        // Slight organic sag when slack, taut when stretched
+        const sag = Math.max(0, (s.rest - dist) * 0.18);
         const hot = Math.min(1, s.strain);
+
         ctx.save();
-        ctx.lineCap = "round";
+        if (s.species === "balloon") {
+            // Thin tan balloon string (matching SS 4 & SS 5)
+            ctx.strokeStyle = "#080906";
+            ctx.lineWidth = 4.2;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.quadraticCurveTo(mx, my + sag, b.x, b.y);
+            ctx.stroke();
 
-        // Outer translucent sap sheath
-        ctx.strokeStyle =
-            hot > 0.55
-                ? `rgba(255, 92, 108, ${(0.45 + 0.35 * beatPulse).toFixed(3)})`
-                : rule.colorRim;
-        ctx.lineWidth = Math.max(4, 9 - hot * 3.5);
+            ctx.strokeStyle = "#e6d29e";
+            ctx.lineWidth = 2.0;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.quadraticCurveTo(mx, my + sag, b.x, b.y);
+            ctx.stroke();
+            ctx.restore();
+            continue;
+        }
+
+        // Iconic World-of-Goo thick hourglass/taffy strand: wide where it meets the two Goo balls,
+        // tapering in the middle like pulled black ink or viscous green ivy taffy
+        const endW = 9.5;
+        const midW = Math.max(2.4, 5.2 - hot * 2.4 + beatPulse * 0.6);
+        const cx = mx;
+        const cy = my + sag;
+
         ctx.beginPath();
-        ctx.moveTo(a.x, a.y);
-        ctx.quadraticCurveTo(mx, my + sag, b.x, b.y);
+        ctx.moveTo(a.x + nx * endW, a.y + ny * endW);
+        ctx.quadraticCurveTo(cx + nx * midW, cy + ny * midW, b.x + nx * endW, b.y + ny * endW);
+        ctx.lineTo(b.x - nx * endW, b.y - ny * endW);
+        ctx.quadraticCurveTo(cx - nx * midW, cy - ny * midW, a.x - nx * endW, a.y - ny * endW);
+        ctx.closePath();
+
+        if (hot > 0.55) {
+            ctx.fillStyle = "#d92b2b";
+        } else if (s.species === "ivy") {
+            ctx.fillStyle = "#529918";
+        } else if (s.species === "albino") {
+            ctx.fillStyle = "#dcd9ce";
+        } else {
+            ctx.fillStyle = "#0e0f0c";
+        }
+        ctx.fill();
+
+        ctx.strokeStyle = "#050604";
+        ctx.lineWidth = 2.2;
         ctx.stroke();
 
-        // Inner luminous core strand
+        // Wet specular sheen along the upper edge of the stretched taffy strand
         ctx.strokeStyle =
-            hot > 0.55
-                ? "#ff6b7a"
+            s.species === "ivy"
+                ? "rgba(210, 255, 128, 0.55)"
                 : s.species === "albino"
-                  ? "#99f2ff"
-                  : s.species === "ivy"
-                    ? "#4be39b"
-                    : s.species === "balloon"
-                      ? "#d3a8ff"
-                      : "#f5a623";
-        ctx.lineWidth = Math.max(2, 4.5 - hot * 1.8);
+                  ? "rgba(255, 255, 255, 0.75)"
+                  : "rgba(255, 255, 255, 0.22)";
+        ctx.lineWidth = 1.4;
         ctx.beginPath();
-        ctx.moveTo(a.x, a.y);
-        ctx.quadraticCurveTo(mx, my + sag, b.x, b.y);
+        ctx.moveTo(a.x + nx * (endW * 0.45), a.y + ny * (endW * 0.45));
+        ctx.quadraticCurveTo(cx + nx * (midW * 0.45), cy + ny * (midW * 0.45), b.x + nx * (endW * 0.45), b.y + ny * (endW * 0.45));
         ctx.stroke();
 
-        void t;
         ctx.restore();
     }
 }
 
-function drawBlobs(
+function drawGooBalls(
     ctx: CanvasRenderingContext2D,
     solver: SapSolver,
     t: number,
@@ -587,71 +905,87 @@ function drawBlobs(
 ): void {
     for (const b of solver.blobs) {
         if (b.state === "saved") continue;
-        const rule = SPECIES_RULES[b.species];
         ctx.save();
         ctx.translate(b.x, b.y);
 
-        // Squash & stretch from velocity + 106 BPM pulse
+        // Soft drop shadow on the ground/structure behind the Goo ball
+        ctx.fillStyle = "rgba(0, 0, 0, 0.28)";
+        ctx.beginPath();
+        ctx.ellipse(2, 4, b.radius * 0.95, b.radius * 0.75, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Squash & stretch from velocity + 106 BPM beat bounce
         const speed = Math.hypot(b.vx, b.vy);
-        const squash = Math.min(0.22, speed * 0.0005) + (b.state === "built" ? 0.03 * beatPulse : 0.05 * Math.sin(t * 4 + b.wobblePhase));
+        const squash =
+            Math.min(0.22, speed * 0.0005) +
+            (b.state === "built" ? 0.045 * beatPulse : 0.06 * Math.sin(t * 4.5 + b.wobblePhase));
         ctx.scale(1 + squash, 1 - squash * 0.8);
 
         const r = b.radius * (b.state === "sucking" ? Math.max(0.25, 1 - b.suckT * 0.75) : 1);
 
-        // Outer bioluminescent aura
-        if (b.state !== "dormant") {
-            const halo = ctx.createRadialGradient(0, 0, r * 0.3, 0, 0, r * 1.65);
-            halo.addColorStop(0, rule.colorGlow + "55");
-            halo.addColorStop(1, rule.colorGlow + "00");
-            ctx.fillStyle = halo;
+        if (b.species === "balloon") {
+            // Iconic World-of-Goo translucent cherry-red ribbed Balloon (matching SS 4 & SS 5)
+            const balGrad = ctx.createRadialGradient(-r * 0.32, -r * 0.35, r * 0.12, 0, 0, r * 1.15);
+            balGrad.addColorStop(0, "#ff9e8a");
+            balGrad.addColorStop(0.45, "#e32626");
+            balGrad.addColorStop(1, "#6e0909");
+            ctx.fillStyle = balGrad;
+            ctx.strokeStyle = "#080906";
+            ctx.lineWidth = 3.2;
             ctx.beginPath();
-            ctx.arc(0, 0, r * 1.65, 0, Math.PI * 2);
+            ctx.ellipse(0, -2, r * 0.96, r * 1.14, 0, 0, Math.PI * 2);
             ctx.fill();
+            ctx.stroke();
+
+            // Knot at bottom of balloon
+            ctx.fillStyle = "#8f1111";
+            ctx.beginPath();
+            ctx.moveTo(-4, r * 1.1);
+            ctx.lineTo(4, r * 1.1);
+            ctx.lineTo(0, r * 1.1 + 5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        } else {
+            // Core glossy World-of-Goo sphere (pitch-black Common Goo, acidic-green Ivy Goo, or pearl Albino Goo)
+            const bodyGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.32, r * 0.12, 0, 0, r);
+            if (b.species === "amber") {
+                bodyGrad.addColorStop(0, "#3d403a");
+                bodyGrad.addColorStop(0.35, "#151614");
+                bodyGrad.addColorStop(1, "#050504");
+            } else if (b.species === "ivy") {
+                bodyGrad.addColorStop(0, "#c8ff6e");
+                bodyGrad.addColorStop(0.55, "#7bd624");
+                bodyGrad.addColorStop(1, "#254d06");
+            } else {
+                bodyGrad.addColorStop(0, "#ffffff");
+                bodyGrad.addColorStop(0.65, "#e6e2d6");
+                bodyGrad.addColorStop(1, "#8c887b");
+            }
+
+            ctx.fillStyle = bodyGrad;
+            ctx.strokeStyle = "#050604";
+            ctx.lineWidth = 3.0;
+            ctx.beginPath();
+            ctx.arc(0, 0, r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
         }
 
-        // Core glossy sphere
-        const bodyGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.32, r * 0.15, 0, 0, r);
-        bodyGrad.addColorStop(0, rule.colorGlow);
-        bodyGrad.addColorStop(0.55, rule.colorCore);
-        bodyGrad.addColorStop(1, rule.colorRim);
-        ctx.fillStyle = bodyGrad;
-        ctx.globalAlpha = b.state === "dormant" ? 0.55 : 1.0;
+        // Wet white specular highlight dot (top-left)
+        ctx.fillStyle = "rgba(255, 255, 255, 0.62)";
         ctx.beginPath();
-        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.ellipse(-r * 0.34, -r * 0.38, r * 0.24, r * 0.13, -0.55, 0, Math.PI * 2);
         ctx.fill();
 
-        // Pinned bark ring for fixed anchors
-        if (b.state === "pinned") {
-            ctx.strokeStyle = "#ffd479";
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            ctx.arc(0, 0, r + 2, 0, Math.PI * 2);
-            ctx.stroke();
-        } else if (rule.detachable && b.state === "built") {
-            // Dashed ring reminding player that Ivy / Spore Floater nodes can be detached
-            ctx.strokeStyle = "#ffffffaa";
-            ctx.lineWidth = 1.5;
-            ctx.setLineDash([4, 3]);
-            ctx.beginPath();
-            ctx.arc(0, 0, r + 2.5, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.setLineDash([]);
-        }
-
-        // Specular highlight
-        ctx.fillStyle = "rgba(255, 255, 255, 0.45)";
-        ctx.beginPath();
-        ctx.ellipse(-r * 0.32, -r * 0.36, r * 0.28, r * 0.16, -0.5, 0, Math.PI * 2);
-        ctx.fill();
-
-        // World-of-Goo style expressive eyes
-        drawBlobEyes(ctx, b, r, solver);
+        // Iconic asymmetrical bulging white World-of-Goo eyes
+        drawWorldOfGooEyes(ctx, b, r, solver);
 
         ctx.restore();
     }
 }
 
-function drawBlobEyes(
+function drawWorldOfGooEyes(
     ctx: CanvasRenderingContext2D,
     b: SapBlob,
     r: number,
@@ -659,11 +993,11 @@ function drawBlobEyes(
 ): void {
     if (b.state === "dormant") {
         // Closed sleeping eyelids
-        ctx.strokeStyle = "#121a1d";
-        ctx.lineWidth = 1.8;
-        for (const ex of [-r * 0.34, r * 0.32]) {
+        ctx.strokeStyle = b.species === "amber" ? "#d8d4c8" : "#121410";
+        ctx.lineWidth = 2.0;
+        for (const ex of [-r * 0.35, r * 0.33]) {
             ctx.beginPath();
-            ctx.arc(ex, -r * 0.05, r * 0.18, 0.15 * Math.PI, 0.85 * Math.PI);
+            ctx.arc(ex, -r * 0.04, r * 0.2, 0.15 * Math.PI, 0.85 * Math.PI);
             ctx.stroke();
         }
         return;
@@ -672,23 +1006,74 @@ function drawBlobEyes(
     const lookTargetX = b.state === "crawler" ? solver.level.cistern.x : solver.pointerX;
     const lookTargetY = b.state === "crawler" ? solver.level.cistern.y : solver.pointerY;
     const ang = Math.atan2(lookTargetY - b.y, lookTargetX - b.x);
-    const pxOff = Math.cos(ang) * (r * 0.09);
-    const pyOff = Math.sin(ang) * (r * 0.09);
+    const pxOff = Math.cos(ang) * (r * 0.11);
+    const pyOff = Math.sin(ang) * (r * 0.11);
 
+    // One large bulging eye + one slightly smaller offset eye (signature 2D Boy look)
     const eyes: [number, number, number][] = [
-        [-r * 0.33, -r * 0.06, r * 0.25],
-        [r * 0.31, -r * 0.10, r * 0.21],
+        [-r * 0.34, -r * 0.06, r * 0.31],
+        [r * 0.32, -r * 0.12, r * 0.24],
     ];
     for (const [ex, ey, er] of eyes) {
-        ctx.fillStyle = "#fcfaf2";
+        ctx.fillStyle = "#fffef9";
+        ctx.strokeStyle = "#050604";
+        ctx.lineWidth = 2.0;
         ctx.beginPath();
         ctx.arc(ex, ey, er, 0, Math.PI * 2);
         ctx.fill();
+        ctx.stroke();
 
-        ctx.fillStyle = "#101820";
+        // Tiny pitch-black pinprick pupil
+        ctx.fillStyle = "#050604";
         ctx.beginPath();
-        ctx.arc(ex + pxOff, ey + pyOff, er * 0.48, 0, Math.PI * 2);
+        ctx.arc(ex + pxOff, ey + pyOff, er * 0.38, 0, Math.PI * 2);
         ctx.fill();
+    }
+}
+
+function drawFloatingLeavesAndFlies(
+    ctx: CanvasRenderingContext2D,
+    camX: number,
+    t: number,
+    beatPulse: number
+): void {
+    for (const p of FLOATING_PARTICLES) {
+        const px = p.x + Math.sin(t * 0.8 + p.phase) * 24;
+        if (px < camX - 40 || px > camX + VIEW_W + 40) continue;
+        const py = ((p.y - t * p.speedY) % (VIEW_H - 60) + (VIEW_H - 60)) % (VIEW_H - 60) + 30;
+
+        ctx.save();
+        ctx.translate(px, py);
+        if (p.kind === "leaf") {
+            // Silhouette tumbling leaf (matching SS 4)
+            ctx.rotate(t * 1.6 + p.phase);
+            ctx.fillStyle = "rgba(18, 20, 12, 0.72)";
+            ctx.beginPath();
+            ctx.ellipse(0, 0, p.size * 1.7, p.size * 0.75, 0, 0, Math.PI * 2);
+            ctx.fill();
+        } else if (p.kind === "fly") {
+            // Tiny World-of-Goo winged black bug with two white eyes (matching SS 1 & SS 5)
+            const flap = Math.sin(t * 22 + p.phase) * 0.45;
+            ctx.fillStyle = "#10120c";
+            for (const dir of [-1, 1]) {
+                ctx.save();
+                ctx.rotate(dir * (0.5 + flap));
+                ctx.beginPath();
+                ctx.ellipse(dir * 5, -2, 4.5, 2.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+            ctx.beginPath();
+            ctx.arc(0, 0, 3.2 + beatPulse * 0.6, 0, Math.PI * 2);
+            ctx.fill();
+        } else {
+            // Golden glowing bokeh spore mote
+            ctx.fillStyle = "rgba(255, 250, 210, 0.55)";
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.restore();
     }
 }
 
@@ -696,15 +1081,30 @@ function drawWhistleWaves(ctx: CanvasRenderingContext2D, solver: SapSolver, t: n
     if (!solver.whistleActive) return;
     ctx.save();
     for (let i = 0; i < 3; i++) {
-        const frac = (t * 2.2 + i / 3) % 1;
+        const frac = (t * (106 / 60) + i / 3) % 1;
         const r = 14 + frac * 140;
-        ctx.strokeStyle = `rgba(153, 242, 255, ${((1 - frac) * 0.65).toFixed(3)})`;
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = `rgba(255, 250, 210, ${((1 - frac) * 0.75).toFixed(3)})`;
+        ctx.lineWidth = 2.6;
         ctx.beginPath();
         ctx.arc(solver.pointerX, solver.pointerY, r, 0, Math.PI * 2);
         ctx.stroke();
     }
     ctx.restore();
+}
+
+function drawStorybookVignette(ctx: CanvasRenderingContext2D): void {
+    const vig = ctx.createRadialGradient(
+        VIEW_W * 0.5,
+        VIEW_H * 0.5,
+        VIEW_W * 0.34,
+        VIEW_W * 0.5,
+        VIEW_H * 0.5,
+        VIEW_W * 0.64
+    );
+    vig.addColorStop(0, "rgba(0, 0, 0, 0)");
+    vig.addColorStop(1, "rgba(12, 10, 6, 0.52)");
+    ctx.fillStyle = vig;
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 }
 
 function drawHudAndMinimap(
@@ -717,31 +1117,31 @@ function drawHudAndMinimap(
     const { solver, camX, beatPulse } = state;
     const c = solver.counts();
 
-    // Top bar backdrop
-    ctx.fillStyle = "rgba(8, 17, 23, 0.84)";
+    // Top bar backdrop: dark inked silhouette trim with warm cream typography
+    ctx.fillStyle = "rgba(14, 15, 11, 0.86)";
     ctx.fillRect(0, 0, VIEW_W, 46);
-    ctx.strokeStyle = "rgba(75, 227, 155, 0.32)";
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#050604";
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(0, 46);
     ctx.lineTo(VIEW_W, 46);
     ctx.stroke();
 
-    // Left: Saved Sap counter & C-Minor 106 BPM pulse badge
-    ctx.font = "bold 14px system-ui, -apple-system, sans-serif";
+    // Left: Saved Goo counter & colony stats
+    ctx.font = "900 15px Georgia, serif";
     ctx.textAlign = "left";
-    ctx.fillStyle = c.saved >= c.goal ? "#4be39b" : "#ffd479";
+    ctx.fillStyle = c.saved >= c.goal ? "#a6f037" : "#fff2b2";
     ctx.fillText(`SAP SAVED: ${c.saved} / ${c.goal}`, 16, 20);
 
-    ctx.font = "500 11px system-ui, -apple-system, sans-serif";
-    ctx.fillStyle = "#99f2ff";
+    ctx.font = "600 11px system-ui, -apple-system, sans-serif";
+    ctx.fillStyle = "#dcd6be";
     ctx.fillText(
         `Awake: ${c.free}  ·  Sleeping: ${c.dormant}  ·  Woven: ${c.built}  ·  OCD: ${c.ocd}`,
         16,
         37
     );
 
-    // Center: 5-Zone Interactive Minimap Bar (x = 290 .. 680)
+    // Center: 5-Zone Interactive Minimap Bar (x = 290 .. 670)
     const mapX = 290;
     const mapY = 8;
     const mapW = 380;
@@ -756,31 +1156,27 @@ function drawHudAndMinimap(
             label: `Zone ${z.index}`,
             x: zx,
             y: mapY,
-            w: zoneW - 3,
+            w: zoneW - 4,
             h: mapH,
         };
         buttons.push(rect);
         const hovered = px >= rect.x && px <= rect.x + rect.w && py >= rect.y && py <= rect.y + rect.h;
 
-        ctx.fillStyle = active
-            ? "rgba(75, 227, 155, 0.28)"
-            : hovered
-              ? "rgba(255, 212, 121, 0.20)"
-              : "rgba(22, 42, 48, 0.75)";
-        ctx.strokeStyle = active ? z.accentHex : "rgba(153, 242, 255, 0.25)";
-        ctx.lineWidth = active ? 2 : 1;
+        ctx.fillStyle = active ? "#7ab82e" : hovered ? "#5c4a28" : "#26281e";
+        ctx.strokeStyle = active ? "#fff2b2" : "#050604";
+        ctx.lineWidth = active ? 2.5 : 2;
         ctx.beginPath();
-        ctx.roundRect(rect.x, rect.y, rect.w, rect.h, 5);
+        ctx.roundRect(rect.x, rect.y, rect.w, rect.h, 6);
         ctx.fill();
         ctx.stroke();
 
-        ctx.font = "bold 11px system-ui, sans-serif";
+        ctx.font = "bold 11px Georgia, serif";
         ctx.textAlign = "center";
-        ctx.fillStyle = active ? "#ffffff" : "#b8d8be";
+        ctx.fillStyle = active ? "#0e100a" : "#f2ebd4";
         ctx.fillText(`Zone ${z.index}`, rect.x + rect.w * 0.5, rect.y + 19);
     });
 
-    // Right: Action buttons (Undo [Z], Wake Next Grove [G], Reset [R])
+    // Right: Action buttons (Time Bug Undo [Z], Cistern [5], Reset [R])
     const actionButtons: { id: string; label: string; w: number }[] = [
         { id: "undo", label: `Undo (${solver.undoAvailable}) [Z]`, w: 94 },
         { id: "frontier", label: "Cistern [5]", w: 82 },
@@ -791,66 +1187,66 @@ function drawHudAndMinimap(
         const rect: UiButtonRect = { id: ab.id, label: ab.label, x: bx, y: 9, w: ab.w, h: 28 };
         buttons.push(rect);
         const hovered = px >= rect.x && px <= rect.x + rect.w && py >= rect.y && py <= rect.y + rect.h;
-        ctx.fillStyle = hovered ? "rgba(245, 166, 35, 0.30)" : "rgba(24, 46, 52, 0.85)";
-        ctx.strokeStyle = hovered ? "#ffd479" : "rgba(153, 242, 255, 0.35)";
-        ctx.lineWidth = 1.2;
+        ctx.fillStyle = hovered ? "#d99b38" : "#2c2e22";
+        ctx.strokeStyle = "#050604";
+        ctx.lineWidth = 2.2;
         ctx.beginPath();
-        ctx.roundRect(rect.x, rect.y, rect.w, rect.h, 5);
+        ctx.roundRect(rect.x, rect.y, rect.w, rect.h, 6);
         ctx.fill();
         ctx.stroke();
 
-        ctx.font = "600 11px system-ui, sans-serif";
+        ctx.font = "bold 11px Georgia, serif";
         ctx.textAlign = "center";
-        ctx.fillStyle = "#eef9f4";
+        ctx.fillStyle = hovered ? "#0e100a" : "#fff2c2";
         ctx.fillText(ab.label, rect.x + rect.w * 0.5, rect.y + 18);
         bx += ab.w + 6;
     }
 
-    // Bottom status bar: Current Zone name + C-Minor 106 BPM harmonic indicator + Controls hint
+    // Bottom status bar: Current Zone name + C-Minor 106 BPM harmonic indicator
     const curZone =
         FOREST_ZONES.find((z) => camX + VIEW_W * 0.5 >= z.x0 && camX + VIEW_W * 0.5 < z.x1) ??
         FOREST_ZONES[FOREST_ZONES.length - 1];
 
-    ctx.fillStyle = "rgba(8, 17, 23, 0.78)";
+    ctx.fillStyle = "rgba(12, 13, 9, 0.84)";
     ctx.fillRect(0, VIEW_H - 32, VIEW_W, 32);
 
-    ctx.font = "600 12px system-ui, sans-serif";
+    ctx.font = "bold 12px Georgia, serif";
     ctx.textAlign = "left";
-    ctx.fillStyle = curZone.accentHex;
+    ctx.fillStyle = "#b8f244";
     ctx.fillText(curZone.name, 16, VIEW_H - 12);
 
     ctx.font = "400 11px system-ui, sans-serif";
-    ctx.fillStyle = "#c8e6df";
+    ctx.fillStyle = "#ebe3c8";
     ctx.fillText(`— ${curZone.subtitle}`, 215, VIEW_H - 12);
 
     // 106 BPM · C Minor equalizer bars on bottom right
-    ctx.font = "600 11px system-ui, sans-serif";
+    ctx.font = "bold 11px Georgia, serif";
     ctx.textAlign = "right";
-    ctx.fillStyle = "#99f2ff";
+    ctx.fillStyle = "#fff0b3";
     ctx.fillText("C MINOR · 106 BPM", VIEW_W - 44, VIEW_H - 12);
     for (let b = 0; b < 4; b++) {
-        const bh = 6 + ((b % 2 === 0 ? beatPulse : 1 - beatPulse * 0.6) * 14);
-        ctx.fillStyle = b % 2 === 0 ? "#4be39b" : "#f5a623";
+        const bh = 6 + (b % 2 === 0 ? beatPulse : 1 - beatPulse * 0.6) * 14;
+        ctx.fillStyle = b % 2 === 0 ? "#95e028" : "#f5b038";
         ctx.fillRect(VIEW_W - 36 + b * 6, VIEW_H - 8 - bh, 4, bh);
     }
 
-    // Off-screen Pipe directional indicator if the Heartwood Cistern is off to the right
+    // Off-screen Pipe directional indicator if the Cistern Pipe is off to the right
     const cisternScreenX = solver.level.cistern.x - camX;
     if (cisternScreenX > VIEW_W - 24) {
         const distMeters = Math.round((solver.level.cistern.x - (camX + VIEW_W * 0.5)) / 20);
         ctx.save();
-        ctx.fillStyle = "rgba(12, 28, 34, 0.88)";
-        ctx.strokeStyle = "#ffd479";
-        ctx.lineWidth = 1.5;
+        ctx.fillStyle = "#1a1c14";
+        ctx.strokeStyle = "#050604";
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.roundRect(VIEW_W - 148, 58, 136, 32, 16);
+        ctx.roundRect(VIEW_W - 152, 58, 140, 32, 16);
         ctx.fill();
         ctx.stroke();
 
-        ctx.font = "bold 11px system-ui, sans-serif";
+        ctx.font = "bold 11px Georgia, serif";
         ctx.textAlign = "center";
-        ctx.fillStyle = "#ffd479";
-        ctx.fillText(`CISTERN  ${distMeters}m  →`, VIEW_W - 80, 78);
+        ctx.fillStyle = "#fff0b3";
+        ctx.fillText(`PIPE  ${distMeters}m  →`, VIEW_W - 82, 78);
         ctx.restore();
     }
 
@@ -858,72 +1254,85 @@ function drawHudAndMinimap(
     if (state.bannerText && state.bannerAlpha > 0.01) {
         ctx.save();
         ctx.globalAlpha = Math.min(1, state.bannerAlpha);
-        ctx.fillStyle = "rgba(9, 22, 28, 0.88)";
-        ctx.strokeStyle = "#4be39b";
-        ctx.lineWidth = 1.8;
+        ctx.fillStyle = "#171911";
+        ctx.strokeStyle = "#050604";
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.roundRect(VIEW_W * 0.5 - 230, 58, 460, 36, 10);
+        ctx.roundRect(VIEW_W * 0.5 - 235, 58, 470, 36, 10);
         ctx.fill();
         ctx.stroke();
 
-        ctx.font = "bold 13px system-ui, sans-serif";
+        ctx.font = "bold 13px Georgia, serif";
         ctx.textAlign = "center";
-        ctx.fillStyle = "#eafff5";
+        ctx.fillStyle = "#fff4c2";
         ctx.fillText(state.bannerText, VIEW_W * 0.5, 81);
         ctx.restore();
     }
 }
 
-function drawSignpostModal(
+function drawSignPainterModal(
     ctx: CanvasRenderingContext2D,
     sign: Signpost,
     buttons: UiButtonRect[]
 ): void {
     ctx.save();
-    ctx.fillStyle = "rgba(6, 14, 19, 0.88)";
-    ctx.strokeStyle = "#ffd479";
-    ctx.lineWidth = 2;
-    const mw = 560;
-    const mh = 185;
+    // Weathered wooden / parchment plaque signed "- The Sign Painter"
+    const mw = 570;
+    const mh = 195;
     const mx = (VIEW_W - mw) * 0.5;
-    const my = 96;
+    const my = 94;
+
+    ctx.fillStyle = "#1d1a14";
+    ctx.strokeStyle = "#050604";
+    ctx.lineWidth = 5;
     ctx.beginPath();
-    ctx.roundRect(mx, my, mw, mh, 12);
+    ctx.roundRect(mx, my, mw, mh, 14);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = "bold 11px system-ui, sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillStyle = "#4be39b";
-    ctx.fillText(sign.zoneTitle, mx + 24, my + 28);
+    ctx.strokeStyle = "#8c7248";
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(mx + 8, my + 8, mw - 16, mh - 16);
 
-    ctx.font = "bold 18px system-ui, sans-serif";
-    ctx.fillStyle = "#ffd479";
-    ctx.fillText(sign.heading, mx + 24, my + 54);
+    ctx.font = "bold 11px Georgia, serif";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#95e028";
+    ctx.fillText(sign.zoneTitle, mx + 26, my + 30);
+
+    ctx.font = "900 19px Georgia, serif";
+    ctx.fillStyle = "#fff2b2";
+    ctx.fillText(sign.heading, mx + 26, my + 56);
 
     ctx.font = "400 13px system-ui, sans-serif";
-    ctx.fillStyle = "#e6f5f0";
+    ctx.fillStyle = "#f2ebd9";
     sign.body.forEach((line, idx) => {
-        ctx.fillText(line, mx + 24, my + 86 + idx * 24);
+        ctx.fillText(line, mx + 26, my + 86 + idx * 24);
     });
+
+    ctx.font = "italic 12px Georgia, serif";
+    ctx.fillStyle = "#c9b892";
+    ctx.fillText("— The Sign Painter", mx + 26, my + mh - 20);
 
     const closeRect: UiButtonRect = {
         id: "close-signpost",
-        label: "Close",
-        x: mx + mw - 96,
-        y: my + mh - 42,
-        w: 76,
-        h: 28,
+        label: "Continue",
+        x: mx + mw - 106,
+        y: my + mh - 44,
+        w: 86,
+        h: 30,
     };
     buttons.push(closeRect);
-    ctx.fillStyle = "#f5a623";
+    ctx.fillStyle = "#8cd926";
+    ctx.strokeStyle = "#050604";
+    ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.roundRect(closeRect.x, closeRect.y, closeRect.w, closeRect.h, 6);
     ctx.fill();
-    ctx.font = "bold 12px system-ui, sans-serif";
+    ctx.stroke();
+    ctx.font = "bold 12px Georgia, serif";
     ctx.textAlign = "center";
-    ctx.fillStyle = "#091317";
-    ctx.fillText("Got it", closeRect.x + closeRect.w * 0.5, closeRect.y + 18);
+    ctx.fillStyle = "#0d0f08";
+    ctx.fillText("Continue", closeRect.x + closeRect.w * 0.5, closeRect.y + 19);
     ctx.restore();
 }
 
@@ -937,57 +1346,66 @@ function drawWinOverlay(
     const isOcd = c.saved >= c.ocd;
 
     ctx.save();
-    ctx.fillStyle = "rgba(6, 14, 20, 0.84)";
-    ctx.strokeStyle = isOcd ? "#99f2ff" : "#4be39b";
-    ctx.lineWidth = 2.5 + beatPulse * 1.5;
-    const pw = 520;
-    const ph = 240;
+    const pw = 540;
+    const ph = 250;
     const px = (VIEW_W - pw) * 0.5;
     const py = (VIEW_H - ph) * 0.5;
+
+    ctx.fillStyle = "rgba(18, 17, 12, 0.94)";
+    ctx.strokeStyle = "#050604";
+    ctx.lineWidth = 6;
     ctx.beginPath();
-    ctx.roundRect(px, py, pw, ph, 14);
+    ctx.roundRect(px, py, pw, ph, 16);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = "bold 24px system-ui, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#ffd479";
-    ctx.fillText("THE HEARTWOOD CISTERN AWAKENS", VIEW_W * 0.5, py + 48);
+    // Inner golden frame pulsing on the 106 BPM kick
+    ctx.strokeStyle = isOcd ? "#a6f037" : "#f5b841";
+    ctx.lineWidth = 2 + beatPulse * 1.5;
+    ctx.strokeRect(px + 10, py + 10, pw - 20, ph - 20);
 
-    ctx.font = "500 15px system-ui, sans-serif";
-    ctx.fillStyle = "#a2ffcf";
+    ctx.font = "900 24px Georgia, serif";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#fff2b2";
+    ctx.fillText("THE HEARTWOOD CISTERN AWAKENS", VIEW_W * 0.5, py + 52);
+
+    ctx.font = "bold 15px Georgia, serif";
+    ctx.fillStyle = "#a6f037";
     ctx.fillText(
-        `Saved ${c.saved} Sap Globs (Goal ${c.goal} · OCD ${c.ocd}) in ${solver.movesCount} moves`,
+        `Saved ${c.saved} Goo Globs (Goal ${c.goal} · OCD ${c.ocd}) in ${solver.movesCount} moves`,
         VIEW_W * 0.5,
-        py + 86
+        py + 90
     );
 
     ctx.font = "400 13px system-ui, sans-serif";
-    ctx.fillStyle = "#d9f2ec";
+    ctx.fillStyle = "#f0e8d2";
     ctx.fillText(
         isOcd
-            ? "Obsessive Completion Distinction achieved! The C-minor pulse of the forest is whole."
-            : "The last sap flows through the Heartwood Pipe in C minor. Keep building or press R to replay.",
+            ? "Obsessive Completion Distinction achieved! Every C-minor beat & glob is accounted for."
+            : "The last sap flows into the Heartwood Pipe in 106 BPM C-minor sync. Press R to replay.",
         VIEW_W * 0.5,
-        py + 122
+        py + 128
     );
 
     const replayRect: UiButtonRect = {
         id: "reset",
         label: "Replay Expedition [R]",
-        x: VIEW_W * 0.5 - 95,
-        y: py + ph - 58,
-        w: 190,
-        h: 36,
+        x: VIEW_W * 0.5 - 98,
+        y: py + ph - 62,
+        w: 196,
+        h: 38,
     };
     buttons.push(replayRect);
-    ctx.fillStyle = "#4be39b";
+    ctx.fillStyle = "#8cd926";
+    ctx.strokeStyle = "#050604";
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.roundRect(replayRect.x, replayRect.y, replayRect.w, replayRect.h, 8);
     ctx.fill();
-    ctx.font = "bold 13px system-ui, sans-serif";
-    ctx.fillStyle = "#071418";
-    ctx.fillText(replayRect.label, VIEW_W * 0.5, replayRect.y + 23);
+    ctx.stroke();
+    ctx.font = "bold 13px Georgia, serif";
+    ctx.fillStyle = "#0c0e08";
+    ctx.fillText(replayRect.label, VIEW_W * 0.5, replayRect.y + 24);
 
     ctx.restore();
 }

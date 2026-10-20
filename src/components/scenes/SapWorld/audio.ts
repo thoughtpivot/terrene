@@ -23,7 +23,10 @@ export type SapSfx =
     | "win";
 
 export const SAP_BPM = 106;
-export const SAP_BEAT = 60 / SAP_BPM;
+export const SAP_BEAT = 60 / SAP_BPM;         // 0.5660377s per quarter-note beat
+export const SAP_EIGHTH = SAP_BEAT / 2;       // 0.2830189s per 8th note
+export const SAP_SIXTEENTH = SAP_BEAT / 4;    // 0.1415094s per 16th note
+export const SAP_SWING_SEC = 0.016;           // 16ms minimal-tech swing on odd 16th notes
 export const SAP_LOOP_BARS = 64;
 export const SAP_LOOP_LENGTH = SAP_LOOP_BARS * 4 * SAP_BEAT;
 
@@ -32,14 +35,28 @@ export const SAP_LOOP_LENGTH = SAP_LOOP_BARS * 4 * SAP_BEAT;
  * so any pitch-shifted SFX stays strictly in the key of C minor.
  */
 export const C_MINOR_RATIOS: readonly number[] = [
-    1.0,              // C
-    Math.pow(2, 2 / 12),  // D
-    Math.pow(2, 3 / 12),  // Eb
-    Math.pow(2, 5 / 12),  // F
-    Math.pow(2, 7 / 12),  // G
-    Math.pow(2, 8 / 12),  // Ab
-    Math.pow(2, 10 / 12), // Bb
-    2.0,              // C (+1 octave)
+    1.0,                  // 0: C
+    Math.pow(2, 2 / 12),  // 1: D
+    Math.pow(2, 3 / 12),  // 2: Eb
+    Math.pow(2, 5 / 12),  // 3: F
+    Math.pow(2, 7 / 12),  // 4: G
+    Math.pow(2, 8 / 12),  // 5: Ab
+    Math.pow(2, 10 / 12), // 6: Bb
+    2.0,                  // 7: C (+1 octave)
+];
+
+/**
+ * Chord-aware scale degrees in C minor for each 2-bar chord in the 8-bar progression:
+ *   Bars 0-1: Cm9      -> C(0), Eb(2), G(4), Bb(6), D(1), C+8ve(7)
+ *   Bars 2-3: Abmaj9   -> Ab(5), C(0), Eb(2), G(4), Bb(6), C+8ve(7)
+ *   Bars 4-5: Fm9      -> F(3), Ab(5), C(0), Eb(2), G(4), C+8ve(7)
+ *   Bars 6-7: Gm7(b13) -> G(4), Bb(6), D(1), F(3), Eb(2), G(4)
+ */
+const CHORD_DEGREES_BY_PAIR: readonly (readonly number[])[] = [
+    [0, 2, 4, 6, 1, 7],
+    [5, 0, 2, 4, 6, 7],
+    [3, 5, 0, 2, 4, 7],
+    [4, 6, 1, 3, 2, 4],
 ];
 
 /** MIDI notes in C minor across octaves 3..6 for real-time harmonic accents. */
@@ -64,22 +81,42 @@ const SFX_URLS: Record<SapSfx, string> = {
 };
 
 const SFX_LEVEL: Record<SapSfx, number> = {
-    grab: 0.45,
-    attach: 0.58,
-    detach: 0.46,
-    wake: 0.62,
-    strain: 0.42,
-    snap: 0.66,
-    launch: 0.52,
-    signpost: 0.56,
-    suck: 0.68,
-    win: 0.82,
+    grab: 0.48,
+    attach: 0.62,
+    detach: 0.48,
+    wake: 0.66,
+    strain: 0.44,
+    snap: 0.68,
+    launch: 0.54,
+    signpost: 0.58,
+    suck: 0.70,
+    win: 0.85,
+};
+
+/**
+ * Rhythmic quantization subdivision for each SFX so every sound locks to the 106 BPM grid:
+ * - "16th": snaps to the nearest swung 16th-note grid line (max ~65ms lookahead)
+ * - "8th":  snaps to the nearest 8th-note grid line (for grove wake / pipe suction melody)
+ * - "beat": snaps to the next quarter-note kick/beat (for win fanfare)
+ */
+const SFX_GRID: Record<SapSfx, "16th" | "8th" | "beat"> = {
+    grab: "16th",
+    attach: "16th",
+    detach: "16th",
+    wake: "8th",
+    strain: "16th",
+    snap: "16th",
+    launch: "16th",
+    signpost: "8th",
+    suck: "16th",
+    win: "beat",
 };
 
 interface MusicVoice {
     source: AudioBufferSourceNode;
     gain: GainNode;
-    startedAt: number;
+    /** WebAudio timestamp corresponding to Bar 0 Beat 0 of the 106 BPM loop. */
+    loopEpochAt: number;
 }
 
 let ctx: AudioContext | null = null;
@@ -87,6 +124,7 @@ let master: GainNode | null = null;
 let voice: MusicVoice | null = null;
 let wantMusic = false;
 let scaleStep = 0;
+let lastQuantizedSlotTime = 0;
 const buffers = new Map<string, AudioBuffer>();
 const pending = new Map<string, Promise<AudioBuffer | null>>();
 
@@ -166,17 +204,20 @@ function beginMusic(): void {
     const source = ac.createBufferSource();
     source.buffer = buffer;
     source.loop = true;
-    source.loopStart = 1.0;
-    source.loopEnd = Math.min(buffer.duration, 1.0 + SAP_LOOP_LENGTH);
+    // Start at 0.0 and loop the exact 64-bar 106 BPM cycle so `ac.currentTime - loopEpochAt`
+    // is always phase-locked to Bar 0 Beat 0 of the score, even across loop wraps.
+    source.loopStart = 0.0;
+    source.loopEnd = Math.min(buffer.duration, SAP_LOOP_LENGTH);
     const gain = ac.createGain();
     source.connect(gain);
     gain.connect(master);
-    const now = ac.currentTime;
+    const now = ac.currentTime + 0.02;
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.62, now + 2.2);
-    source.start(now);
-    voice = { source, gain, startedAt: now };
-    console.log("🏰 Forest Last Sap World music started: Last Sap of the Heartwood (C minor, 106 BPM)");
+    gain.gain.linearRampToValueAtTime(0.62, now + 4 * SAP_BEAT);
+    source.start(now, 0);
+    voice = { source, gain, loopEpochAt: now };
+    lastQuantizedSlotTime = now;
+    console.log("🏰 Forest Last Sap World music started: Last Sap of the Heartwood (C minor, 106 BPM, beat-synced)");
 }
 
 export function stopSapMusic(): void {
@@ -206,44 +247,98 @@ export function duckSapMusic(level: number, seconds: number): void {
     g.linearRampToValueAtTime(base, now + seconds + 1.8);
 }
 
-/** Current beat phase (0..1) at 106 BPM so visuals can pulse with the four-on-the-floor kick. */
-export function getSapBeatPulse(): number {
+/** Elapsed musical time in seconds since Bar 0 Beat 0 of the 106 BPM score. */
+function getMusicalElapsedSeconds(): number {
     const ac = ctx;
     if (!ac || !voice || ac.state !== "running") {
-        const t = performance.now() / 1000;
-        return 1 - ((t / SAP_BEAT) % 1);
+        return performance.now() / 1000;
     }
-    const elapsed = Math.max(0, ac.currentTime - voice.startedAt);
+    return Math.max(0, ac.currentTime - voice.loopEpochAt);
+}
+
+/** Current beat phase (0..1, where 1.0 is the exact downbeat kick impact) at 106 BPM. */
+export function getSapBeatPulse(): number {
+    const elapsed = getMusicalElapsedSeconds();
     return 1 - ((elapsed / SAP_BEAT) % 1);
 }
 
 /**
- * Play a C-minor sound effect.
- * `degree` optionally selects a scale degree in C minor (0=C, 1=D, 2=Eb, 3=F, 4=G, 5=Ab, 6=Bb, 7=C+8ve)
- * so repeated actions play a C-minor melodic sequence rather than pitching out of key.
+ * Compute the exact WebAudio `startTime` on the 106 BPM rhythmic grid so every sound effect
+ * lands rhythmically in sync with the score's kick, hats, and swung 16th-note groove.
+ */
+function quantizeTo106BpmGrid(ac: AudioContext, mode: "16th" | "8th" | "beat", isBurstSequence = false): {
+    startTime: number;
+    barIndex: number;
+    stepInBar: number;
+} {
+    const now = ac.currentTime;
+    const epoch = voice ? voice.loopEpochAt : 0;
+    const elapsed = Math.max(0, now - epoch);
+
+    const rawStepFloat = elapsed / SAP_SIXTEENTH;
+    let stepIndex = Math.ceil(rawStepFloat - 0.18); // if within ~25ms after a grid line, fire immediately on that grid line
+
+    if (mode === "8th") {
+        if (stepIndex % 2 !== 0) stepIndex += 1;
+    } else if (mode === "beat") {
+        const rem = stepIndex % 4;
+        if (rem !== 0) stepIndex += 4 - rem;
+    }
+
+    const swingOffset = stepIndex % 2 === 1 ? SAP_SWING_SEC : 0;
+    let targetTime = epoch + stepIndex * SAP_SIXTEENTH + swingOffset;
+
+    if (targetTime < now + 0.002) {
+        targetTime = now + 0.002;
+    }
+
+    // When multiple Goo balls are sucked into the pipe or attached rapidly, stagger them on consecutive
+    // 16th-note subdivisions so they form a tight 106 BPM minimal-tech arpeggio instead of flamming!
+    if (isBurstSequence && targetTime <= lastQuantizedSlotTime + SAP_SIXTEENTH * 0.55) {
+        stepIndex += 1;
+        const nextSwing = stepIndex % 2 === 1 ? SAP_SWING_SEC : 0;
+        targetTime = Math.max(now + 0.002, epoch + stepIndex * SAP_SIXTEENTH + nextSwing);
+    }
+    if (isBurstSequence) {
+        lastQuantizedSlotTime = targetTime;
+    }
+
+    const barIndex = Math.floor(stepIndex / 16) % SAP_LOOP_BARS;
+    const stepInBar = ((stepIndex % 16) + 16) % 16;
+    return { startTime: targetTime, barIndex, stepInBar };
+}
+
+/**
+ * Play a C-minor sound effect rhythmically quantized to the 106 BPM grid and harmonically
+ * voiced to the active bar's chord (`Cm9`, `Abmaj9`, `Fm9`, `Gm7`).
  */
 export function playSapSfx(name: SapSfx, pan = 0, degree?: number): void {
     const ac = ctx;
     if (!ac || !master || ac.state !== "running") {
-        // Synthesize a light C-minor tone if buffers are still decoding
         playCMinorSynthFallback(name, pan, degree);
         return;
     }
+
+    const isBurst = name === "suck" || name === "attach";
+    const { startTime, barIndex, stepInBar } = quantizeTo106BpmGrid(ac, SFX_GRID[name], isBurst);
+    const chordPairIdx = Math.floor(barIndex / 2) % CHORD_DEGREES_BY_PAIR.length;
+    const activeChordDegrees = CHORD_DEGREES_BY_PAIR[chordPairIdx];
+
     const url = SFX_URLS[name];
     const buffer = buffers.get(url);
     if (!buffer) {
-        playCMinorSynthFallback(name, pan, degree);
+        playCMinorSynthFallback(name, pan, degree, startTime);
         return;
     }
+
     const src = ac.createBufferSource();
     src.buffer = buffer;
     if (degree !== undefined) {
-        const idx = ((Math.round(degree) % C_MINOR_RATIOS.length) + C_MINOR_RATIOS.length) % C_MINOR_RATIOS.length;
-        src.playbackRate.value = C_MINOR_RATIOS[idx];
-    } else if (name === "attach" || name === "suck") {
-        // Step through C-minor chord tones (C, Eb, G, Bb, D, G, C+8ve) so building/rescuing plays a melody
-        const chordDegrees = [0, 2, 4, 6, 1, 4, 7];
-        const deg = chordDegrees[scaleStep % chordDegrees.length];
+        const degIdx = activeChordDegrees[((Math.round(degree) % activeChordDegrees.length) + activeChordDegrees.length) % activeChordDegrees.length];
+        src.playbackRate.value = C_MINOR_RATIOS[degIdx];
+    } else if (name === "attach" || name === "suck" || name === "grab") {
+        // Step through the currently playing bar's C-minor chord tones in 16th-note sync
+        const deg = activeChordDegrees[(scaleStep + stepInBar) % activeChordDegrees.length];
         scaleStep++;
         src.playbackRate.value = C_MINOR_RATIOS[deg];
     } else {
@@ -261,15 +356,15 @@ export function playSapSfx(name: SapSfx, pan = 0, degree?: number): void {
     } else {
         gain.connect(master);
     }
-    src.start();
+    src.start(startTime);
 }
 
-/** Real-time WebAudio C-minor minimal dub pluck used for live harmonic feedback and fallback. */
-export function playCMinorSynthFallback(name: SapSfx, pan = 0, degree = 0): void {
+/** Real-time WebAudio C-minor minimal dub pluck locked to 106 BPM 16th-note subdivisions. */
+export function playCMinorSynthFallback(name: SapSfx, pan = 0, degree = 0, scheduledStart?: number): void {
     const ac = ctx;
     if (!ac || !master || ac.state !== "running") return;
     const notesByKind: Record<SapSfx, number[]> = {
-        grab: [60, 67],
+        grab: [60, 67, 75],
         attach: [60, 63, 67, 70, 74],
         detach: [67, 63, 60],
         wake: [60, 63, 67, 72, 75],
@@ -281,21 +376,22 @@ export function playCMinorSynthFallback(name: SapSfx, pan = 0, degree = 0): void
         win: [60, 63, 67, 70, 74, 79, 84],
     };
     const baseNotes = notesByKind[name] ?? [60, 63, 67];
-    const now = ac.currentTime;
+    const t0 = scheduledStart ?? quantizeTo106BpmGrid(ac, SFX_GRID[name]).startTime;
     baseNotes.forEach((midiNote, i) => {
         const shifted = C_MINOR_MIDI[Math.min(C_MINOR_MIDI.length - 1, Math.max(0, C_MINOR_MIDI.indexOf(midiNote) + (degree % 5)))] ?? midiNote;
         const freq = 440 * Math.pow(2, (shifted - 69) / 12);
         const osc = ac.createOscillator();
         const filter = ac.createBiquadFilter();
         const gain = ac.createGain();
+        const noteTime = t0 + i * (SAP_SIXTEENTH * 0.5);
         osc.type = name === "snap" ? "sawtooth" : "triangle";
-        osc.frequency.setValueAtTime(freq, now + i * 0.035);
+        osc.frequency.setValueAtTime(freq, noteTime);
         filter.type = "lowpass";
-        filter.frequency.setValueAtTime(2200, now + i * 0.035);
-        filter.frequency.exponentialRampToValueAtTime(280, now + i * 0.035 + 0.28);
-        gain.gain.setValueAtTime(0.0001, now + i * 0.035);
-        gain.gain.linearRampToValueAtTime(0.12 / Math.sqrt(baseNotes.length), now + i * 0.035 + 0.008);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.035 + 0.32);
+        filter.frequency.setValueAtTime(2200, noteTime);
+        filter.frequency.exponentialRampToValueAtTime(280, noteTime + SAP_EIGHTH);
+        gain.gain.setValueAtTime(0.0001, noteTime);
+        gain.gain.linearRampToValueAtTime(0.12 / Math.sqrt(baseNotes.length), noteTime + 0.008);
+        gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + SAP_EIGHTH + 0.04);
         osc.connect(filter);
         filter.connect(gain);
         if (typeof ac.createStereoPanner === "function") {
@@ -306,7 +402,7 @@ export function playCMinorSynthFallback(name: SapSfx, pan = 0, degree = 0): void
         } else {
             gain.connect(master!);
         }
-        osc.start(now + i * 0.035);
-        osc.stop(now + i * 0.035 + 0.34);
+        osc.start(noteTime);
+        osc.stop(noteTime + SAP_EIGHTH + 0.05);
     });
 }
