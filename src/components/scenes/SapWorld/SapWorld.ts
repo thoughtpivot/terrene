@@ -1,9 +1,9 @@
 // 1. ExcaliburJS core
 import {
     Actor,
+    Canvas,
     Color,
     Engine,
-    ExcaliburGraphicsContext,
     ImageFiltering,
     ImageSource,
     Keys,
@@ -78,8 +78,7 @@ export default class SapWorld extends Scene {
     private engineRef: Engine | null = null;
     private saved: SavedScreen | null = null;
     private canvasActor: Actor | null = null;
-    private offscreen: HTMLCanvasElement | null = null;
-    private offCtx: CanvasRenderingContext2D | null = null;
+    private screenCanvas: Canvas | null = null;
     private uiButtons: UiButtonRect[] = [];
     private panningSky = false;
     private panStartScreenX = 0;
@@ -176,12 +175,25 @@ export default class SapWorld extends Scene {
         if (this.canvasActor) {
             this.canvasActor.kill();
         }
-        if (!this.offscreen) {
-            this.offscreen = document.createElement("canvas");
-            this.offscreen.width = VIEW_W;
-            this.offscreen.height = VIEW_H;
-            this.offCtx = this.offscreen.getContext("2d");
-        }
+        this.screenCanvas = new Canvas({
+            width: VIEW_W,
+            height: VIEW_H,
+            cache: true,
+            quality: 1,
+            filtering: ImageFiltering.Blended,
+            draw: (ctx: CanvasRenderingContext2D): void => {
+                this.uiButtons = renderSapWorld(ctx, {
+                    solver: this.solver,
+                    camX: this.camX,
+                    pointerScreenX: this.pointerScreenX,
+                    pointerScreenY: this.pointerScreenY,
+                    beatPulse: getSapBeatPulse(),
+                    activeSignpost: this.activeSignpost,
+                    bannerText: this.bannerText,
+                    bannerAlpha: Math.min(1, Math.max(0, this.bannerTime)),
+                });
+            },
+        });
 
         const actor = new Actor({
             pos: vec(0, 0),
@@ -190,21 +202,7 @@ export default class SapWorld extends Scene {
             height: VIEW_H,
             z: 0,
         });
-
-        actor.graphics.onPostDraw = (gfx: ExcaliburGraphicsContext): void => {
-            if (!this.offscreen || !this.offCtx) return;
-            this.uiButtons = renderSapWorld(this.offCtx, {
-                solver: this.solver,
-                camX: this.camX,
-                pointerScreenX: this.pointerScreenX,
-                pointerScreenY: this.pointerScreenY,
-                beatPulse: getSapBeatPulse(),
-                activeSignpost: this.activeSignpost,
-                bannerText: this.bannerText,
-                bannerAlpha: Math.min(1, Math.max(0, this.bannerTime)),
-            });
-            gfx.drawImage(this.offscreen, 0, 0);
-        };
+        actor.graphics.use(this.screenCanvas);
 
         this.add(actor);
         this.canvasActor = actor;
@@ -384,6 +382,7 @@ export default class SapWorld extends Scene {
         const z = FOREST_ZONES.find((item) => item.index === zoneIndex);
         if (!z) return;
         this.setTargetCamX(z.cameraX - VIEW_W * 0.5);
+        this.camX = this.camX + (this.targetCamX - this.camX) * 0.65;
         this.showBanner(`${z.name} — ${z.subtitle}`);
         playSapSfx("grab", 0, zoneIndex);
     }
@@ -463,7 +462,10 @@ export default class SapWorld extends Scene {
         }
 
         // Smooth camera interpolation
-        this.camX += (this.targetCamX - this.camX) * Math.min(1, dt * 10);
+        this.camX += (this.targetCamX - this.camX) * Math.min(1, dt * 18);
+        if (Math.abs(this.targetCamX - this.camX) < 1) {
+            this.camX = this.targetCamX;
+        }
 
         // Fixed 60 Hz physics step
         this.stepAcc += dt;
@@ -476,5 +478,6 @@ export default class SapWorld extends Scene {
         }
 
         this.flushSolverAudioEvents();
+        this.screenCanvas?.flagDirty();
     }
 }

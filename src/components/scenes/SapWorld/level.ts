@@ -235,8 +235,8 @@ export const SAP_WORLD_LEVEL: SapLevelData = {
     signposts: [
         {
             id: "sign-1",
-            x: 155,
-            y: 352,
+            x: 68,
+            y: 348,
             zoneTitle: "ZONE I · THE SAPLING CRADLE",
             heading: "The Last Sap of the Heartwood",
             body: [
@@ -327,9 +327,9 @@ export const SAP_WORLD_LEVEL: SapLevelData = {
         {
             id: "grove-5",
             name: "Heartwood Sanctum Grove",
-            x: 2865,
-            y: 324,
-            wakeRadius: 145,
+            x: 3095,
+            y: 318,
+            wakeRadius: 165,
             woken: false,
         },
     ],
@@ -388,6 +388,7 @@ export const SAP_WORLD_LEVEL: SapLevelData = {
         // Starter triangle on Moss Bough
         [4, 5],
         // Starter base at Heartwood Sanctum so building at the sanctum has a sturdy footing
+        [19, 20],
         [20, 21],
         [20, 22],
         [21, 22],
@@ -448,18 +449,22 @@ export const SAP_WORLD_LEVEL: SapLevelData = {
         { x: 2170, y: 316, species: "albino", state: "dormant", groveId: "grove-4" },
         { x: 2195, y: 292, species: "balloon", state: "dormant", groveId: "grove-4" },
 
-        // Grove 5 (Heartwood Sanctum Approach - awake & ready for the final spire + dormant bonus): 12 blobs
-        { x: 2835, y: 300, species: "amber", state: "free" },
-        { x: 2860, y: 300, species: "amber", state: "free" },
-        { x: 2885, y: 300, species: "amber", state: "free" },
-        { x: 2910, y: 300, species: "amber", state: "free" },
-        { x: 2935, y: 300, species: "ivy", state: "free" },
-        { x: 2960, y: 300, species: "ivy", state: "free" },
-        { x: 2985, y: 300, species: "albino", state: "free" },
-        { x: 3010, y: 300, species: "albino", state: "free" },
-        { x: 3070, y: 296, species: "amber", state: "dormant", groveId: "grove-5" },
-        { x: 3095, y: 296, species: "amber", state: "dormant", groveId: "grove-5" },
-        { x: 3115, y: 296, species: "ivy", state: "dormant", groveId: "grove-5" },
-        { x: 3135, y: 280, species: "balloon", state: "dormant", groveId: "grove-5" },
+        // Grove 5 (Heartwood Sanctum Approach - awake & ready for the final spire + dormant bonus): 16 blobs
+        { x: 2995, y: 298, species: "amber", state: "free" },
+        { x: 3015, y: 298, species: "amber", state: "free" },
+        { x: 3035, y: 298, species: "amber", state: "free" },
+        { x: 3055, y: 298, species: "amber", state: "free" },
+        { x: 3075, y: 298, species: "ivy", state: "free" },
+        { x: 3095, y: 298, species: "ivy", state: "free" },
+        { x: 3115, y: 298, species: "albino", state: "free" },
+        { x: 3135, y: 298, species: "albino", state: "free" },
+        { x: 3155, y: 298, species: "amber", state: "free" },
+        { x: 3175, y: 298, species: "amber", state: "free" },
+        { x: 3060, y: 286, species: "amber", state: "dormant", groveId: "grove-5" },
+        { x: 3080, y: 286, species: "amber", state: "dormant", groveId: "grove-5" },
+        { x: 3100, y: 286, species: "amber", state: "dormant", groveId: "grove-5" },
+        { x: 3120, y: 286, species: "ivy", state: "dormant", groveId: "grove-5" },
+        { x: 3140, y: 286, species: "albino", state: "dormant", groveId: "grove-5" },
+        { x: 3160, y: 274, species: "balloon", state: "dormant", groveId: "grove-5" },
     ],
 };

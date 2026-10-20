@@ -663,9 +663,27 @@ export class SapSolver {
                 }
             }
 
-            // Gentle wander impulse for free blobs on ground
+            // Gentle wander impulse for free blobs on ground, plus attraction toward nearby walkable structure
             if (b.state === "free") {
                 ax += Math.sin(this.time * 2.4 + b.wobblePhase) * 28;
+                let nearestDx = 0;
+                let nearestDist = 320;
+                for (const s of this.strands) {
+                    if (!s.walkable) continue;
+                    const na = this.getBlob(s.a);
+                    const nb = this.getBlob(s.b);
+                    for (const node of [na, nb]) {
+                        if (!node) continue;
+                        const d = Math.hypot(node.x - b.x, node.y - b.y);
+                        if (d < nearestDist && Math.abs(node.y - b.y) < 95) {
+                            nearestDist = d;
+                            nearestDx = node.x - b.x;
+                        }
+                    }
+                }
+                if (Math.abs(nearestDx) > 6) {
+                    ax += Math.sign(nearestDx) * (this.pipeOpen ? 220 : 95);
+                }
             }
 
             const vx = (b.x - b.px) * damping + ax * dt * dt;
@@ -934,10 +952,10 @@ export class SapSolver {
     private updateGrovesAndPipe(dt: number): void {
         const c = this.level.cistern;
 
-        // Check if any structural node has reached within wakeRadius of a dormant grove or the cistern pipe
+        // Check if any player-built or crawling node has reached within wakeRadius of a dormant grove or the cistern pipe
         let pipeReached = false;
         for (const b of this.blobs) {
-            if (!this.isStructural(b)) continue;
+            if (b.state !== "built" && b.state !== "crawler") continue;
             for (const g of this.level.groves) {
                 if (!g.woken && Math.hypot(b.x - g.x, b.y - g.y) <= g.wakeRadius) {
                     this.wakeGrove(g);

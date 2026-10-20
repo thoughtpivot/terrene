@@ -86,12 +86,12 @@ export function renderSapWorld(ctx: CanvasRenderingContext2D, state: RenderState
     drawWindZones(ctx, solver, t, beatPulse);
     drawTerrains(ctx, solver, t);
     drawGroves(ctx, solver, t, beatPulse);
-    drawSignposts(ctx, solver, state.activeSignpost, t);
     drawThorns(ctx, solver, t);
     drawCisternPipe(ctx, solver, t, beatPulse);
     drawGhostTies(ctx, solver, t);
     drawStrands(ctx, solver, t, beatPulse);
     drawBlobs(ctx, solver, t, beatPulse);
+    drawSignposts(ctx, solver, state.activeSignpost, t);
     drawWhistleWaves(ctx, solver, t);
 
     // Drifting bioluminescent forest motes in world space
