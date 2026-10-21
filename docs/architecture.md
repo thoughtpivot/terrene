@@ -97,9 +97,9 @@ Scenes are ExcaliburJS `Scene` subclasses that represent game levels:
 - Quest marker creation
 - Interaction system setup
 
-**Examples:** Eldergrove, Breaze, TheWoods, Vitosha, Solic, Baston, Zelda Land, Zelda Cave, Oka World, Oka World 2
+**Examples:** Eldergrove, Breaze, TheWoods, Vitosha, Solic, Baston, Zelda Land, Zelda Cave, Oka World, Oka World 2, Street
 
-Oka World is the default scene (`DEFAULT_SCENE` in `Terrene.ts`) and opens at `/`. Scenes listed in `ROUTED_SCENES` can be opened from the URL hash, for example Oka World 2 at `/#okaworld2` and World 1-1 at `/#worldone`. An empty or unknown hash opens the default, and changing the hash switches scenes. Oka World and Oka World 2 switch the engine to a 960x540 HD mode while they are active, see [oka-world.md](./oka-world.md).
+Oka World is the default scene (`DEFAULT_SCENE` in `Terrene.ts`) and opens at `/`. Scenes listed in `ROUTED_SCENES` can be opened from the URL hash, for example Oka World 2 at `/#okaworld2`, World 1-1 at `/#worldone`, and Street at `/#street`. An empty or unknown hash opens the default, and changing the hash switches scenes. Oka World and Oka World 2 switch the engine to a 960x540 HD mode while they are active, see [oka-world.md](./oka-world.md).
 
 A scene can also lead to the next one itself. Winning Oka World calls `history.replaceState` with `#okaworld2` before `engine.goToScene("okaworld2")`, so the URL matches the scene without firing the hash router a second time. Both Oka worlds extend the shared `OkaScene` with their own config, see [oka-world-2.md](./oka-world-2.md).
 

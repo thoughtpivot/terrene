@@ -7,6 +7,7 @@ A 2d game we're working on.
 -   Oka World, a painted cave platformer, is the default scene: [thoughtpivot.github.io/terrene](https://thoughtpivot.github.io/terrene/). See [docs/oka-world.md](docs/oka-world.md).
 -   Oka World 2: The Hollow Beneath, the dark sequel that opens when you finish Oka World: [thoughtpivot.github.io/terrene/#okaworld2](https://thoughtpivot.github.io/terrene/#okaworld2). See [docs/oka-world-2.md](docs/oka-world-2.md).
 -   World 1-1: [thoughtpivot.github.io/terrene/#worldone](https://thoughtpivot.github.io/terrene/#worldone)
+-   Street, scene one: [thoughtpivot.github.io/terrene/#street](https://thoughtpivot.github.io/terrene/#street). See [docs/street.md](docs/street.md).
 
 ## Cursor Rules & ExcaliburJS Guidance
 
