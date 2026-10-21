@@ -23,6 +23,25 @@ export const WORLD = TILE * 40;
 export const VIEW_W = 960;
 export const VIEW_H = 540;
 
+/**
+ * Game pixels that cover a browser window at the same scale as the 960×540 view.
+ * A 16:9 window stays 960×540. A wider or taller window shows more of the town
+ * instead of leaving black bars.
+ */
+export function fillView(
+    windowW: number,
+    windowH: number,
+    designW = VIEW_W,
+    designH = VIEW_H
+): { width: number; height: number } {
+    if (!(windowW > 0) || !(windowH > 0)) return { width: designW, height: designH };
+    const scale = Math.min(windowW / designW, windowH / designH);
+    return {
+        width: Math.max(1, Math.round(windowW / scale)),
+        height: Math.max(1, Math.round(windowH / scale)),
+    };
+}
+
 export type TimeOfDay = "afternoon" | "dusk";
 export type Control = "light" | "stop";
 

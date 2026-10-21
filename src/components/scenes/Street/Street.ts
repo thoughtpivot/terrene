@@ -23,7 +23,7 @@ import type { DialogueNPC } from "../../../common/DialogueNPC";
 
 // 4. Scene modules
 import { carGraphic, dumpsterGraphic, groundGraphic, personGraphic, stopSignGraphic, type FigureKind } from "./art";
-import { VIEW_H, VIEW_W, WORLD, buildSceneOne, type City, type StreetLevel, type StreetPack } from "./level";
+import { WORLD, buildSceneOne, fillView, type City, type StreetLevel, type StreetPack } from "./level";
 import {
     FOLLOW_GAP,
     NO_LINES,
@@ -190,7 +190,14 @@ export default class Street extends Scene {
     private hintText!: Text;
     private bannerText!: Text;
     private cardText!: Text;
+    private cashPanel!: ScreenElement;
+    private bottomPanel!: ScreenElement;
     private cardPanel!: ScreenElement;
+    private cashLabel!: ScreenElement;
+    private hintLabel!: ScreenElement;
+    private bannerLabel!: ScreenElement;
+    private cardLabel!: ScreenElement;
+    private panelSize = new WeakMap<ScreenElement, string>();
     private booted = false;
 
     constructor(pack: StreetPack = buildSceneOne()) {
@@ -224,6 +231,11 @@ export default class Street extends Scene {
         this.leaveHd(context.engine);
         console.log("🏰 Street scene deactivated");
     }
+
+    private readonly onResize = (): void => {
+        if (!this.saved) return;
+        this.applyFill(this.engine);
+    };
 
     onPreUpdate(engine: Engine, delta: number): void {
         const dt = Math.min(0.05, delta / 1000);
@@ -926,14 +938,51 @@ export default class Street extends Scene {
         this.hintText = new Text({ text: "", font: small });
         this.bannerText = new Text({ text: "", font: small });
         this.cardText = new Text({ text: "", font });
-        this.add(this.panel(12, 10, 520, 34));
-        this.add(this.panel(12, VIEW_H - 78, 720, 64));
-        this.cardPanel = this.panel(VIEW_W / 2 - 260, VIEW_H / 2 - 28, 520, 48);
+        this.cashPanel = this.panel(0, 0, 1, 1);
+        this.bottomPanel = this.panel(0, 0, 1, 1);
+        this.cardPanel = this.panel(0, 0, 1, 1);
+        this.cashLabel = this.label(this.cashText, 0, 0);
+        this.hintLabel = this.label(this.hintText, 0, 0);
+        this.bannerLabel = this.label(this.bannerText, 0, 0);
+        this.cardLabel = this.label(this.cardText, 0, 0);
+        this.add(this.cashPanel);
+        this.add(this.bottomPanel);
         this.add(this.cardPanel);
-        this.add(this.label(this.cashText, 24, 16));
-        this.add(this.label(this.hintText, 24, VIEW_H - 36));
-        this.add(this.label(this.bannerText, 24, VIEW_H - 62));
-        this.add(this.label(this.cardText, VIEW_W / 2 - 240, VIEW_H / 2 - 14));
+        this.add(this.cashLabel);
+        this.add(this.hintLabel);
+        this.add(this.bannerLabel);
+        this.add(this.cardLabel);
+        const { width, height } = this.engine.screen.resolution;
+        this.layoutHud(width, height);
+    }
+
+    private layoutHud(width: number, height: number): void {
+        if (!this.cashPanel) return;
+        const margin = 12;
+        const cashW = Math.min(560, Math.max(280, width - margin * 2));
+        const bottomW = Math.min(Math.max(720, Math.round(width * 0.62)), Math.max(280, width - margin * 2));
+        this.placePanel(this.cashPanel, margin, 10, cashW, 34);
+        this.placePanel(this.bottomPanel, margin, height - 78, bottomW, 64);
+        this.cashLabel.pos = vec(24, 16);
+        this.hintLabel.pos = vec(24, height - 36);
+        this.bannerLabel.pos = vec(24, height - 62);
+        const cardW = Math.min(520, Math.max(280, width - margin * 2));
+        const cardH = 48;
+        const cardX = Math.max(margin, (width - cardW) / 2);
+        const cardY = Math.max(margin, (height - cardH) / 2);
+        this.placePanel(this.cardPanel, cardX, cardY, cardW, cardH);
+        this.cardLabel.pos = vec(cardX + 20, cardY + 14);
+        this.cardPanel.graphics.opacity = this.cardText.text ? 1 : 0;
+    }
+
+    private placePanel(actor: ScreenElement, x: number, y: number, w: number, h: number): void {
+        actor.pos = vec(x, y);
+        const key = `${w}x${h}`;
+        if (this.panelSize.get(actor) === key) return;
+        this.panelSize.set(actor, key);
+        const opacity = actor.graphics.opacity;
+        actor.graphics.use(new Rectangle({ width: w, height: h, color: Color.fromRGB(27, 23, 20, 0.92) }));
+        actor.graphics.opacity = opacity;
     }
 
     private panel(x: number, y: number, w: number, h: number): ScreenElement {
@@ -976,8 +1025,9 @@ export default class Street extends Scene {
     }
 
     private placeCamera(): void {
-        this.camera.pos.x = clamp(this.player.x, VIEW_W / 2, WORLD - VIEW_W / 2);
-        this.camera.pos.y = clamp(this.player.y, VIEW_H / 2, WORLD - VIEW_H / 2);
+        const { width, height } = this.engine.screen.resolution;
+        this.camera.pos.x = frameAxis(this.player.x, width, WORLD);
+        this.camera.pos.y = frameAxis(this.player.y, height, WORLD);
     }
 
     private prop(x: number, y: number, graphic: ReturnType<typeof dumpsterGraphic>, name: string): Actor {
@@ -999,20 +1049,38 @@ export default class Street extends Scene {
         this.saved = {
             width: screen.resolution.width,
             height: screen.resolution.height,
-            pixelRatio: screen.pixelRatioOverride ?? undefined,
+            pixelRatio: screen.pixelRatioOverride,
             antialiasing: screen.antialiasing,
             snap: engine.snapToPixel,
             background: engine.backgroundColor,
         };
-        screen.resolution = { width: VIEW_W, height: VIEW_H };
         screen.antialiasing = false;
+        screen.pixelRatioOverride = 1;
         engine.snapToPixel = true;
         engine.backgroundColor = Color.fromHex("#1b1714");
         this.physics.config.gravity = vec(0, 0);
+        document.documentElement.classList.add("street-fill");
+        engine.canvas.classList.add("street-fill");
+        this.applyFill(engine);
+        window.addEventListener("resize", this.onResize);
+    }
+
+    /** Resolution matches the window, and the canvas is stretched across it. */
+    private applyFill(engine: Engine): void {
+        const screen = engine.screen;
+        const view = fillView(window.innerWidth, window.innerHeight);
+        screen.resolution = view;
+        screen.viewport = { width: window.innerWidth, height: window.innerHeight };
+        screen.applyResolutionAndViewport();
+        this.layoutHud(view.width, view.height);
+        if (this.booted && this.player) this.placeCamera();
     }
 
     private leaveHd(engine: Engine): void {
         if (!this.saved) return;
+        window.removeEventListener("resize", this.onResize);
+        document.documentElement.classList.remove("street-fill");
+        engine.canvas.classList.remove("street-fill");
         const screen = engine.screen;
         screen.resolution = { width: this.saved.width, height: this.saved.height };
         screen.pixelRatioOverride = this.saved.pixelRatio;
@@ -1020,7 +1088,13 @@ export default class Street extends Scene {
         engine.snapToPixel = this.saved.snap;
         engine.backgroundColor = this.saved.background;
         this.saved = null;
+        window.dispatchEvent(new Event("resize"));
     }
+}
+
+function frameAxis(value: number, view: number, world: number): number {
+    if (view >= world) return world / 2;
+    return clamp(value, view / 2, world - view / 2);
 }
 
 function hudFont(size: number): Font {
