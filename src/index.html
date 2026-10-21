@@ -33,6 +33,22 @@
             image-rendering: crisp-edges;
         }
 
+        /* Street covers the browser. The class is added only while that scene is active. */
+        html.street-fill,
+        html.street-fill body {
+            background-color: #1b1714;
+        }
+
+        canvas.street-fill {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: none !important;
+            max-height: none !important;
+            image-rendering: pixelated !important;
+        }
+
         /* Loading message */
         #loading {
             position: absolute;

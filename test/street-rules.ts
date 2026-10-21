@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildSceneOne } from "../src/components/scenes/Street/level.ts";
+import { buildSceneOne, fillView } from "../src/components/scenes/Street/level.ts";
 import {
     abortHandoff,
     ask,
@@ -138,4 +138,18 @@ test("a crosswalk keeps a car from counting as a hit", () => {
     assert.equal(carHitsPlayer(10, 10, 14, car, [walk]), false);
     assert.equal(carHitsPlayer(10, 10, 14, car, []), true);
     assert.equal(circleHitsRect(100, 100, 14, car), false);
+});
+
+test("the street view fills the window at the 960 by 540 scale", () => {
+    assert.deepEqual(fillView(1920, 1080), { width: 960, height: 540 });
+    assert.deepEqual(fillView(1280, 720), { width: 960, height: 540 });
+    assert.deepEqual(fillView(2560, 1080), { width: 1280, height: 540 });
+    assert.deepEqual(fillView(1440, 900), { width: 960, height: 600 });
+    assert.deepEqual(fillView(800, 600), { width: 960, height: 720 });
+    assert.deepEqual(fillView(0, 0), { width: 960, height: 540 });
+    for (const [w, h] of [[1920, 1080], [2560, 1080], [800, 600], [1000, 800]] as const) {
+        const view = fillView(w, h);
+        assert.ok(Math.abs(view.width / view.height - w / h) < 0.01);
+        assert.ok(view.width >= 960 || view.height >= 540);
+    }
 });
