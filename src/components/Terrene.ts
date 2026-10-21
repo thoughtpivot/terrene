@@ -1,4 +1,12 @@
-import { Color, DisplayMode, Engine, Loader, PointerScope } from "excalibur";
+import {
+    Color,
+    DefaultLoader,
+    DefaultLoaderOptions,
+    DisplayMode,
+    Engine,
+    Loadable,
+    PointerScope,
+} from "excalibur";
 import OkaWorld, { OKA_WORLD_SCENE } from "./scenes/OkaWorld/OkaWorld";
 import OkaWorldTwo, { OKA_WORLD_TWO_SCENE } from "./scenes/OkaWorld/2/OkaWorldTwo";
 import SapWorld, { SAP_WORLD_SCENE } from "./scenes/SapWorld/SapWorld";
@@ -7,6 +15,22 @@ import ZeldaLand from "./scenes/ZeldaLand/ZeldaLand";
 import { ZELDA_CAVE_SCENE, ZELDA_LAND_SCENE } from "./scenes/ZeldaLand/run";
 import WorldOne, { Resources as WorldOneResources } from "./scenes/WorldOne/WorldOne";
 import WorldOneTwo, { WORLD_ONE_TWO_SCENE } from "./scenes/WorldOneTwo/WorldOneTwo";
+
+export class SilentLoader extends DefaultLoader {
+    constructor(loadables?: Loadable<unknown>[] | DefaultLoaderOptions) {
+        super(Array.isArray(loadables) ? { loadables } : loadables);
+    }
+
+    override onDraw(): void {
+        // Suppress Excalibur's startup splash screen and loading spinner.
+    }
+
+    override async onUserAction(): Promise<void> {}
+
+    override async onBeforeLoad(): Promise<void> {}
+
+    override async onAfterLoad(): Promise<void> {}
+}
 
 const WORLD_ONE_SCENE = "worldone";
 const DEFAULT_SCENE = OKA_WORLD_SCENE;
@@ -52,11 +76,17 @@ class Terrene extends Engine {
         });
     }
 
-    initialize(): void {
-        const loader = new Loader([WorldOneResources.Image]);
-        loader.suppressPlayButton = true;
+    override async load(loader: DefaultLoader, hideLoader = false): Promise<void> {
+        const silent = loader instanceof SilentLoader
+            ? loader
+            : new SilentLoader([...loader.resources]);
+        return super.load(silent, hideLoader);
+    }
 
-        this.start(loader).then(() => {
+    initialize(): Promise<void> {
+        const loader = new SilentLoader([WorldOneResources.Image]);
+
+        return this.start(loader).then(() => {
             this.addScene(WORLD_ONE_SCENE, new WorldOne());
             this.addScene(WORLD_ONE_TWO_SCENE, new WorldOneTwo());
             this.addScene(ZELDA_LAND_SCENE, new ZeldaLand());
