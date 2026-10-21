@@ -10,6 +10,7 @@ import {
 import OkaWorld, { OKA_WORLD_SCENE } from "./scenes/OkaWorld/OkaWorld";
 import OkaWorldTwo, { OKA_WORLD_TWO_SCENE } from "./scenes/OkaWorld/2/OkaWorldTwo";
 import SapWorld, { SAP_WORLD_SCENE } from "./scenes/SapWorld/SapWorld";
+import Street, { STREET_SCENE } from "./scenes/Street/Street";
 import ZeldaCave from "./scenes/ZeldaCave/ZeldaCave";
 import ZeldaLand from "./scenes/ZeldaLand/ZeldaLand";
 import { ZELDA_CAVE_SCENE, ZELDA_LAND_SCENE } from "./scenes/ZeldaLand/run";
@@ -36,12 +37,13 @@ const WORLD_ONE_SCENE = "worldone";
 const DEFAULT_SCENE = OKA_WORLD_SCENE;
 
 /** Scenes that can be opened straight from the URL, e.g. /#worldone. An empty or unknown hash opens the default. */
-const ROUTED_SCENES = [OKA_WORLD_SCENE, OKA_WORLD_TWO_SCENE, WORLD_ONE_SCENE, SAP_WORLD_SCENE];
+const ROUTED_SCENES = [OKA_WORLD_SCENE, OKA_WORLD_TWO_SCENE, WORLD_ONE_SCENE, SAP_WORLD_SCENE, STREET_SCENE];
 
 const HASH_ALIASES: Record<string, string> = {
     forestlastsapworld: SAP_WORLD_SCENE,
     sapwell: SAP_WORLD_SCENE,
     sap: SAP_WORLD_SCENE,
+    sceneone: STREET_SCENE,
 };
 
 const SCENE_TITLES: Record<string, string> = {
@@ -49,6 +51,7 @@ const SCENE_TITLES: Record<string, string> = {
     [OKA_WORLD_TWO_SCENE]: "Oka World 2",
     [WORLD_ONE_SCENE]: "World 1-1",
     [SAP_WORLD_SCENE]: "Forest Last Sap World",
+    [STREET_SCENE]: "Street",
 };
 
 function sceneFromHash(): string {
@@ -94,6 +97,7 @@ class Terrene extends Engine {
             this.addScene(OKA_WORLD_SCENE, new OkaWorld());
             this.addScene(OKA_WORLD_TWO_SCENE, new OkaWorldTwo());
             this.addScene(SAP_WORLD_SCENE, new SapWorld());
+            this.addScene(STREET_SCENE, new Street());
             const first = sceneFromHash();
             console.log(first === DEFAULT_SCENE
                 ? `🏰 Engine started, loading ${SCENE_TITLES[first]} as the default scene`
