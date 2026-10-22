@@ -1,14 +1,17 @@
-.room-view,
-.room-view * {
+#heaven-or-hell .room-view,
+#heaven-or-hell .room-view * {
     box-sizing: border-box;
 }
 
-.room-view {
+#heaven-or-hell .room-view {
     --room-ink: var(--ink, #1a1410);
     --room-paper: var(--parchment, #f3e6d0);
-    min-height: 100%;
-    min-height: 100vh;
-    padding: 16px 16px 28px;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    padding: 16px 16px 18px;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -19,26 +22,32 @@
     line-height: 1.35;
 }
 
-.room-banner,
-.room-hud,
-.room-heat,
-.room-note,
-.room-dark,
-.room-hint,
-.room-offer,
-.room-enemy,
-.room-card {
+#heaven-or-hell .room-view > :not(.room-scene) {
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: 100%;
+}
+
+#heaven-or-hell .room-banner,
+#heaven-or-hell .room-hud,
+#heaven-or-hell .room-heat,
+#heaven-or-hell .room-note,
+#heaven-or-hell .room-dark,
+#heaven-or-hell .room-hint,
+#heaven-or-hell .room-offer,
+#heaven-or-hell .room-enemy,
+#heaven-or-hell .room-card {
     background: var(--room-paper);
     color: var(--room-ink);
     border: 3px solid var(--room-ink);
 }
 
-.room-banner {
+#heaven-or-hell .room-banner {
     box-shadow: 6px 6px 0 var(--room-ink);
     padding: 0.75rem 1rem 0.9rem;
 }
 
-.room-title {
+#heaven-or-hell .room-title {
     margin: 0;
     font-size: 2.1rem;
     font-weight: 700;
@@ -46,33 +55,50 @@
     text-transform: uppercase;
 }
 
-.room-prose {
+#heaven-or-hell .room-prose {
     margin: 0.35rem 0 0;
     max-width: 40rem;
 }
 
-.room-scene {
-    border: 4px solid var(--room-ink);
-    background: var(--room-wash, #c4a15a);
+#heaven-or-hell .room-scene {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+    container-type: size;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
     line-height: 0;
 }
 
-.room-svg {
+#heaven-or-hell .room-svg {
     display: block;
-    width: 100%;
+    box-sizing: border-box;
+    width: min(100cqw, calc(100cqh * 800 / 460));
+    max-width: 100%;
+    max-height: 100%;
     height: auto;
+    aspect-ratio: 800 / 460;
+    object-fit: contain;
+    border: 4px solid var(--room-ink);
+    background: var(--room-wash, #c4a15a);
 }
 
-.room-hud,
-.room-heat,
-.room-note,
-.room-dark,
-.room-hint {
+#heaven-or-hell .room-hud,
+#heaven-or-hell .room-heat,
+#heaven-or-hell .room-note,
+#heaven-or-hell .room-dark,
+#heaven-or-hell .room-hint {
     margin: 0;
     padding: 0.45rem 0.7rem;
 }
 
-.room-hud {
+#heaven-or-hell .room-hud {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -80,28 +106,28 @@
     font-weight: 700;
 }
 
-.room-hud p {
+#heaven-or-hell .room-hud p {
     margin: 0;
 }
 
-.room-heat {
+#heaven-or-hell .room-heat {
     font-weight: 700;
     white-space: pre-wrap;
 }
 
-.room-note,
-.room-dark,
-.room-hint {
+#heaven-or-hell .room-note,
+#heaven-or-hell .room-dark,
+#heaven-or-hell .room-hint {
     font-weight: 700;
 }
 
-.room-lamp {
+#heaven-or-hell .room-lamp {
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
-.room-pip {
+#heaven-or-hell .room-pip {
     width: 0.85rem;
     height: 0.85rem;
     border: 3px solid var(--room-ink);
@@ -110,28 +136,32 @@
     display: inline-block;
 }
 
-.room-pip--lit {
+#heaven-or-hell .room-pip--lit {
     background: var(--room-ink);
 }
 
-.room-enemies,
-.room-hand,
-.room-pile-cards,
-.room-nav,
-.room-actions {
+#heaven-or-hell .room-enemies,
+#heaven-or-hell .room-hand,
+#heaven-or-hell .room-pile-cards,
+#heaven-or-hell .room-nav,
+#heaven-or-hell .room-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
     align-items: stretch;
+    max-width: 100%;
+    min-width: 0;
 }
 
-.room-offers {
+#heaven-or-hell .room-offers {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    max-width: 100%;
+    min-width: 0;
 }
 
-.room-offer {
+#heaven-or-hell .room-offer {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -139,31 +169,37 @@
     padding: 8px 10px;
 }
 
-.room-offer-label,
-.room-pile-title,
-.room-enemy p,
-.room-card-name,
-.room-card-cost,
-.room-line,
-.room-card-lock,
-.room-chosen,
-.room-pile-empty {
+#heaven-or-hell .room-offer-label,
+#heaven-or-hell .room-pile-title,
+#heaven-or-hell .room-enemy p,
+#heaven-or-hell .room-card-name,
+#heaven-or-hell .room-card-cost,
+#heaven-or-hell .room-line,
+#heaven-or-hell .room-card-lock,
+#heaven-or-hell .room-chosen,
+#heaven-or-hell .room-pile-empty {
     margin: 0;
 }
 
-.room-pile {
+#heaven-or-hell .room-pile {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    max-width: 100%;
+    min-width: 0;
 }
 
-.room-pile-title {
+#heaven-or-hell .room-pile-title {
     font-size: 1rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 
-.room-view button {
+#heaven-or-hell .room-view > button {
+    align-self: flex-start;
+}
+
+#heaven-or-hell .room-view button {
     font: inherit;
     color: var(--room-ink);
     background: var(--room-paper);
@@ -172,19 +208,20 @@
     cursor: pointer;
 }
 
-.room-view button:focus-visible {
+#heaven-or-hell .room-view button:focus-visible {
     outline: 3px solid var(--room-paper);
     outline-offset: 2px;
 }
 
-.room-view button.room-btn--hell,
-.room-view .room-line--hell {
+#heaven-or-hell .room-view button.room-btn--hell,
+#heaven-or-hell .room-view .room-line--hell {
     background: var(--room-ink);
     color: var(--room-paper);
 }
 
-.room-view button.room-enemy {
+#heaven-or-hell .room-view button.room-enemy {
     width: 13.5rem;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -193,24 +230,25 @@
     padding: 0.55rem 0.7rem 0.65rem;
 }
 
-.room-enemy-name {
+#heaven-or-hell .room-enemy-name {
     font-size: 1.35rem;
     font-weight: 700;
 }
 
-.room-enemy--selected,
-.room-card--chosen {
+#heaven-or-hell .room-enemy--selected,
+#heaven-or-hell .room-card--chosen {
     outline: 4px solid var(--room-paper);
     outline-offset: 3px;
 }
 
-.room-view button.room-enemy:disabled {
+#heaven-or-hell .room-view button.room-enemy:disabled {
     opacity: 0.45;
     cursor: default;
 }
 
-.room-card {
+#heaven-or-hell .room-card {
     width: 12rem;
+    max-width: 100%;
     padding: 0.55rem 0.6rem 0.65rem;
     display: flex;
     flex-direction: column;
@@ -218,37 +256,37 @@
     box-shadow: 4px 4px 0 var(--room-ink);
 }
 
-.room-view button.room-card {
+#heaven-or-hell .room-view button.room-card {
     text-align: left;
     align-items: stretch;
 }
 
-.room-card-head {
+#heaven-or-hell .room-card-head {
     display: flex;
     justify-content: space-between;
     gap: 8px;
     align-items: baseline;
 }
 
-.room-card-name {
+#heaven-or-hell .room-card-name {
     font-size: 1.25rem;
     font-weight: 700;
 }
 
-.room-card-cost {
+#heaven-or-hell .room-card-cost {
     font-weight: 700;
 }
 
-.room-line {
+#heaven-or-hell .room-line {
     font-size: 0.95rem;
     padding: 0.12rem 0.35rem;
 }
 
-.room-line--heaven {
+#heaven-or-hell .room-line--heaven {
     border: 2px solid var(--room-ink);
 }
 
-.room-view button.room-card-pick {
+#heaven-or-hell .room-view button.room-card-pick {
     background: transparent;
     border: 0;
     box-shadow: none;
@@ -260,54 +298,66 @@
     cursor: pointer;
 }
 
-.room-card-actions {
+#heaven-or-hell .room-card-actions {
     display: flex;
     gap: 0.4rem;
 }
 
-.room-view .room-card-actions button {
+#heaven-or-hell .room-view .room-card-actions button {
     flex: 1;
     padding: 0.35rem 0.3rem;
 }
 
-.room-card--unselectable {
+#heaven-or-hell .room-card--unselectable {
     opacity: 0.55;
     box-shadow: none;
 }
 
-.room-card--steady {
+#heaven-or-hell .room-card--steady {
     opacity: 0.4;
 }
 
-.room-card-lock,
-.room-chosen {
+#heaven-or-hell .room-card-lock,
+#heaven-or-hell .room-chosen {
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
 }
 
-.room-card--steady .room-card-name {
+#heaven-or-hell .room-card--steady .room-card-name {
     text-decoration: line-through;
 }
 
-.room-btn--end {
+#heaven-or-hell .room-btn--end {
     font-weight: 700;
     letter-spacing: 0.06em;
 }
 
+@media (max-height: 860px) {
+    #heaven-or-hell .room-view--combat .room-heat,
+    #heaven-or-hell .room-view--combat .room-enemies,
+    #heaven-or-hell .room-view--combat .room-hud,
+    #heaven-or-hell .room-view--combat .room-hand,
+    #heaven-or-hell .room-view--combat .room-hint,
+    #heaven-or-hell .room-view--combat > .room-note,
+    #heaven-or-hell .room-view--combat > button {
+        zoom: 0.8;
+    }
+}
+
 @media (max-width: 640px) {
-    .room-view {
-        padding: 10px 10px 20px;
+    #heaven-or-hell .room-view {
+        padding: 10px 10px 16px;
         font-size: 16px;
     }
 
-    .room-title {
+    #heaven-or-hell .room-title {
         font-size: 1.6rem;
     }
 
-    .room-card,
-    .room-view button.room-enemy {
+    #heaven-or-hell .room-card,
+    #heaven-or-hell .room-view button.room-enemy {
         width: 100%;
     }
 }

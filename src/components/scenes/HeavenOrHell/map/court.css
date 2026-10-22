@@ -1,74 +1,100 @@
-.court-shell {
+#heaven-or-hell .court-shell {
   box-sizing: border-box;
   width: min(100%, 840px);
+  height: 100%;
+  max-height: 100%;
   margin: 0 auto;
-  padding: 14px 16px 24px;
+  padding: 14px 16px 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-self: center;
   background: #f3e6d0;
   color: #1a1410;
   font-family: Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
 }
 
-.court-hud {
+#heaven-or-hell .court-hud {
+  flex: 0 0 auto;
   margin: 0 0 6px;
   font-size: 18px;
   font-weight: 700;
   line-height: 1.4;
 }
 
-.court-log {
+#heaven-or-hell .court-log {
+  flex: 0 0 auto;
   margin: 0 0 10px;
   font-size: 16px;
   font-weight: 600;
   line-height: 1.35;
 }
 
-.court-stage {
-  position: relative;
+#heaven-or-hell .court-fit {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
   width: 100%;
+  container-type: size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#heaven-or-hell .court-stage {
+  position: relative;
+  width: min(100cqw, calc(100cqh * 800 / 520));
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
   aspect-ratio: 800 / 520;
   background: #f3e6d0;
   container-type: size;
 }
 
-.court-svg {
+#heaven-or-hell .court-svg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
   display: block;
   cursor: crosshair;
 }
 
-.court-hit {
+#heaven-or-hell .court-hit {
   fill: #f7efe0;
   stroke: #1a1410;
   stroke-width: 3;
 }
 
-.court-door {
+#heaven-or-hell .court-door {
   cursor: pointer;
 }
 
-.court-door-detour .court-hit {
+#heaven-or-hell .court-door-detour .court-hit {
   fill: #f4e7c8;
 }
 
-.court-door-gate .court-hit {
+#heaven-or-hell .court-door-gate .court-hit {
   fill: #e4d5b6;
 }
 
-.court-door:focus-visible .court-hit {
+#heaven-or-hell .court-door:focus-visible .court-hit {
   stroke-width: 6;
 }
 
-.court-label,
-.court-caption {
+#heaven-or-hell .court-label,
+#heaven-or-hell .court-caption {
   fill: #1a1410;
   stroke: none;
   user-select: none;
 }
 
-.court-token {
+#heaven-or-hell .court-token {
   position: absolute;
   z-index: 3;
   left: 0;
@@ -81,17 +107,17 @@
   text-align: center;
 }
 
-.court-token-instant {
+#heaven-or-hell .court-token-instant {
   transition: none;
 }
 
-.court-token-mark {
+#heaven-or-hell .court-token-mark {
   display: block;
   width: 100%;
   height: auto;
 }
 
-.court-token-name {
+#heaven-or-hell .court-token-name {
   position: absolute;
   left: calc(100% + 4px);
   bottom: 0;
@@ -107,7 +133,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .court-token {
+  #heaven-or-hell .court-token {
     transition: none;
   }
 }

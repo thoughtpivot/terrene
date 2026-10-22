@@ -1,136 +1,146 @@
-.meta-screen {
+#heaven-or-hell .meta-screen {
     box-sizing: border-box;
-    min-height: 100vh;
+    width: min(100%, 720px);
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
     margin: 0 auto;
-    padding: 28px 16px 48px;
-    max-width: 720px;
+    align-self: center;
+    padding: clamp(10px, 2vh, 28px) 16px clamp(12px, 2.4vh, 36px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
     background: #1a1410;
     color: #f3e6d0;
     font-family: Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
 }
 
-.meta-screen *,
-.meta-screen *::before,
-.meta-screen *::after {
+#heaven-or-hell .meta-screen *,
+#heaven-or-hell .meta-screen *::before,
+#heaven-or-hell .meta-screen *::after {
     box-sizing: border-box;
 }
 
-.meta-banner,
-.meta-codex,
-.meta-wicks {
+#heaven-or-hell .meta-banner,
+#heaven-or-hell .meta-codex,
+#heaven-or-hell .meta-wicks {
+    flex: 0 1 auto;
+    min-height: 0;
     background: #f3e6d0;
     color: #1a1410;
     border: 3px solid #1a1410;
     box-shadow: 6px 6px 0 #c6a15b;
 }
 
-.meta-banner {
-    padding: 22px 22px 18px;
+#heaven-or-hell .meta-banner {
+    padding: clamp(12px, 2vh, 22px) clamp(14px, 2vw, 22px) clamp(12px, 1.8vh, 18px);
 }
 
-.meta-kicker {
+#heaven-or-hell .meta-kicker {
     margin: 0 0 6px;
-    font-size: 15px;
+    font-size: clamp(12px, 1.8vh, 15px);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: #8f2d2d;
 }
 
-.meta-title {
+#heaven-or-hell .meta-title {
     margin: 0;
-    font-size: 48px;
+    font-size: clamp(30px, 5.2vh, 48px);
     line-height: 1;
     font-weight: 700;
 }
 
-.meta-result {
-    margin: 14px 0 0;
-    font-size: 22px;
+#heaven-or-hell .meta-result {
+    margin: clamp(8px, 1.4vh, 14px) 0 0;
+    font-size: clamp(16px, 2.4vh, 22px);
     line-height: 1.35;
 }
 
-.meta-codex,
-.meta-wicks {
-    margin-top: 18px;
-    padding: 16px 18px 18px;
+#heaven-or-hell .meta-codex,
+#heaven-or-hell .meta-wicks {
+    margin-top: clamp(8px, 1.6vh, 18px);
+    padding: clamp(10px, 1.6vh, 16px) clamp(12px, 2vw, 18px) clamp(10px, 1.8vh, 18px);
 }
 
-.meta-heading {
-    margin: 0 0 10px;
+#heaven-or-hell .meta-heading {
+    margin: 0 0 8px;
     padding: 0;
-    font-size: 22px;
+    font-size: clamp(16px, 2.4vh, 22px);
     font-weight: 700;
 }
 
-.meta-wicks {
+#heaven-or-hell .meta-wicks {
     border: 3px solid #1a1410;
 }
 
-.meta-codex-list {
+#heaven-or-hell .meta-codex-list {
     margin: 0;
     padding-left: 1.2em;
 }
 
-.meta-codex-list li {
-    margin: 4px 0;
-    font-size: 18px;
+#heaven-or-hell .meta-codex-list li {
+    margin: 2px 0;
+    font-size: clamp(14px, 2vh, 18px);
 }
 
-.meta-empty,
-.meta-note,
-.meta-choice-text {
+#heaven-or-hell .meta-empty,
+#heaven-or-hell .meta-note,
+#heaven-or-hell .meta-choice-text {
     margin: 0;
-    font-size: 17px;
-    line-height: 1.4;
+    font-size: clamp(14px, 1.9vh, 17px);
+    line-height: 1.35;
 }
 
-.meta-note {
-    margin-bottom: 12px;
+#heaven-or-hell .meta-note {
+    margin-bottom: 8px;
 }
 
-.meta-choice {
+#heaven-or-hell .meta-choice {
     display: flex;
     gap: 10px;
     align-items: flex-start;
-    margin-top: 10px;
-    padding: 8px 10px;
+    margin-top: clamp(6px, 1vh, 10px);
+    padding: clamp(6px, 1vh, 8px) 10px;
     background: #fff8ec;
     border: 2px solid #1a1410;
     cursor: pointer;
 }
 
-.meta-radio {
+#heaven-or-hell .meta-radio {
     margin-top: 4px;
     accent-color: #8f2d2d;
 }
 
-.meta-choice-copy {
+#heaven-or-hell .meta-choice-copy {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
-.meta-choice-name {
-    font-size: 18px;
+#heaven-or-hell .meta-choice-name {
+    font-size: clamp(15px, 2vh, 18px);
     font-weight: 700;
 }
 
-.meta-descend {
+#heaven-or-hell .meta-descend {
     display: block;
-    margin-top: 22px;
-    padding: 12px 18px;
+    align-self: flex-start;
+    margin-top: clamp(10px, 2vh, 22px);
+    padding: clamp(8px, 1.4vh, 12px) 18px;
     border: 3px solid #f3e6d0;
     background: #8f2d2d;
     color: #f3e6d0;
     font: inherit;
-    font-size: 20px;
+    font-size: clamp(16px, 2.4vh, 20px);
     font-weight: 700;
     cursor: pointer;
 }
 
-.meta-descend:hover,
-.meta-descend:focus-visible {
+#heaven-or-hell .meta-descend:hover,
+#heaven-or-hell .meta-descend:focus-visible {
     background: #c6a15b;
     color: #1a1410;
     border-color: #c6a15b;
