@@ -1,0 +1,137 @@
+.meta-screen {
+    box-sizing: border-box;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: 28px 16px 48px;
+    max-width: 720px;
+    background: #1a1410;
+    color: #f3e6d0;
+    font-family: Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+}
+
+.meta-screen *,
+.meta-screen *::before,
+.meta-screen *::after {
+    box-sizing: border-box;
+}
+
+.meta-banner,
+.meta-codex,
+.meta-wicks {
+    background: #f3e6d0;
+    color: #1a1410;
+    border: 3px solid #1a1410;
+    box-shadow: 6px 6px 0 #c6a15b;
+}
+
+.meta-banner {
+    padding: 22px 22px 18px;
+}
+
+.meta-kicker {
+    margin: 0 0 6px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8f2d2d;
+}
+
+.meta-title {
+    margin: 0;
+    font-size: 48px;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.meta-result {
+    margin: 14px 0 0;
+    font-size: 22px;
+    line-height: 1.35;
+}
+
+.meta-codex,
+.meta-wicks {
+    margin-top: 18px;
+    padding: 16px 18px 18px;
+}
+
+.meta-heading {
+    margin: 0 0 10px;
+    padding: 0;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.meta-wicks {
+    border: 3px solid #1a1410;
+}
+
+.meta-codex-list {
+    margin: 0;
+    padding-left: 1.2em;
+}
+
+.meta-codex-list li {
+    margin: 4px 0;
+    font-size: 18px;
+}
+
+.meta-empty,
+.meta-note,
+.meta-choice-text {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.4;
+}
+
+.meta-note {
+    margin-bottom: 12px;
+}
+
+.meta-choice {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: #fff8ec;
+    border: 2px solid #1a1410;
+    cursor: pointer;
+}
+
+.meta-radio {
+    margin-top: 4px;
+    accent-color: #8f2d2d;
+}
+
+.meta-choice-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.meta-choice-name {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.meta-descend {
+    display: block;
+    margin-top: 22px;
+    padding: 12px 18px;
+    border: 3px solid #f3e6d0;
+    background: #8f2d2d;
+    color: #f3e6d0;
+    font: inherit;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.meta-descend:hover,
+.meta-descend:focus-visible {
+    background: #c6a15b;
+    color: #1a1410;
+    border-color: #c6a15b;
+}

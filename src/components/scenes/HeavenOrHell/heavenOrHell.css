@@ -1,0 +1,16 @@
+.hoh-root {
+    --parchment: #f3e6d0;
+    --ink: #1a1410;
+    --gold: #c6a15b;
+    --tartarus: #8f2d2d;
+    --bg: #1a1410;
+    --fg: #f3e6d0;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    overflow: auto;
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+}

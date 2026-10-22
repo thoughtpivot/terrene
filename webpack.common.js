@@ -20,6 +20,11 @@ module.exports = {
         type: "asset/resource",
       },
       {
+        test: /\.css$/,
+        type: "javascript/auto",
+        use: [path.resolve(__dirname, "src/components/scenes/HeavenOrHell/cssInjectLoader.js")],
+      },
+      {
         test: /\.js$/,
         use: ["source-map-loader"],
         exclude: [path.resolve(__dirname, "node_modules/excalibur")],
@@ -43,6 +48,9 @@ module.exports = {
   },
   resolve: {
     extensions: [".ts", ".js"],
+    extensionAlias: {
+      ".js": [".ts", ".js"],
+    },
   },
   optimization: {
     splitChunks: {

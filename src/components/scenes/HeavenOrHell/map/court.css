@@ -1,0 +1,113 @@
+.court-shell {
+  box-sizing: border-box;
+  width: min(100%, 840px);
+  margin: 0 auto;
+  padding: 14px 16px 24px;
+  background: #f3e6d0;
+  color: #1a1410;
+  font-family: Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+}
+
+.court-hud {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.court-log {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.court-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 800 / 520;
+  background: #f3e6d0;
+  container-type: size;
+}
+
+.court-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+.court-hit {
+  fill: #f7efe0;
+  stroke: #1a1410;
+  stroke-width: 3;
+}
+
+.court-door {
+  cursor: pointer;
+}
+
+.court-door-detour .court-hit {
+  fill: #f4e7c8;
+}
+
+.court-door-gate .court-hit {
+  fill: #e4d5b6;
+}
+
+.court-door:focus-visible .court-hit {
+  stroke-width: 6;
+}
+
+.court-label,
+.court-caption {
+  fill: #1a1410;
+  stroke: none;
+  user-select: none;
+}
+
+.court-token {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  top: 0;
+  width: 46px;
+  width: 6.5cqw;
+  transform: translate(-50%, -100%);
+  transition: left 380ms linear, top 380ms linear;
+  pointer-events: none;
+  text-align: center;
+}
+
+.court-token-instant {
+  transition: none;
+}
+
+.court-token-mark {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.court-token-name {
+  position: absolute;
+  left: calc(100% + 4px);
+  bottom: 0;
+  padding: 0 4px 1px;
+  border: 2px solid #1a1410;
+  background: #f7efe0;
+  color: #1a1410;
+  font-size: 13px;
+  font-size: 1.8cqw;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .court-token {
+    transition: none;
+  }
+}
