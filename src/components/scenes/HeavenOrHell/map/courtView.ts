@@ -400,6 +400,9 @@ export function renderCourt(root: HTMLElement, run: RunState, onIntent: (intent:
   if (gateWasAcknowledged(run) && last.trim()) log.textContent = last;
   else log.hidden = true;
 
+  const fit = document.createElement("div");
+  fit.className = "court-fit";
+
   const stage = document.createElement("div");
   stage.className = "court-stage";
 
@@ -420,7 +423,8 @@ export function renderCourt(root: HTMLElement, run: RunState, onIntent: (intent:
   token.append(name);
 
   stage.append(svg, token);
-  shell.append(hud, log, stage);
+  fit.append(stage);
+  shell.append(hud, log, fit);
   root.append(shell);
   tokenEl = token;
   paint(false);
