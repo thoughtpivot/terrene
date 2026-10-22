@@ -334,14 +334,16 @@
     letter-spacing: 0.06em;
 }
 
-#heaven-or-hell .room-view--combat .room-heat,
-#heaven-or-hell .room-view--combat .room-enemies,
-#heaven-or-hell .room-view--combat .room-hud,
-#heaven-or-hell .room-view--combat .room-hand,
-#heaven-or-hell .room-view--combat .room-hint,
-#heaven-or-hell .room-view--combat > .room-note,
-#heaven-or-hell .room-view--combat > button {
-    zoom: min(1, calc(100vh / 900));
+@media (max-height: 860px) {
+    #heaven-or-hell .room-view--combat .room-heat,
+    #heaven-or-hell .room-view--combat .room-enemies,
+    #heaven-or-hell .room-view--combat .room-hud,
+    #heaven-or-hell .room-view--combat .room-hand,
+    #heaven-or-hell .room-view--combat .room-hint,
+    #heaven-or-hell .room-view--combat > .room-note,
+    #heaven-or-hell .room-view--combat > button {
+        zoom: 0.8;
+    }
 }
 
 @media (max-width: 640px) {
