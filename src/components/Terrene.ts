@@ -6,6 +6,7 @@ import {
     Engine,
     Loadable,
     PointerScope,
+    Scene,
 } from "excalibur";
 import OkaWorld, { OKA_WORLD_SCENE } from "./scenes/OkaWorld/OkaWorld";
 import OkaWorldTwo, { OKA_WORLD_TWO_SCENE } from "./scenes/OkaWorld/2/OkaWorldTwo";
@@ -99,25 +100,70 @@ class Terrene extends Engine {
     }
 
     initialize(): Promise<void> {
-        const loader = new SilentLoader([WorldOneResources.Image]);
+        const first = sceneFromHash();
+        // Heaven Or Hell is a DOM scene. Waiting on World 1-1 art here left
+        // "Loading Terrene..." up forever when that sheet stalled, and the hash
+        // scene never mounted.
+        const blockOnWorldOne = first === WORLD_ONE_SCENE;
+        const loader = new SilentLoader(blockOnWorldOne ? [WorldOneResources.Image] : []);
+        if (!blockOnWorldOne) {
+            void WorldOneResources.Image.load().catch((error: unknown) => {
+                console.error(error);
+            });
+        }
 
         return this.start(loader).then(() => {
-            this.addScene(WORLD_ONE_SCENE, new WorldOne());
-            this.addScene(WORLD_ONE_TWO_SCENE, new WorldOneTwo());
-            this.addScene(ZELDA_LAND_SCENE, new ZeldaLand());
-            this.addScene(ZELDA_CAVE_SCENE, new ZeldaCave());
-            this.addScene(OKA_WORLD_SCENE, new OkaWorld());
-            this.addScene(OKA_WORLD_TWO_SCENE, new OkaWorldTwo());
-            this.addScene(SAP_WORLD_SCENE, new SapWorld());
-            this.addScene(STREET_SCENE, new Street());
-            this.addScene(HEAVEN_OR_HELL_SCENE, new HeavenOrHell());
-            const first = sceneFromHash();
             console.log(first === DEFAULT_SCENE
                 ? `🏰 Engine started, loading ${SCENE_TITLES[first]} as the default scene`
                 : `🏰 Engine started, opening ${SCENE_TITLES[first]} from the URL`);
-            this.goToScene(first);
-            window.addEventListener("hashchange", () => this.goToScene(sceneFromHash()));
+
+            if (first === HEAVEN_OR_HELL_SCENE) {
+                this.addScene(HEAVEN_OR_HELL_SCENE, new HeavenOrHell());
+                void this.goToScene(first).catch((error: unknown) => console.error(error));
+            }
+
+            this.addScenes(first === HEAVEN_OR_HELL_SCENE ? HEAVEN_OR_HELL_SCENE : undefined);
+
+            if (first !== HEAVEN_OR_HELL_SCENE) {
+                void this.goToScene(first).catch((error: unknown) => console.error(error));
+            }
+
+            window.addEventListener("hashchange", () => {
+                const next = sceneFromHash();
+                const go = () => {
+                    void this.goToScene(next).catch((error: unknown) => console.error(error));
+                };
+                if (next === WORLD_ONE_SCENE && !WorldOneResources.Image.isLoaded()) {
+                    void WorldOneResources.Image.load().then(go, (error: unknown) => {
+                        console.error(error);
+                        go();
+                    });
+                    return;
+                }
+                go();
+            });
         });
+    }
+
+    /** Register every routed scene. A constructor failure must not block the scene already open. */
+    private addScenes(skip?: string): void {
+        const add = (name: string, create: () => Scene) => {
+            if (name === skip) return;
+            try {
+                this.addScene(name, create());
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        add(WORLD_ONE_SCENE, () => new WorldOne());
+        add(WORLD_ONE_TWO_SCENE, () => new WorldOneTwo());
+        add(ZELDA_LAND_SCENE, () => new ZeldaLand());
+        add(ZELDA_CAVE_SCENE, () => new ZeldaCave());
+        add(OKA_WORLD_SCENE, () => new OkaWorld());
+        add(OKA_WORLD_TWO_SCENE, () => new OkaWorldTwo());
+        add(SAP_WORLD_SCENE, () => new SapWorld());
+        add(STREET_SCENE, () => new Street());
+        add(HEAVEN_OR_HELL_SCENE, () => new HeavenOrHell());
     }
 }
 

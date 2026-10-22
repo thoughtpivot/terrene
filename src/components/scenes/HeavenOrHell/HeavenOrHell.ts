@@ -32,11 +32,18 @@ export default class HeavenOrHell extends Scene {
 
     onActivate(context: { engine: Engine }): void {
         void context;
+        // Drop the page loader as soon as this scene is current. Terrene only
+        // removes it after initialize() fulfills, which never happens if boot throws.
+        document.getElementById("loading")?.remove();
         if (this.hostTitle === null) {
             this.hostTitle = document.title;
         }
         document.title = TITLE;
-        this.mountRoot();
+        try {
+            this.mountRoot();
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     onDeactivate(context: { engine: Engine }): void {

@@ -1,11 +1,9 @@
 import Terrene from "./components/Terrene";
 
 const game = new Terrene();
-game.initialize().then(() => {
-    // Remove loading message
-    const loadingEl = document.getElementById("loading");
-    if (loadingEl) {
-        loadingEl.remove();
-    }
+const hideLoading = () => document.getElementById("loading")?.remove();
+game.initialize().then(hideLoading, (error: unknown) => {
+    console.error(error);
+    hideLoading();
 });
 
