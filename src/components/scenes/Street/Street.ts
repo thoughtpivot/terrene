@@ -22,7 +22,7 @@ import type { ChatMessage } from "../../../common/ChatSystem";
 import type { DialogueNPC } from "../../../common/DialogueNPC";
 
 // 4. Scene modules
-import { carGraphic, dumpsterGraphic, groundGraphic, personGraphic, stopSignGraphic, type FigureKind } from "./art";
+import { carGraphic, crumbGraphic, dumpsterGraphic, groundGraphic, personGraphic, stopSignGraphic, type FigureKind } from "./art";
 import { WORLD, buildSceneOne, fillView, type City, type StreetLevel, type StreetPack } from "./level";
 import {
     FOLLOW_GAP,
@@ -36,6 +36,7 @@ import {
     approach,
     ask,
     beginHandoff,
+    carryAim,
     carHitsPlayer,
     circleHitsRect,
     clamp,
@@ -44,6 +45,7 @@ import {
     facingOf,
     freshSale,
     gateClosed,
+    layTrail,
     lightPhase,
     pointInRect,
     sees,
@@ -67,7 +69,9 @@ const Resources = {
 export { Resources };
 
 const CAR_COLORS = ["#c23b3b", "#3c6eae", "#e6d36a", "#f7f4ee", "#2c2c30"];
+const COP_COAT = "#3c5f92";
 const PED_SPEED = 62;
+const PATROL_SPEED = 58;
 
 interface SavedScreen {
     width: number;
@@ -93,7 +97,7 @@ interface Npc extends Body {
     homeX: number;
     homeY: number;
     homeDir: Dir;
-    state: "sit" | "follow" | "hold" | "home" | "chew";
+    state: "sit" | "follow" | "hold" | "home" | "chew" | "carry" | "fed";
 }
 
 interface Ped extends Body {
@@ -105,14 +109,21 @@ interface Ped extends Body {
 }
 
 interface Cop extends Body {
+    kind: "patrol" | "called";
     sprintLeft: number;
     recoverLeft: number;
-    mode: "chase" | "search" | "leave";
+    mode: "patrol" | "trail" | "chase" | "search" | "leave";
     searchLeft: number;
     lastX: number;
     lastY: number;
     leaveX: number;
     leaveY: number;
+    pts: Vec[];
+    lengths: number[];
+    total: number;
+    cursor: number;
+    crumbs: Vec[];
+    crumb: number;
 }
 
 interface Ride {
@@ -186,6 +197,7 @@ export default class Street extends Scene {
     private bannerLeft = 0;
     private callSpot: Vec | null = null;
     private hadHeat = false;
+    private crumbActors: Actor[] = [];
     private cashText!: Text;
     private hintText!: Text;
     private bannerText!: Text;
@@ -280,6 +292,7 @@ export default class Street extends Scene {
         this.bannerLeft = 4.2;
         this.callSpot = null;
         this.hadHeat = false;
+        this.crumbActors = [];
 
         const ground = new Actor({
             name: "Ground",
@@ -384,6 +397,13 @@ export default class Street extends Scene {
             this.paint(ped, "walk", ped.coat);
             this.peds.push(ped);
             this.add(actor);
+        }
+
+        for (const beat of this.city.beats) {
+            const { lengths, total } = measure(beat.pts);
+            const cursor = beat.offset * total;
+            const at = pointOn(beat.pts, lengths, cursor);
+            this.cops.push(this.makeCop(at.x, at.y, "patrol", "patrol", beat.pts, lengths, total, cursor));
         }
 
         this.city.lanes.forEach((lane, laneIndex) => {
@@ -538,37 +558,50 @@ export default class Street extends Scene {
 
     private updateFollower(dt: number): void {
         for (const npc of this.npcs) {
-            if (npc.state === "sit" || npc.state === "chew" || npc.state === "hold") {
-                if (npc.state === "sit") {
+            if (npc.state === "sit" || npc.state === "chew" || npc.state === "hold" || npc.state === "fed") {
+                if (npc.state === "sit" || npc.state === "fed") {
                     npc.x = npc.homeX;
                     npc.y = npc.homeY;
                     npc.dir = npc.homeDir;
                 }
-                this.sync(npc, npc.state === "chew" ? "chew" : npc.state === "sit" ? "sit" : "walk", npc.coat);
+                const kind: FigureKind = npc.state === "chew" || npc.state === "fed" ? "chew" : npc.state === "sit" ? "sit" : "walk";
+                this.sync(npc, kind, npc.coat);
                 continue;
             }
-            const target = npc.state === "home"
-                ? { x: npc.homeX, y: npc.homeY }
-                : behind(this.player, FOLLOW_GAP);
+            const home = { x: npc.homeX, y: npc.homeY };
+            const threats = npc.state === "carry" ? this.watching(npc) : [];
+            const target = npc.state === "carry"
+                ? carryAim({ x: npc.x, y: npc.y }, home, threats)
+                : npc.state === "home"
+                    ? home
+                    : behind(this.player, FOLLOW_GAP);
             const dx = target.x - npc.x;
             const dy = target.y - npc.y;
             const dist = Math.hypot(dx, dy);
-            if (npc.state === "home" && dist < 8) {
-                npc.state = "sit";
+            const homeDist = Math.hypot(home.x - npc.x, home.y - npc.y);
+            if ((npc.state === "home" || npc.state === "carry") && homeDist < 10 && threats.length === 0) {
+                npc.state = npc.state === "carry" ? "fed" : "sit";
                 npc.x = npc.homeX;
                 npc.y = npc.homeY;
                 npc.dir = npc.homeDir;
-                this.sync(npc, "sit", npc.coat);
+                this.sync(npc, npc.state === "fed" ? "chew" : "sit", npc.coat);
                 continue;
             }
-            const speed = npc.state === "follow" ? Math.max(PLAYER_SPRINT, 200) : PLAYER_WALK;
+            const speed = npc.state === "follow" ? Math.max(PLAYER_SPRINT, 200) : npc.state === "carry" ? 74 : PLAYER_WALK;
             const step = dist < 1 ? 0 : Math.min(dist, speed * dt);
             const moved = slide(npc, dist < 1 ? 0 : (dx / dist) * step, dist < 1 ? 0 : (dy / dist) * step, 12, this.solids(true));
             npc.x = moved.x;
             npc.y = moved.y;
             if (step > 0) npc.dir = facingOf(dx, dy, npc.dir);
-            this.sync(npc, "walk", npc.coat);
+            this.sync(npc, npc.state === "carry" ? "carry" : "walk", npc.coat);
         }
+    }
+
+    /** Cops with a line of sight on someone still holding the squares. */
+    private watching(npc: Npc): Vec[] {
+        return this.cops
+            .filter((cop) => sees(cop.x, cop.y, npc.x, npc.y, this.level.copSight, this.city.buildings))
+            .map((cop) => ({ x: cop.x, y: cop.y }));
     }
 
     private updatePeds(dt: number): void {
@@ -642,7 +675,12 @@ export default class Street extends Scene {
             this.say(`$${this.level.price}. They tear the box open.`);
             if (prevTimer === null && this.sale.policeIn !== null) this.markCall();
         }
-        if (this.sale.note === "free") this.say("They're chewing. You can go.");
+        if (this.sale.note === "free") {
+            const id = this.sale.sold[this.sale.sold.length - 1];
+            const npc = this.npcById(id);
+            if (npc && npc.state === "chew") npc.state = "carry";
+            this.say("They head home with the squares.");
+        }
         if (!prevHeat && this.sale.heat) this.spawnPolice();
         if (this.sale.money >= this.level.goal && this.sale.phase === "idle") {
             this.mode = "won";
@@ -652,13 +690,19 @@ export default class Street extends Scene {
     }
 
     private updateCops(dt: number): void {
+        this.spotCarriers();
         for (const cop of [...this.cops]) {
+            if (cop.mode === "patrol") {
+                this.walkBeat(cop, dt);
+                continue;
+            }
             const seen = !this.hidden && sees(cop.x, cop.y, this.player.x, this.player.y, this.level.copSight, this.city.buildings);
-            if (seen) {
+            if (seen && (cop.mode === "trail" || cop.mode === "search" || cop.mode === "chase")) {
                 cop.lastX = this.player.x;
                 cop.lastY = this.player.y;
                 cop.mode = "chase";
             }
+            if (cop.mode === "trail") this.advanceTrail(cop);
             if (cop.mode === "chase" && !seen && Math.hypot(cop.x - cop.lastX, cop.y - cop.lastY) < 18) {
                 cop.mode = "search";
                 cop.searchLeft = 4.2;
@@ -666,38 +710,24 @@ export default class Street extends Scene {
             if (cop.mode === "search") {
                 cop.searchLeft -= dt;
                 if (seen) cop.mode = "chase";
-                else if (cop.searchLeft <= 0) cop.mode = "leave";
+                else if (cop.searchLeft <= 0) {
+                    if (cop.kind === "patrol") cop.mode = "patrol";
+                    else cop.mode = "leave";
+                }
             }
-            const target = cop.mode === "leave"
-                ? { x: cop.leaveX, y: cop.leaveY }
-                : cop.mode === "search"
-                    ? { x: cop.lastX + Math.sin(cop.searchLeft * 3) * 18, y: cop.lastY }
-                    : { x: cop.lastX, y: cop.lastY };
+            const target = this.copTarget(cop);
             let speed = this.level.policeWalk;
-            if (cop.mode !== "leave" && cop.sprintLeft > 0) {
+            if (cop.mode === "chase" && cop.sprintLeft > 0) {
                 speed = this.level.policeSprint;
                 cop.sprintLeft -= dt;
                 if (cop.sprintLeft <= 0) cop.recoverLeft = this.level.policeRecover;
-            } else {
+            } else if (cop.mode === "chase") {
                 cop.recoverLeft -= dt;
                 if (cop.recoverLeft <= 0) cop.sprintLeft = this.level.policeSprintTime;
             }
-            const dx = target.x - cop.x;
-            const dy = target.y - cop.y;
-            const dist = Math.hypot(dx, dy);
-            const step = dist < 1 ? 0 : Math.min(dist, speed * dt);
-            const moved = slide(
-                cop,
-                dist < 1 ? 0 : (dx / dist) * step,
-                dist < 1 ? 0 : (dy / dist) * step,
-                12,
-                this.solids(true)
-            );
-            cop.x = clamp(moved.x, 16, WORLD - 16);
-            cop.y = clamp(moved.y, 16, WORLD - 16);
-            if (step > 0) cop.dir = facingOf(dx, dy, cop.dir);
-            this.sync(cop, "cop", "#243456");
-            if (this.hidden && this.hideIndex >= 0) {
+            this.stepCop(cop, target, speed, dt);
+            const alert = cop.mode === "chase" || cop.mode === "trail" || cop.mode === "search";
+            if (alert && this.hidden && this.hideIndex >= 0) {
                 const dump = this.city.dumpsters[this.hideIndex];
                 const cx = dump.x + dump.w / 2;
                 const cy = dump.y + dump.h / 2;
@@ -705,7 +735,7 @@ export default class Street extends Scene {
                     this.fail("arrest");
                     return;
                 }
-            } else if (Math.hypot(cop.x - this.player.x, cop.y - this.player.y) < 22) {
+            } else if (alert && Math.hypot(cop.x - this.player.x, cop.y - this.player.y) < 22) {
                 this.fail("arrest");
                 return;
             }
@@ -714,11 +744,155 @@ export default class Street extends Scene {
                 this.cops = this.cops.filter((other) => other !== cop);
             }
         }
-        if (this.hadHeat && this.cops.length === 0) {
+        if (!this.cops.some((cop) => cop.mode === "trail")) this.clearCrumbs();
+        if (this.hadHeat && !this.cops.some((cop) => cop.kind === "called")) {
             this.sale = clearHeat(this.sale);
             this.hadHeat = false;
             this.say("They gave up.");
         }
+    }
+
+    private walkBeat(cop: Cop, dt: number): void {
+        if (cop.total <= 0) return;
+        const at = pointOn(cop.pts, cop.lengths, cop.cursor);
+        if (Math.hypot(cop.x - at.x, cop.y - at.y) > 22) {
+            this.stepCop(cop, at, PATROL_SPEED, dt);
+            return;
+        }
+        cop.cursor = (cop.cursor + PATROL_SPEED * dt) % cop.total;
+        const next = pointOn(cop.pts, cop.lengths, cop.cursor);
+        cop.x = next.x;
+        cop.y = next.y;
+        cop.dir = next.dir;
+        this.sync(cop, "cop", COP_COAT);
+    }
+
+    private advanceTrail(cop: Cop): void {
+        if (cop.crumbs.length === 0) {
+            cop.mode = "search";
+            cop.searchLeft = 4.2;
+            return;
+        }
+        while (cop.crumb < cop.crumbs.length - 1 && Math.hypot(cop.x - cop.crumbs[cop.crumb].x, cop.y - cop.crumbs[cop.crumb].y) < 16) {
+            cop.crumb += 1;
+        }
+        const last = cop.crumbs[cop.crumbs.length - 1];
+        if (cop.crumb >= cop.crumbs.length - 1 && Math.hypot(cop.x - last.x, cop.y - last.y) < 18) {
+            cop.mode = "search";
+            cop.searchLeft = 4.2;
+        }
+    }
+
+    private copTarget(cop: Cop): Vec {
+        if (cop.mode === "leave") return { x: cop.leaveX, y: cop.leaveY };
+        if (cop.mode === "search") return { x: cop.lastX + Math.sin(cop.searchLeft * 3) * 18, y: cop.lastY };
+        if (cop.mode === "trail" && cop.crumbs.length > 0) return cop.crumbs[Math.min(cop.crumb, cop.crumbs.length - 1)];
+        return { x: cop.lastX, y: cop.lastY };
+    }
+
+    private stepCop(cop: Cop, target: Vec, speed: number, dt: number): void {
+        const dx = target.x - cop.x;
+        const dy = target.y - cop.y;
+        const dist = Math.hypot(dx, dy);
+        const step = dist < 1 ? 0 : Math.min(dist, speed * dt);
+        const moved = slide(
+            cop,
+            dist < 1 ? 0 : (dx / dist) * step,
+            dist < 1 ? 0 : (dy / dist) * step,
+            12,
+            this.solids(true)
+        );
+        cop.x = clamp(moved.x, 16, WORLD - 16);
+        cop.y = clamp(moved.y, 16, WORLD - 16);
+        if (step > 0) cop.dir = facingOf(dx, dy, cop.dir);
+        this.sync(cop, "cop", COP_COAT);
+    }
+
+    private spotCarriers(): void {
+        for (const npc of this.npcs) {
+            if (npc.state !== "carry") continue;
+            for (const cop of this.cops) {
+                if (cop.mode !== "patrol") continue;
+                if (!sees(cop.x, cop.y, npc.x, npc.y, this.level.copSight, this.city.buildings)) continue;
+                cop.crumbs = layTrail({ x: npc.x, y: npc.y }, { x: this.player.x, y: this.player.y });
+                cop.crumb = 0;
+                cop.lastX = this.player.x;
+                cop.lastY = this.player.y;
+                cop.mode = "trail";
+                this.showCrumbs(cop.crumbs);
+                this.say("A cop saw the squares. That trail leads to you.");
+            }
+        }
+    }
+
+    private showCrumbs(crumbs: Vec[]): void {
+        this.clearCrumbs();
+        this.crumbActors = crumbs.map((crumb) => {
+            const actor = new Actor({
+                name: "Trail",
+                pos: vec(crumb.x, crumb.y),
+                anchor: vec(0.5, 0.5),
+                z: 1,
+                collisionType: CollisionType.PreventCollision,
+            });
+            actor.body.useGravity = false;
+            actor.graphics.use(crumbGraphic().clone());
+            this.add(actor);
+            return actor;
+        });
+    }
+
+    private clearCrumbs(): void {
+        for (const actor of this.crumbActors) actor.kill();
+        this.crumbActors = [];
+    }
+
+    private makeCop(
+        x: number,
+        y: number,
+        kind: Cop["kind"],
+        mode: Cop["mode"],
+        pts: Vec[],
+        lengths: number[],
+        total: number,
+        cursor: number
+    ): Cop {
+        const actor = new Actor({
+            name: kind === "patrol" ? "Patrol" : "Police",
+            pos: vec(x, y),
+            width: 28,
+            height: 28,
+            anchor: vec(0.5, 0.5),
+            collisionType: CollisionType.PreventCollision,
+            z: y,
+        });
+        actor.body.useGravity = false;
+        const cop: Cop = {
+            actor,
+            x,
+            y,
+            dir: "s",
+            look: "",
+            kind,
+            sprintLeft: this.level.policeSprintTime,
+            recoverLeft: 0,
+            mode,
+            searchLeft: 0,
+            lastX: x,
+            lastY: y,
+            leaveX: x,
+            leaveY: y,
+            pts,
+            lengths,
+            total,
+            cursor,
+            crumbs: [],
+            crumb: 0,
+        };
+        this.paint(cop, "cop", COP_COAT);
+        this.cops.push(cop);
+        this.add(actor);
+        return cop;
     }
 
     private spawnPolice(): void {
@@ -730,34 +904,11 @@ export default class Street extends Scene {
             { x: WORLD - 36, y: clamp(spot.y, 40, WORLD - 40) },
         ].sort((a, b) => (a.x - spot.x) ** 2 + (a.y - spot.y) ** 2 - ((b.x - spot.x) ** 2 + (b.y - spot.y) ** 2));
         edges.slice(0, 2).forEach((edge, index) => {
-            const actor = new Actor({
-                name: "Police",
-                pos: vec(edge.x, edge.y),
-                width: 28,
-                height: 28,
-                anchor: vec(0.5, 0.5),
-                collisionType: CollisionType.PreventCollision,
-                z: edge.y,
-            });
-            actor.body.useGravity = false;
-            const cop: Cop = {
-                actor,
-                x: edge.x,
-                y: edge.y,
-                dir: "s",
-                look: "",
-                sprintLeft: this.level.policeSprintTime,
-                recoverLeft: 0,
-                mode: "chase",
-                searchLeft: 0,
-                lastX: spot.x + index * 12,
-                lastY: spot.y,
-                leaveX: edge.x,
-                leaveY: edge.y,
-            };
-            this.paint(cop, "cop", "#243456");
-            this.cops.push(cop);
-            this.add(actor);
+            const cop = this.makeCop(edge.x, edge.y, "called", "chase", [], [], 0, 0);
+            cop.lastX = spot.x + index * 12;
+            cop.lastY = spot.y;
+            cop.leaveX = edge.x;
+            cop.leaveY = edge.y;
         });
         this.hadHeat = true;
         this.say("Police on the block.");
@@ -810,7 +961,7 @@ export default class Street extends Scene {
 
     private sendHome(id: number | null): void {
         const npc = this.npcById(id);
-        if (!npc || npc.state === "chew") return;
+        if (!npc || npc.state === "chew" || npc.state === "carry" || npc.state === "fed") return;
         npc.state = "home";
     }
 
@@ -926,8 +1077,9 @@ export default class Street extends Scene {
         if (this.sale.phase === "follow") return "E  sell    Q  send them back";
         if (this.nearestSeat()) return "E  ask";
         if (this.nearestDump(54) >= 0) return "E  hide in the dumpster";
+        if (this.cops.some((cop) => cop.mode === "trail")) return "A cop has a trail on you.";
         if (this.sale.policeIn !== null) return "Someone is calling.";
-        if (this.sale.heat) return "Police are looking.";
+        if (this.sale.heat || this.cops.some((cop) => cop.kind === "patrol" && cop.mode === "chase")) return "Police are looking.";
         return "Shift  sprint";
     }
 
