@@ -9,7 +9,6 @@ dist/
 /*.js.map
 /main.ts
 /index.html
-!/index.html
 /*]
 
 # Logs

@@ -49,9 +49,9 @@ export function renderMeta(root: HTMLElement, state: GameState, onIntent: (inten
         codex.append(list);
     }
 
-    const wicks = document.createElement("fieldset");
+    const wicks = document.createElement("section");
     wicks.className = "meta-wicks";
-    const legend = document.createElement("legend");
+    const legend = document.createElement("h2");
     legend.className = "meta-heading";
     legend.textContent = "Wicks";
     wicks.append(legend);

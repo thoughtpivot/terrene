@@ -19,7 +19,7 @@ let selectedHandId: string | null = null;
 let pendingHint = "";
 
 /**
- * Mirrors enemyHit in src/core/combat.ts.
+ * Mirrors enemyHit in src/components/scenes/HeavenOrHell/core/combat.ts.
  * threatened = max(0, intent + ash + 2 * crack - guard)
  */
 function enemyHit(intent: number, ash: number, crack: number, guard: number): number {
@@ -27,9 +27,10 @@ function enemyHit(intent: number, ash: number, crack: number, guard: number): nu
 }
 
 function shownAmount(base: number, card: CardInstance, side: Side): number {
-    const sideBonus = side === "heaven" ? card.heavenBonus : card.hellBonus;
-    const clean = side === "heaven" && card.cleanWick ? 1 : 0;
-    return base + sideBonus + card.combatBonus + clean;
+    if (side === "heaven") {
+        return Math.trunc(base + card.heavenBonus + card.combatBonus + (card.cleanWick ? 1 : 0));
+    }
+    return Math.trunc(base + card.hellBonus + card.combatBonus);
 }
 
 function effectPhrase(effect: Effect, card: CardInstance, side: Side): string {
