@@ -47,77 +47,88 @@ function roundBox(
     outline: string
 ): void {
     ctx.fillStyle = outline;
-    ctx.fillRect(x - 2, y - 2, w + 4, h + 4);
+    ctx.fillRect(x - 3, y - 3, w + 6, h + 6);
     ctx.fillStyle = fill;
     ctx.fillRect(x, y, w, h);
 }
 
-export type FigureKind = "seller" | "sit" | "walk" | "cop" | "chew";
+export type FigureKind = "seller" | "sit" | "walk" | "cop" | "chew" | "carry";
+
+const INK = "#14110e";
 
 export function personGraphic(kind: FigureKind, dir: Dir, coat: string): Canvas {
-    return gfx(`p:${kind}:${dir}:${coat}`, 72, 84, 36, 74, (ctx) => drawPerson(ctx, kind, dir, coat));
+    return gfx(`p2:${kind}:${dir}:${coat}`, 80, 96, 40, 86, (ctx) => drawPerson(ctx, kind, dir, coat));
 }
 
 function drawPerson(ctx: CanvasRenderingContext2D, kind: FigureKind, dir: Dir, coat: string): void {
-    const skin = "#f0c7a4";
-    const hair = kind === "cop" ? "#1c2430" : "#2a211c";
-    const pants = kind === "cop" ? "#1e2a44" : "#3a342e";
-    const outline = "#1b1714";
-    if (kind === "sit" || kind === "chew") {
-        roundBox(ctx, 18, 58, 36, 12, "#c4a574", outline);
-    }
-    ctx.fillStyle = "rgba(20,16,12,0.28)";
+    const skin = "#e8b48a";
+    const hair = kind === "cop" ? "#1b2433" : "#2c241e";
+    const pants = kind === "cop" ? "#1c2740" : "#3a332c";
+    const seated = kind === "sit" || kind === "chew";
+    ctx.fillStyle = "rgba(20,16,12,0.38)";
     ctx.beginPath();
-    ctx.ellipse(36, 76, 16, 5, 0, 0, Math.PI * 2);
+    ctx.ellipse(40, 86, 18, 6, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    const seated = kind === "sit" || kind === "chew";
-    const bodyY = seated ? 40 : 36;
-    const bodyH = seated ? 22 : 28;
-    roundBox(ctx, 22, bodyY, 28, bodyH, coat, outline);
+    if (seated) roundBox(ctx, 18, 70, 44, 12, "#8d6844", INK);
     if (!seated) {
-        roundBox(ctx, 18, 58, 10, 14, pants, outline);
-        roundBox(ctx, 44, 58, 10, 14, pants, outline);
+        const step = dir === "e" ? 2 : dir === "w" ? -2 : 0;
+        roundBox(ctx, 22 + step, 66, 12, 16, pants, INK);
+        roundBox(ctx, 46 - step, 66, 12, 16, pants, INK);
+        roundBox(ctx, 22 + step, 78, 12, 6, "#2a2622", INK);
+        roundBox(ctx, 46 - step, 78, 12, 6, "#2a2622", INK);
     }
-    disk(ctx, 36, 28, 14, skin, outline);
+    roundBox(ctx, seated ? 24 : 22, seated ? 50 : 44, seated ? 32 : 36, seated ? 22 : 26, coat, INK);
+    if (kind === "cop") {
+        ctx.fillStyle = "#f0c84a";
+        ctx.fillRect(48, 52, 6, 6);
+        ctx.fillStyle = INK;
+        ctx.fillRect(50, 54, 2, 2);
+    }
+    disk(ctx, 40, 34, 16, skin, INK);
     ctx.fillStyle = hair;
     ctx.beginPath();
-    if (dir === "n") ctx.arc(36, 26, 14, 0, Math.PI * 2);
-    else ctx.arc(36, 24, 14, Math.PI, Math.PI * 2);
+    if (dir === "n") ctx.arc(40, 32, 16, 0, Math.PI * 2);
+    else ctx.arc(40, 30, 16, Math.PI * 1.05, Math.PI * 1.95);
     ctx.fill();
-
+    if (kind === "cop") {
+        roundBox(ctx, 22, 16, 36, 10, "#243656", INK);
+        roundBox(ctx, 18, 24, 44, 5, "#1c2a44", INK);
+        ctx.fillStyle = "#f0c84a";
+        ctx.fillRect(38, 18, 5, 5);
+    }
     if (dir !== "n") {
-        ctx.fillStyle = outline;
-        const eyeY = 30;
+        ctx.fillStyle = INK;
+        const eyeY = 34;
         if (dir === "s") {
-            ctx.fillRect(29, eyeY, 3, 3);
-            ctx.fillRect(40, eyeY, 3, 3);
+            ctx.fillRect(32, eyeY, 4, 4);
+            ctx.fillRect(44, eyeY, 4, 4);
         } else if (dir === "e") {
-            ctx.fillRect(42, eyeY, 3, 3);
+            ctx.fillRect(48, eyeY, 4, 4);
         } else {
-            ctx.fillRect(27, eyeY, 3, 3);
+            ctx.fillRect(28, eyeY, 4, 4);
         }
     }
-
     if (kind === "seller") {
-        roundBox(ctx, 40, 42, 18, 14, "#d23b32", outline);
+        roundBox(ctx, 46, 48, 22, 16, "#c43732", INK);
         ctx.fillStyle = "#f2c14e";
-        ctx.fillRect(44, 46, 4, 4);
-        ctx.fillRect(50, 46, 4, 4);
-        ctx.fillRect(44, 51, 4, 4);
+        ctx.fillRect(50, 52, 5, 5);
+        ctx.fillRect(58, 52, 5, 5);
+        ctx.fillRect(50, 58, 5, 5);
     }
-    if (kind === "walk") {
-        roundBox(ctx, dir === "w" ? 14 : 46, 48, 12, 10, "#efe6d6", outline);
+    if (kind === "carry" || kind === "chew") {
+        const hx = dir === "w" ? 8 : 52;
+        const hy = kind === "chew" ? 36 : 50;
+        roundBox(ctx, hx, hy, 16, 14, "#f0b429", INK);
+        ctx.fillStyle = "#d8892a";
+        ctx.fillRect(hx + 3, hy + 3, 10, 3);
     }
-    if (kind === "cop") {
-        roundBox(ctx, 24, 12, 24, 8, "#243456", outline);
-        ctx.fillStyle = "#f2c14e";
-        ctx.fillRect(46, 44, 5, 5);
-    }
-    if (kind === "chew") {
-        roundBox(ctx, 44, 36, 16, 12, "#d23b32", outline);
-        disk(ctx, dir === "w" ? 24 : 48, 32, 4, "#f2c14e", outline);
-    }
+}
+
+export function crumbGraphic(): Canvas {
+    return gfx("crumb", 14, 14, 7, 7, (ctx) => {
+        roundBox(ctx, 2, 2, 10, 10, "#f0b429", INK);
+    });
 }
 
 export function carGraphic(dir: Dir, color: string): Canvas {
@@ -166,12 +177,17 @@ export function groundGraphic(city: City, time: TimeOfDay): Canvas {
 function paintGround(ctx: CanvasRenderingContext2D, city: City, palette: Palette): void {
     ctx.fillStyle = palette.sidewalk;
     ctx.fillRect(0, 0, WORLD, WORLD);
-    for (let y = 0; y < WORLD; y += TILE * 2) {
-        for (let x = (y / (TILE * 2)) % 2 === 0 ? 0 : TILE; x < WORLD; x += TILE * 2) {
-            ctx.fillStyle = palette.sidewalkAlt;
-            ctx.fillRect(x, y, TILE, TILE);
+    for (let y = 0; y < WORLD; y += TILE) {
+        for (let x = 0; x < WORLD; x += TILE) {
+            if (((x / TILE) + (y / TILE)) % 2 === 0) {
+                ctx.fillStyle = palette.sidewalkAlt;
+                ctx.fillRect(x, y, TILE, TILE);
+            }
         }
     }
+    ctx.fillStyle = "rgba(28,22,16,0.28)";
+    for (let y = 0; y < WORLD; y += TILE) ctx.fillRect(0, y, WORLD, 2);
+    for (let x = 0; x < WORLD; x += TILE) ctx.fillRect(x, 0, 2, WORLD);
 
     ctx.fillStyle = palette.road;
     for (const origin of [2, 18, 34]) {
@@ -228,9 +244,13 @@ function paintBuilding(ctx: CanvasRenderingContext2D, building: Rect, palette: P
     const wall = palette.wall[index % palette.wall.length];
     const roof = palette.roof[index % palette.roof.length];
     ctx.fillStyle = palette.outline;
-    ctx.fillRect(building.x - 3, building.y - 3, building.w + 6, building.h + 6);
+    ctx.fillRect(building.x - 4, building.y - 4, building.w + 8, building.h + 8);
     ctx.fillStyle = wall;
     ctx.fillRect(building.x, building.y, building.w, building.h);
+    ctx.fillStyle = roof;
+    ctx.fillRect(building.x, building.y, building.w, 16);
+    ctx.fillStyle = palette.outline;
+    ctx.fillRect(building.x, building.y + 14, building.w, 3);
     const inset = 8;
     if (building.w > inset * 3 && building.h > inset * 3) {
         ctx.fillStyle = roof;

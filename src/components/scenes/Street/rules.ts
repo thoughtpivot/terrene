@@ -141,6 +141,44 @@ export function clearHeat(sale: Sale): Sale {
     return { ...sale, heat: false };
 }
 
+/** Crumbs from someone holding the squares back to where you were standing. */
+export function layTrail(from: Vec, to: Vec, step = 40): Vec[] {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const dist = Math.hypot(dx, dy);
+    const n = Math.max(1, Math.ceil(dist / Math.max(8, step)));
+    const crumbs: Vec[] = [];
+    for (let i = 0; i <= n; i++) {
+        crumbs.push({ x: from.x + (dx * i) / n, y: from.y + (dy * i) / n });
+    }
+    return crumbs;
+}
+
+/**
+ * Head home, but sheer off any cop who can see the squares.
+ * With nobody watching, the aim is the seat.
+ */
+export function carryAim(pos: Vec, home: Vec, threats: Vec[]): Vec {
+    if (threats.length === 0) return home;
+    let ax = 0;
+    let ay = 0;
+    for (const cop of threats) {
+        const dx = pos.x - cop.x;
+        const dy = pos.y - cop.y;
+        const d = Math.hypot(dx, dy) || 1;
+        const push = 160 / d;
+        ax += (dx / d) * push;
+        ay += (dy / d) * push;
+    }
+    const hx = home.x - pos.x;
+    const hy = home.y - pos.y;
+    const hd = Math.hypot(hx, hy) || 1;
+    return {
+        x: pos.x + ax * 70 + (hx / hd) * 36,
+        y: pos.y + ay * 70 + (hy / hd) * 36,
+    };
+}
+
 export interface LightPhase {
     nsGreen: boolean;
     ewGreen: boolean;

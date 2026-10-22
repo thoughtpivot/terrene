@@ -105,6 +105,8 @@ export interface City {
     lanes: Lane[];
     crosswalks: Rect[];
     peds: PedRoute[];
+    /** Cop loops. Block beats plus a town loop, so patrols are not piled on one corner. */
+    beats: PedRoute[];
     signs: Array<{ x: number; y: number; kind: "stop" | "ns" | "ew" }>;
     start: Vec;
     checks: SightCheck[];
@@ -206,16 +208,16 @@ export function paletteFor(time: TimeOfDay): Palette {
         };
     }
     return {
-        sidewalk: "#d7c4a8",
-        sidewalkAlt: "#cbb89a",
-        curb: "#8d7b68",
-        road: "#3e444d",
-        lane: "#e4d7a4",
-        alley: "#5c564f",
-        outline: "#1b1714",
-        cross: "#f3eee6",
-        wall: ["#e0c9a6", "#d2c0a2", "#c5d0ce", "#ead4b8"],
-        roof: ["#8d4638", "#5d6e4e", "#3c5870", "#a56a3e"],
+        sidewalk: "#c6b79a",
+        sidewalkAlt: "#b7a78a",
+        curb: "#6e6256",
+        road: "#4a4e55",
+        lane: "#d9d2b4",
+        alley: "#8d7354",
+        outline: "#1a1612",
+        cross: "#efe8d8",
+        wall: ["#c9845a", "#b7b3a6", "#d08a62", "#a9b0a4"],
+        roof: ["#6e3a30", "#4e5c42", "#3a4c60", "#7a4e32"],
         background: "#cbb89a",
     };
 }
@@ -333,6 +335,7 @@ export function buildTown(level: StreetLevel): City {
 
     const { lanes, crosswalks, signs } = buildTraffic(level);
     const peds = buildPeds();
+    const beats = buildBeats();
     return {
         buildings,
         alleys,
@@ -341,10 +344,41 @@ export function buildTown(level: StreetLevel): City {
         lanes,
         crosswalks,
         peds,
+        beats,
         signs,
         start: { x: 12.5 * TILE, y: 33.15 * TILE },
         checks,
     };
+}
+
+function buildBeats(): PedRoute[] {
+    const beats: PedRoute[] = BLOCKS.map((block, index) => ({
+        pts: ring(block.col, block.row, 1.2),
+        coat: "#3c5f92",
+        offset: (index * 0.27) % 1,
+    }));
+    const town = [
+        { x: 7 * TILE, y: 7 * TILE },
+        { x: 33 * TILE, y: 7 * TILE },
+        { x: 33 * TILE, y: 33 * TILE },
+        { x: 7 * TILE, y: 33 * TILE },
+    ];
+    beats.push({ pts: town, coat: "#3c5f92", offset: 0.08 });
+    beats.push({ pts: town, coat: "#3c5f92", offset: 0.58 });
+    return beats;
+}
+
+function ring(col: number, row: number, pad: number): Vec[] {
+    const left = (col - pad) * TILE;
+    const right = (col + 8 + pad) * TILE;
+    const top = (row - pad) * TILE;
+    const bot = (row + 8 + pad) * TILE;
+    return [
+        { x: left, y: top },
+        { x: right, y: top },
+        { x: right, y: bot },
+        { x: left, y: bot },
+    ];
 }
 
 function buildPeds(): PedRoute[] {

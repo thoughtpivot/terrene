@@ -6,10 +6,12 @@ import {
     ask,
     beginHandoff,
     carHitsPlayer,
+    carryAim,
     circleHitsRect,
     dismiss,
     freshSale,
     gateClosed,
+    layTrail,
     lightPhase,
     pointInRect,
     sees,
@@ -138,6 +140,34 @@ test("a crosswalk keeps a car from counting as a hit", () => {
     assert.equal(carHitsPlayer(10, 10, 14, car, [walk]), false);
     assert.equal(carHitsPlayer(10, 10, 14, car, []), true);
     assert.equal(circleHitsRect(100, 100, 14, car), false);
+});
+
+test("patrol beats cover every block and a loop around the town", () => {
+    const { city } = buildSceneOne();
+    assert.equal(city.beats.length, 6);
+    const xs = city.beats.flatMap((beat) => beat.pts.map((point) => point.x));
+    const ys = city.beats.flatMap((beat) => beat.pts.map((point) => point.y));
+    assert.ok(Math.max(...xs) - Math.min(...xs) > 1000);
+    assert.ok(Math.max(...ys) - Math.min(...ys) > 1000);
+    for (const beat of city.beats) {
+        for (const point of beat.pts) {
+            assert.equal(city.buildings.some((building) => pointInRect(point.x, point.y, building)), false);
+        }
+    }
+});
+
+test("a carrier walks home and sheers off a cop, and the trail runs back to you", () => {
+    const home = { x: 200, y: 0 };
+    const pos = { x: 0, y: 0 };
+    assert.deepEqual(carryAim(pos, home, []), home);
+    const away = carryAim(pos, home, [{ x: 40, y: 0 }]);
+    assert.ok(away.x < pos.x);
+    const aside = carryAim(pos, home, [{ x: 0, y: 50 }]);
+    assert.ok(aside.y < 0);
+    const crumbs = layTrail({ x: 0, y: 0 }, { x: 100, y: 0 }, 40);
+    assert.equal(crumbs[0].x, 0);
+    assert.equal(crumbs[crumbs.length - 1].x, 100);
+    assert.ok(crumbs.length >= 3);
 });
 
 test("the street view fills the window at the 960 by 540 scale", () => {
