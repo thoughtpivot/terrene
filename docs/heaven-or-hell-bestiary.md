@@ -65,6 +65,15 @@ For this game, "biblically accurate" means:
 | **Bright orange** | **Wind-up warning**: a parryable attack is coming. Parry (F) on the flash |
 | **Bright red** | **Danger**: an unparryable attack, grab or area. Roll (Q) or reposition. Block only chips |
 | Gold cracked with red | Corrupted angel: the holy gold glow is smothered, with red bleeding through the cracks |
+| False gold (flickers red at the edges) | A **Deceiver's** lure: counterfeit holy light that copies the player's white-gold palette (see below) |
+
+**False gold: the Deceivers (decided by Dan).** 2 Corinthians 11:14 (KJV): "And no marvel; for Satan himself is transformed into an angel of light." Deceiver-type enemies can show **fake gold** to lure the player. It comes in three forms:
+
+- **False golden light.** A warm white-gold shaft or glow in the distance, the look of an altar, a shrine or an ally, that leads into an ambush or a hazard.
+- **Fake Vision pickups.** There is no gold coin currency; Visions are the shrine currency, and they drop as small white-gold motes. A fake Vision looks like one, but collecting it gives nothing and springs the trap (a grab, a curse or an ambush). It is a visual lure, never money.
+- **A false angelic glow.** The Deceiver itself wears the player's own white-gold palette, posing as an ally angel until it strikes.
+
+Every false gold has a **tell**, so the glow language stays fair: the edges flicker to red or ember at intervals, it casts no bloom on the ground around it, and it never pulses in time with the player's halo. The tell is visible before the trap springs, and the Studied bestiary entry names it. True gold never flickers. The Deceivers are **E10 Furfur** (*Liar's light*), **E31 Belial** (the false angels) and **E34 the False Prophet** (counterfeit fire). The quote names Satan, but he is never a depicted character.
 
 **Keying.** Source paintings sit on a **flat pure magenta (#FF00FF) background**. Hell's red and orange glows sit next to magenta in hue, so prompts must say "no magenta or pink in the figure, glows are orange-red not pink" and the glow halo must stop hard at the ink line (add bloom in-engine, not in the painting).
 
@@ -456,6 +465,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   2. *Antler charge*: parryable, 0.8 s orange antlers, High posture.
   3. *Tail lash*: parryable, 0.5 s, Med; leaves a fire strip.
   4. *Liar's light* (phase 2): it mimics an ally angel's gold glow to bait the player, then strikes with red. Trains players to trust only true gold.
+- **Deceiver (section 1.3):** Before the fight, Furfur scatters **fake Vision motes** along a forest path to draw the player into its lightning circles. They flicker red at the edges.
 - **AI read trait:** Wary (a Count). "Never speaketh truth": its *Liar's light* does the deceiving.
 - **DRAFT AI IMAGE PROMPT:** "Furfur, a demon of the Goetia: a great black hart stag with vast branching antlers crackling with lightning and a long comet-like tail of fire, rearing, storm energy around its hooves. Fixed orthographic camera 45–50 degrees down on a diagonal, three-quarter top-down view, full body, single isolated figure. Death's Door-inspired chunky bevelled forms, toon shading with hard value bands, thick dark ink outlines, dark menacing mood. Near-black monochrome base; only emissive glows are orange lightning on the antlers, an orange-red fiery tail and ember eyes. Flat pure magenta #FF00FF background, no ground, no cast shadow, no magenta or pink in the figure, glows orange-red not pink, high resolution game sprite source."
 
@@ -705,10 +715,10 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
 
 ---
 
-### E22. Leviathan, the Crooked Serpent (boss, Tier 3 to 4)
+### E22. Leviathan, the Crooked Serpent (Corrupted creature, boss, Tier 3 to 4)
 
 - **Source [Scripture]:** Job 41:1, 15–21, 26, 31 (KJV): "Canst thou draw out leviathan with an hook? ... His scales are his pride, shut up together as with a close seal ... By his neesings a light doth shine, and his eyes are like the eyelids of the morning. Out of his mouth go burning lamps, and sparks of fire leap out. Out of his nostrils goeth smoke, as out of a seething pot or caldron. His breath kindleth coals, and a flame goeth out of his mouth ... The sword of him that layeth at him cannot hold: the spear, the dart, nor the habergeon ... He maketh the deep to boil like a pot". Isaiah 27:1: "leviathan the piercing serpent, even leviathan that crooked serpent; and he shall slay the dragon that is in the sea." Psalm 74:14: "Thou brakest the heads of leviathan in pieces".
-- **Notes:** Job 41 presents Leviathan as a created creature, not as a demon. Later demonology (Michaëlis, cited on Wikipedia's *Beelzebub* page) ranked Leviathan among the three foremost fallen angels. Psalm 74:14's plural "heads" supports a **multi-headed** design.
+- **Notes:** Job 41 presents Leviathan as a created creature, not as a demon. Later demonology (Michaëlis, cited on Wikipedia's *Beelzebub* page) ranked Leviathan among the three foremost fallen angels. Psalm 74:14's plural "heads" supports a **multi-headed** design. **Our framing (decided by Dan): Leviathan is a corrupted creature**, like Behemoth (E28). It is not a demon or a fallen angel. Hell has corrupted it and driven it against Heaven, and the ember lines in its scale seams are the mark of that corruption.
 - **Visual:** A colossal sea-serpent with interlocking seal-like scales "that no air can come between", eyes glowing like dawn, sneezes that flash light, burning breath, smoking nostrils, and several heads (we use three). The water boils where it passes.
 - **SPRITE BRIEF**
   - *Silhouette:* Colossal: only coils breaking the water surface and one to three heads rearing toward the camera. Coils as arches read perfectly from the diagonal camera.
@@ -844,10 +854,10 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
 
 ---
 
-### E28. Behemoth (boss, hyperarmour colossus)
+### E28. Behemoth (Corrupted creature, boss, hyperarmour colossus)
 
 - **Source [Scripture]:** Job 40:15–19, 23 (KJV): "Behold now behemoth ... he eateth grass as an ox. Lo now, his strength is in his loins, and his force is in the navel of his belly. He moveth his tail like a cedar: the sinews of his stones are wrapped together. His bones are as strong pieces of brass; his bones are like bars of iron ... Behold, he drinketh up a river, and hasteth not: he trusteth that he can draw up Jordan into his mouth."
-- **Notes:** In Job, Behemoth is a created creature and not demonic. The *Dictionnaire Infernal* (1863) lists Behemoth among its demons, and Le Breton's plate is the elephant-bellied demon most people picture. Our framing: **Hell has corrupted and goaded Behemoth** (see section 6).
+- **Notes:** In Job, Behemoth is a created creature and not demonic. The *Dictionnaire Infernal* (1863) lists Behemoth among its demons, and Le Breton's plate is the elephant-bellied demon most people picture. Our framing (decided by Dan): **Behemoth is a corrupted creature**, as Leviathan (E22) is. Hell has corrupted and goaded it; it is not a demon (see section 6).
 - **Visual:** A grass-eating colossus: an ox-like, hippo-like mass with strength "in his loins", a cedar-trunk tail, a ribcage of brass bones visible through cracked hide, and iron-bar limbs. It drinks rivers dry. Hell's corruption shows as brand-chains and ember sores.
 - **SPRITE BRIEF**
   - *Silhouette:* An enormous, low, wide body; a tree-trunk tail swinging like a cedar is the top-down read; the head is low and broad.
@@ -929,6 +939,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   2. *Mirrored strikes*: the twins attack from both sides; each is parryable (0.6 s orange); they alternate tempo.
   3. *Comely voice*: red, 1.4 s; charm reverses the player's controls for 2 s unless the player is facing away (the "constrained" angle: standing at a seraph's altar nullifies it).
   4. *First to fall*: a desperation dive at low health, parryable, Break.
+- **Deceiver (section 1.3):** On the Tier 3 map, Belial poses as a pair of ally angels standing in a **false golden light** that looks like a shrine. Their glow copies the player's white-gold palette, with the false-gold tell. "Satan himself is transformed into an angel of light" (2 Corinthians 11:14) is the line the Studied entry shows.
 - **AI read trait:** Adaptive ("tarrieth not one hour in the Truth").
 - **DRAFT AI IMAGE PROMPT:** "Belial, a king of the Goetia: two beautiful serene twin angels with long white-gold wings seated side by side in a low ornate chariot of fire with blazing wheels, unsettlingly perfect faces, faint red light bleeding through hairline cracks in their skin. Fixed orthographic camera 45–50 degrees down on a diagonal, three-quarter top-down view, full figures including the chariot, single isolated group. Death's Door-inspired chunky bevelled forms, toon shading with hard value bands, thick dark ink outlines, dark menacing mood beneath beauty. Near-black monochrome base; emissive glows are a false white-gold on the wings and halo, thin red cracks, and orange-red fire on the chariot wheels. Flat pure magenta #FF00FF background, no ground, no cast shadow, no magenta or pink in the figure, glows orange-red not pink, high resolution game sprite source."
 
@@ -992,6 +1003,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   2. *Dragon's voice*: red cone, 1.0 s, posture damage.
   3. *Summon frogs*: three frog-spirits (E3) from his mouth (Revelation 16:13).
   4. *Crook hook*: parryable, 0.6 s, Med; pulls the player in.
+- **Deceiver (section 1.3):** Its counterfeit gold is the false golden light. During the fight it also drops **fake Vision motes** that burst into frog-spirits (E3) when collected.
 - **AI read trait:** Adaptive (a deceiver).
 - **DRAFT AI IMAGE PROMPT:** "The beast from the earth, the false prophet of Revelation 13: a deceptively gentle robed figure with a pale fleece-trimmed mantle and two small curled lamb's horns, holding a shepherd's crook, its mouth unhinging into a fanged dragon's maw, false golden fire swirling above its raised hand. Fixed orthographic camera 45–50 degrees down on a diagonal, three-quarter top-down view, full body, single isolated figure. Death's Door-inspired chunky bevelled forms, toon shading with hard value bands, thick dark ink outlines, dark menacing mood. Near-black monochrome base; emissive glows are a sickly false gold turning orange-red in the fire above its hand and an orange glow inside the dragon maw. Flat pure magenta #FF00FF background, no ground, no cast shadow, no magenta or pink in the figure, glows orange-red not pink, high resolution game sprite source."
 
@@ -1183,7 +1195,7 @@ All pages below were retrieved during this research. Some passages on these page
 
 **Recommended baseline (already applied throughout):**
 
-- **Reserved figures stay out.** Dan's rule: God, Christ and very important biblical figures are left out until he says otherwise, because they will be used for special quests later. Nothing on the reserved list (section 2A) is depicted, given a sprite or prompt, or named as a character in this bestiary. Michael's name appears only where the plan already uses it. Scripture quotes are trimmed with ellipses where a verse names a reserved figure.
+- **Reserved figures stay out.** Dan's rule: God, Christ and very important biblical figures are left out until he says otherwise, because they will be used for special quests later. Nothing on the reserved list (section 2A) is depicted, given a sprite or prompt, or named as a character in this bestiary. Michael's name appears only where the plan already uses it. Scripture quotes are trimmed with ellipses where a verse names a reserved figure. The one exception Dan allowed is that Satan and Lucifer may be *named*: in 2 Corinthians 11:14 for the Deceivers (section 1.3) and in the run difficulty names (progression doc, section 1). Neither is ever added as a depicted character.
 - **The Throne stays offscreen**, shown only as light at the edge of the Throne zone. The Four Living Creatures (A4) and the seraphim (A1) stand at that edge; the seraphim covering their faces is itself a respectful framing device.
 - **Tier escalation is announced by the Living Creatures' "Come"** (Revelation 6), with no visible seal-breaker. Mark 5's Legion story is used without showing the healed man.
 - **Demons as enemies** is a common, widely accepted framing. Angels are never mocked.
@@ -1194,10 +1206,10 @@ All pages below were retrieved during this research. Some passages on these page
 **Decisions only Dan can make:**
 
 1. **The dragon's identity.** Revelation 12:9 identifies the dragon by name with a reserved figure. This bestiary calls it only "the Red Dragon" and "that old serpent" and gives it no other forms. Keep it that way until the special quests are planned, or tie the two together later?
-2. **Beings scripture does not call demonic.** Behemoth and Leviathan are created creatures in Job; the four angels of the Euphrates are "prepared" and loosed at a trumpet; the locusts act only as "it was given them"; Abaddon is "the angel of the bottomless pit". We framed them as **corrupted or goaded by Hell**, as the plan does. Alternatives: (a) keep them neutral "judgement" forces the player survives rather than kills; (b) give Behemoth a *free* ending (already designed) and Marchosias a *spare* ending.
+2. **Beings scripture does not call demonic.** Behemoth and Leviathan are created creatures in Job; the four angels of the Euphrates are "prepared" and loosed at a trumpet; the locusts act only as "it was given them"; Abaddon is "the angel of the bottomless pit". We framed them as **corrupted or goaded by Hell**, as the plan does. *Decided for Behemoth and Leviathan:* both are corrupted creatures and enemies (E28, E22). The rest stays open. Alternatives: (a) keep them neutral "judgement" forces the player survives rather than kills; (b) give Behemoth a *free* ending (already designed) and Marchosias a *spare* ending.
 3. **How much occult material.** The Goetia is a grimoire. Using its spirits' names and appearances is common in games, but some players are uncomfortable with it. Options: keep it as is (15 Goetic spirits featured across 12 entries), or rename them as "Kings of the Pit" with only lore-codex attributions.
 4. **Lilith.** She is a figure of Jewish folklore, and the Isaiah word may mean only a night bird. We use the owl/night-creature reading and **avoid the seductress trope entirely**. Confirm, or drop her and promote Stolas (raven) into the slot.
-5. **Belial's false gold and the Strangers.** This intentionally breaks the "gold equals ally" rule, as does the False Prophet's counterfeit gold. It is a powerful twist, but it muddies the glow language Dan set. Keep it (with a tell, gold that flickers to red at its edges), or keep gold sacrosanct?
+5. **Belial's false gold and the Strangers.** This intentionally breaks the "gold equals ally" rule, as does the False Prophet's counterfeit gold. It is a powerful twist, but it muddies the glow language Dan set. Keep it (with a tell, gold that flickers to red at its edges), or keep gold sacrosanct? *Decided:* keep it. Deceivers may show false golden light, fake Vision pickups and a false angelic glow, always with the tell (section 1.3, 2 Corinthians 11:14).
 6. **Allied angels dying or falling.** Can allied NPC angels (the Host especially) be killed, or corrupted mid-campaign? This is strong drama, but it puts "angels suffering" on screen. Decide the limit.
 7. **Scripture licensing for in-game text.** The KJV is marked public domain on Bible Gateway, so use KJV for any quotations shown in the game. The NRSVUE quotes (goat-demons, Lilith, Azazel, Tobit) are for this document only; **check licensing before quoting NRSVUE or ESV in the shipped game.**
 8. **Art-history baggage.** Do not reproduce the Ottoman "turban" coding in Dürer's woodcuts, and do not reference Doré's *Wandering Jew*. Give Paimon's court an abstract-infernal costume, not real Middle-Eastern dress.
