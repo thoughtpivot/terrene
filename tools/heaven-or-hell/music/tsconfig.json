@@ -1,0 +1,12 @@
+{
+    "extends": "../../../tsconfig.json",
+    "compilerOptions": {
+        "target": "es2020",
+        "module": "esnext",
+        "lib": ["es2020", "dom"],
+        "types": ["node"],
+        "noEmit": true,
+        "strict": true
+    },
+    "include": ["./**/*.ts", "../../../test/heaven-or-hell-music*.ts", "../../../src/components/scenes/HeavenOrHell/audio/*.ts"]
+}

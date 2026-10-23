@@ -7,6 +7,10 @@
     "scripts": {
         "test": "npm run build:prod && node ./test/test.js",
         "test:hoh": "vitest run",
+        "test:hoh-music": "tsx --test test/heaven-or-hell-music*.ts",
+        "music:hoh": "tsx tools/heaven-or-hell/music/render.ts",
+        "music:hoh:demo": "tsx tools/heaven-or-hell/music/demo.ts",
+        "music:hoh:qa": "tsx tools/heaven-or-hell/music/qa.ts",
         "webpack": "webpack",
         "dev": "npx tsc -p tsconfig.json && webpack serve --config webpack.development.js",
         "start": "npm run dev",
@@ -14,7 +18,8 @@
         "build:dev": "webpack --config webpack.development.js",
         "build:prod": "webpack --config webpack.production.js",
         "asperite": "../aseprite/build/bin/aseprite",
-        "tiled": "../tiled/default/install-root/usr/local/Tiled.app/Contents/MacOS/Tiled"
+        "tiled": "../tiled/default/install-root/usr/local/Tiled.app/Contents/MacOS/Tiled",
+        "typecheck:hoh-music": "tsc -p tools/heaven-or-hell/music/tsconfig.json"
     },
     "author": "The Boys and Dad.",
     "license": "MIT",
@@ -31,6 +36,7 @@
         "source-map-loader": "4.0.0",
         "terser-webpack-plugin": "5.3.6",
         "ts-loader": "9.4.1",
+        "tsx": "^4.23.15",
         "typescript": "^5.9.3",
         "vite": "^8.3.5",
         "vitest": "^5.0.5",
