@@ -123,15 +123,55 @@ because the painted rocks have uneven tops:
   surface is a leap that uses normal jump physics until it peaks, high enough
   to climb out onto any bank.
 
+### Mori's animation
+
+Mori's strip (`characters/player/Mori/Mori.png`) has 16 frames: idle; an
+8-frame run of two steps (contact, down, passing, flight on each foot);
+jump, fall and swim; and start, skid, land and stop poses.
+
+- The run cycle advances with distance, not time. One cycle covers `STRIDE`
+  (100 units, two steps), which matches how far the planted foot slides back
+  between painted frames, so his feet keep pace with the ground at any speed.
+  At full speed (235) that is about 4.7 steps a second.
+- Each run frame adds a little lift (flight frames leave the ground) and
+  vertical squash (down frames sink), scaled by speed. He leans into the run,
+  more while still speeding up.
+- Starting from rest shows a crouched push-off. Reversing at speed shows a
+  skid: he keeps facing the old way, leans back and kicks up dust until he
+  slows down. Letting go at speed brakes on a planted foot. Landings show a
+  crouch, squash and dust, then a running landing rolls into the next stride.
+- The lantern glow and aura sit on the flame painted in each frame
+  (`MORI.lamps` in `atlas.ts`), so the light swings with the lantern and
+  follows his lean. Oka World 2's darkness cuts its light from the same point.
+- Movement physics are unchanged: run speed 235, jump speed 575, the same
+  acceleration and friction, so every gap plays as before.
+
+### Footsteps
+
+Footsteps play on the two contact frames of the run cycle, louder at speed.
+A soundtrack effect can be a list of takes, and `audio.ts` plays a random
+take without repeating the last one. Near a pool, or for a few seconds after
+a swim, the steps are wet. Landing plays a thud scaled by fall speed, and a
+skid plays a scrape. Oka World 2 has its own darker, echoing set. All of
+these sit well under the music (mix levels 0.13–0.26, about 4 dB below the music at their loudest).
+
 ## Asset Pipeline
 
-Both tools need Python 3 with `numpy`, `scipy` and `Pillow`, and
-`compose_music.py` also needs `ffmpeg`.
+The tools need Python 3 with `numpy`, `scipy` and `Pillow`, and the audio
+scripts also need `ffmpeg`.
 
 ```bash
-python3 tools/oka-world/build_art.py      # art -> OkaWorld.png, art/*, items, atlas.ts
+python3 tools/oka-world/build_art.py      # art -> OkaWorld.png, art/*, items, Mori, atlas.ts
 python3 tools/oka-world/compose_music.py  # OkaWorld.mp3 and sfx/*.mp3
+python3 tools/oka-world/footsteps.py      # footsteps, land and skid for both worlds
 ```
+
+Mori is built from four painted sheets: `hero.jpg` (idle, jump, fall, swim),
+`hero-run.jpg` (the run cycle), `hero-moves.jpg` (start, stop) and
+`hero-skid.jpg` (skid, land). `build_art.py` scales every sheet to the same
+hood size, stands each frame on the cell floor, and centres the anchor so
+he mirrors in place when he turns. It also measures the lantern flame and
+the lowest foot in every frame and writes them to `MORI` in `atlas.ts`.
 
 `build_art.py` removes the magenta background from each painted source,
 including pink fringe left by JPEG compression around edges. It then cuts the
@@ -144,6 +184,12 @@ ostinato, a wooden flute melody, a frame drum and water drips, all in a long
 convolution reverb. The loop is rendered circularly and the file carries 2
 extra seconds, and `audio.ts` loops between exact sample points, so the loop
 has no gap or click. The script also renders the seven sound effects.
+
+`footsteps.py` renders five dry and three wet footstep takes, a landing
+thud and a skid for each world. A step is a low heel thump, a short scuff of
+grit and a lighter toe tap a few milliseconds later. Each take varies pitch,
+heel-to-toe gap and grit. Oka World's set is in a small, bright cave. Oka
+World 2's is duller, with a long dark tail and a slap back off far walls.
 
 ## Testing
 

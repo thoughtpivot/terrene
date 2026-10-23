@@ -1,5 +1,5 @@
 import { Actor, Sprite, vec } from "excalibur";
-import { SHEETS } from "../../../scenes/OkaWorld/art/atlas";
+import { MORI, SHEETS } from "../../../scenes/OkaWorld/art/atlas";
 import type { OkaHero, OkaHooks } from "../../../scenes/OkaWorld/hooks";
 import { glow, paintedFrames, paintedImage } from "../../../scenes/OkaWorld/paint";
 import { GRAVITY, MAX_FALL, type Body, type Water } from "../../../scenes/OkaWorld/physics";
@@ -20,11 +20,26 @@ export interface MoriInput {
     jumpPressed: boolean;
 }
 
-const IDLE = 0;
-const RUN = [1, 2, 3, 4];
-const JUMP = 5;
-const FALL = 6;
-const SWIM = 7;
+const F = MORI.frames;
+const IDLE = F.idle;
+/** Two steps: contact, down, passing, flight on one foot, then the other. */
+const RUN = [F.run0, F.run1, F.run2, F.run3, F.run4, F.run5, F.run6, F.run7];
+const CONTACTS = [0, 4];
+/** Ground covered by one full cycle. The planted foot slides back about this far per frame. */
+const STRIDE = 100;
+/** Per run frame: lift off the ground and vertical squash, at full speed. */
+const RUN_LIFT = [0, 0, 1, 3.5, 0, 0, 1, 3.5];
+const RUN_SQUASH = [0.985, 0.965, 1, 1.02, 0.985, 0.965, 1, 1.02];
+const JUMP = F.jump;
+const FALL = F.fall;
+const SWIM = F.swim;
+const START = F.start;
+const SKID = F.skid;
+const LAND = F.land;
+const STOP = F.stop;
+const SKID_SPEED = 90;
+/** Boots stay wet for a while after a swim. */
+const WET_TIME = 2.5;
 
 const RUN_SPEED = 235;
 const GROUND_ACCEL = 2100;
@@ -52,14 +67,20 @@ export default class Mori extends Actor implements OkaHero {
     private leaping = false;
     private hurtTime = 0;
     private invuln = 0;
-    private runClock = 0;
+    /** distance into the run cycle, 0 to STRIDE */
+    private runDist = 0;
+    private runFrame = -1;
     private squash = 0;
+    private lean = 0;
     private t = 0;
     private lamp = new Actor({ z: 0.5 });
     private aura = new Actor({ z: -7 });
-    private stepClock = 0;
-    /** set by the scene: called when Mori's feet touch down after a fall */
-    onLand?: (speed: number) => void;
+    private skidding = false;
+    private skidDust = 0;
+    private startTime = 0;
+    private landTime = 0;
+    private stopTime = 0;
+    private wetTime = 0;
     onSplash?: (water: Water, x: number, strength: number) => void;
 
     constructor(x: number, y: number, private hooks: OkaHooks) {
@@ -79,9 +100,13 @@ export default class Mori extends Actor implements OkaHero {
 
     /** World position of the lantern flame and how bright it burns this frame (about 0.8 to 1). */
     get lantern(): { x: number; y: number; flicker: number } {
+        const lx = this.lamp.pos.x * this.scale.x;
+        const ly = this.lamp.pos.y * this.scale.y;
+        const c = Math.cos(this.rotation);
+        const s = Math.sin(this.rotation);
         return {
-            x: this.pos.x + this.lamp.pos.x * this.scale.x,
-            y: this.pos.y + this.lamp.pos.y * this.scale.y,
+            x: this.pos.x + lx * c - ly * s,
+            y: this.pos.y + lx * s + ly * c,
             flicker: this.lamp.graphics.opacity,
         };
     }
@@ -109,6 +134,10 @@ export default class Mori extends Actor implements OkaHero {
         if (refill) this.hearts = 3;
         this.invuln = 1.2;
         this.hurtTime = 0;
+        this.runDist = 0;
+        this.runFrame = -1;
+        this.skidding = false;
+        this.startTime = this.landTime = this.stopTime = 0;
         this.pos = vec(x, y);
     }
 
@@ -150,10 +179,23 @@ export default class Mori extends Actor implements OkaHero {
             const strength = Math.min(1.5, Math.abs(b.vy) / 400 + 0.3);
             this.onSplash?.(this.water, b.x, strength);
         }
+        if (this.inWater) this.wetTime = WET_TIME;
+        else if (this.wetTime > 0) this.wetTime -= dt;
 
         let move = 0;
         if (this.hurtTime <= 0) move = (input.right ? 1 : 0) - (input.left ? 1 : 0);
-        if (move !== 0) this.facing = move > 0 ? 1 : -1;
+        // reversing at speed: plant the front heel and keep facing the old way until he stops
+        const skid = b.grounded && !this.inWater && move !== 0 && b.vx * move < 0 && Math.abs(b.vx) > SKID_SPEED;
+        if (skid && !this.skidding) {
+            this.hooks.sfx("skid", b.x, 0.95 + Math.random() * 0.1, Math.min(1, Math.abs(b.vx) / RUN_SPEED));
+            this.skidDust = 0;
+        }
+        this.skidding = skid;
+        if (skid) this.facing = b.vx > 0 ? 1 : -1;
+        else if (move !== 0) this.facing = move > 0 ? 1 : -1;
+        if (move !== 0 && b.grounded && Math.abs(b.vx) < 30 && !this.inWater && this.startTime <= 0 && this.runFrame < 0) {
+            this.startTime = 0.12;
+        }
 
         if (input.jumpPressed) this.buffer = BUFFER;
         else this.buffer -= dt;
@@ -176,13 +218,20 @@ export default class Mori extends Actor implements OkaHero {
             }
         }
         if (landed) {
-            this.squash = Math.min(1, fallSpeed / 700);
-            this.onLand?.(fallSpeed);
+            const impact = Math.min(1, fallSpeed / 700);
+            this.squash = impact;
+            if (fallSpeed > 160) {
+                // a running landing rolls straight into the next stride
+                this.landTime = Math.abs(b.vx) > 60 ? 0.06 + impact * 0.04 : 0.09 + impact * 0.1;
+                this.runDist = (STRIDE / RUN.length) * 1.01;
+                this.runFrame = 1;
+                this.hooks.sfx("land", b.x, 1.05 - impact * 0.15, 0.35 + impact * 0.65);
+                this.hooks.burst("dust", b.x, b.y, Math.round(2 + impact * 4));
+            }
         }
         if (b.grounded) this.coyote = COYOTE;
         else this.coyote -= dt;
 
-        this.pos = vec(Math.round(b.x * 2) / 2, Math.round(b.y * 2) / 2);
         this.animate(move, dt);
     }
 
@@ -245,47 +294,106 @@ export default class Mori extends Actor implements OkaHero {
         if (Math.random() < dt * 2) this.hooks.burst("glow", b.x + this.facing * 8, b.y - 50, 1);
     }
 
+    /** Close enough to a pool that the stones underfoot are wet. */
+    private nearWater(): boolean {
+        const b = this.rig;
+        return this.hooks.physics.waters.some((w) => b.x > w.x - 30 && b.x < w.x + w.w + 30 && Math.abs(w.y - b.y) < 40);
+    }
+
+    private footfall(i: number, k: number): void {
+        const b = this.rig;
+        const wet = this.wetTime > 0 || this.nearWater();
+        this.hooks.sfx(wet ? "stepWet" : "step", b.x, 0.93 + Math.random() * 0.14, 0.55 + 0.45 * k);
+        const footX = b.x + this.facing * MORI.feet[RUN[i]];
+        this.hooks.burst(wet && Math.random() < 0.5 ? "splash" : "dust", footX, b.y, 1);
+    }
+
     private animate(move: number, dt: number): void {
         const b = this.rig;
-        let frame = IDLE;
-        let rot = 0;
+        const speed = Math.abs(b.vx);
+        const k = Math.min(1, speed / RUN_SPEED);
+        const was = this.runFrame;
+        let frame: number = IDLE;
+        let lean = 0;
+        let lift = 0;
+        let runSy = 1;
+        this.startTime -= dt;
+        this.landTime -= dt;
+        this.stopTime -= dt;
         if (this.inWater) {
-            if (Math.abs(b.vx) > 30) {
+            if (speed > 30) {
                 frame = SWIM;
-                rot = Math.max(-0.25, Math.min(0.25, b.vy / 600)) * this.facing;
+                lean = Math.max(-0.25, Math.min(0.25, b.vy / 600)) * this.facing;
             } else {
                 frame = FALL;
             }
+            this.runFrame = -1;
         } else if (!b.grounded) {
             frame = b.vy < 40 ? JUMP : FALL;
-        } else if (Math.abs(b.vx) > 12) {
-            this.runClock += dt * (4 + Math.abs(b.vx) / 30);
-            frame = RUN[Math.floor(this.runClock) % RUN.length];
-            this.stepClock += dt * Math.abs(b.vx);
-            if (this.stepClock > 70) {
-                this.stepClock = 0;
-                this.hooks.burst("dust", b.x - this.facing * 6, b.y, 1);
+            lean = this.facing * 0.04 * k;
+            this.runFrame = -1;
+        } else if (this.skidding) {
+            frame = SKID;
+            lean = -this.facing * (0.06 + 0.1 * k);
+            this.skidDust -= dt;
+            if (this.skidDust <= 0) {
+                this.skidDust = 0.035;
+                this.hooks.burst("dust", b.x + this.facing * 14, b.y, 1);
             }
+            this.runFrame = -1;
+            this.runDist = 0;
+        } else if (this.landTime > 0) {
+            frame = LAND;
+            lean = this.facing * 0.05 * k;
+            this.runDist = (this.runDist + speed * dt) % STRIDE;
+        } else if (this.startTime > 0 && move !== 0 && speed < 170) {
+            // crouch and push off; the cycle picks up in flight, so the first contact comes next
+            frame = START;
+            lean = this.facing * 0.12;
+            this.runDist = (STRIDE * 3) / RUN.length;
+            this.runFrame = 3;
+        } else if (speed > 12 && (move !== 0 || this.runFrame >= 0 && speed > 120 && this.stopTime <= 0)) {
+            if (move === 0) {
+                // let go at speed: plant a foot and brake
+                frame = STOP;
+                this.stopTime = 0.16;
+                this.runFrame = -1;
+                this.footfall(4, k * 0.7);
+            } else {
+                this.runDist = (this.runDist + speed * dt) % STRIDE;
+                const i = Math.floor(this.runDist / (STRIDE / RUN.length)) % RUN.length;
+                if (i !== was && CONTACTS.includes(i)) this.footfall(i, k);
+                this.runFrame = i;
+                frame = RUN[i];
+                lift = RUN_LIFT[i] * k;
+                runSy = 1 + (RUN_SQUASH[i] - 1) * k;
+                // lean into it, more while still picking up speed
+                lean = this.facing * (0.06 * k + (speed < RUN_SPEED - 5 ? 0.05 * (1 - k) : 0));
+            }
+        } else if (this.stopTime > 0) {
+            frame = STOP;
+            lean = -this.facing * 0.04;
+            this.runFrame = -1;
         } else {
-            this.runClock = 0;
+            this.runFrame = -1;
+            if (this.startTime <= 0) this.runDist = 0;
         }
         const f = this.frames[frame];
         f.flipHorizontal = this.facing < 0;
         this.graphics.use(f);
-        this.rotation = rot;
+        this.lean = this.inWater ? lean : this.lean + (lean - this.lean) * Math.min(1, dt * 14);
+        this.rotation = this.lean;
+        this.pos = vec(Math.round(b.x * 2) / 2, Math.round((b.y - lift) * 2) / 2);
 
         this.squash += (0 - this.squash) * Math.min(1, dt * 10);
         const breathe = frame === IDLE ? Math.sin(this.t * 2.4) * 0.012 : 0;
-        const sy = 1 - this.squash * 0.14 + breathe;
-        const sx = 1 + this.squash * 0.12 - breathe * 0.5;
+        const sy = (1 - this.squash * 0.14 + breathe) * runSy;
+        const sx = 1 + this.squash * 0.12 - breathe * 0.5 + (1 - runSy) * 0.6;
         this.scale = vec(sx, sy);
 
-        // lantern position per pose, measured from the sheet (scene units from the feet)
-        const lampAt: Record<number, [number, number]> = {
-            [IDLE]: [17, -20], [JUMP]: [20, -48], [FALL]: [17, -27], [SWIM]: [27, -30],
-        };
-        const [lx, ly] = lampAt[frame] ?? [20, -32];
-        this.lamp.pos = vec(lx * this.facing, ly / sy);
+        // the glow sits on the flame painted in this frame, so it swings with the lantern
+        const [lx, ly] = MORI.lamps[frame] ?? [20, -24];
+        this.lamp.pos = vec(lx * this.facing, ly);
         this.lamp.graphics.opacity = 0.85 + Math.sin(this.t * 9) * 0.06 + Math.sin(this.t * 23) * 0.04;
         this.aura.pos = vec(lx * this.facing * 0.5, -40);
         this.aura.graphics.opacity = this.inWater ? 0.6 : 1;
