@@ -8,5 +8,5 @@
         "noEmit": true,
         "strict": true
     },
-    "include": ["./**/*.ts", "../../../src/components/scenes/HeavenOrHell/audio/*.ts"]
+    "include": ["./**/*.ts", "../../../src/components/scenes/HeavenOrHell/audio/*.ts", "../../../src/globals.d.ts"]
 }
