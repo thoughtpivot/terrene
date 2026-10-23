@@ -268,7 +268,10 @@ function advanceAttack(state: CombatState, a: AttackAction, events: CombatEvent[
         }
     }
     if (a.activeStarted && spec.kind !== "outcry" && !reached(before, activeEnd)) {
-        if (spec.lunge > 0) p.pos = moveBy(p.pos, normalize(p.facing), (spec.lunge * STEP_MS) / spec.activeMs);
+        if (spec.lunge > 0) {
+            const progress = (t: number) => Math.min(1, Math.max(0, (t - spec.windupMs) / spec.activeMs));
+            p.pos = moveBy(p.pos, normalize(p.facing), spec.lunge * (progress(a.t) - progress(before)));
+        }
         resolveSwingHits(state, a, events);
         if (p.action !== a) return;
         if (reached(a.t, activeEnd) && a.resolved.length === 0) {
