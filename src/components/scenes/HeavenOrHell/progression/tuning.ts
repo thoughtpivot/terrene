@@ -157,6 +157,9 @@ export const TIER_SCALING: Record<CorruptionTier, TierScaling> = {
     5: { enemyHp: 2.25, enemyPosture: 2, enemyDamage: 1.7, enemyAggression: 1.6, weaponTier: 6, lootTier: 6, costMult: 1.8, rewardMult: 2.25 },
 };
 
+/** Save slots on the slot-select screen, labelled A, B, C and so on. */
+export const SAVE_SLOT_COUNT = 3;
+
 export const TRUMPET_PROGRESS_MAX = 100;
 export const TRUMPET_PROGRESS = { bossKill: 35, breachCleared: 15, eliteKill: 5 };
 export const TRUMPET_CHOICES = 3;
