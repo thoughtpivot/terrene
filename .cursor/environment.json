@@ -1,4 +1,4 @@
 {
-  "install": "source ~/.nvm/nvm.sh\nnvm install 16\nnvm use 16\nnpm install",
+  "install": "source \"$HOME/.nvm/nvm.sh\"\nset -eo pipefail\nnvm install\nresolved=\"$(nvm version \"$(tr -d '[:space:]' < .nvmrc)\")\"\nnvm alias default \"$resolved\"\nnvm use \"$resolved\"\nnode_bin_dir=\"$(dirname \"$(nvm which \"$resolved\")\")\"\nsudo ln -sfn \"$node_bin_dir/node\" /usr/local/bin/node\nsudo ln -sfn \"$node_bin_dir/npm\" /usr/local/bin/npm\nsudo ln -sfn \"$node_bin_dir/npx\" /usr/local/bin/npx\nexport PATH=\"$node_bin_dir:$PATH\"\nhash -r\nnpm ci",
   "start": "docker compose up -d redis-stack"
 }
