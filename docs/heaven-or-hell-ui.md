@@ -1,7 +1,7 @@
 # Heaven Or Hell UI
 
 The UI kit for Heaven Or Hell: the in-world HUD, the reusable widgets and two
-menu mocks (the Gift hand and the Choir picker), all drawn by one corruption
+menu screens (the Gift hand and character creation), all drawn by one corruption
 theme. Everything is Excalibur graphics: `ScreenElement`s carrying `Canvas`
 rasters, plus `Text` and `FontSource`. There is no DOM overlay.
 
@@ -20,10 +20,13 @@ src/components/scenes/HeavenOrHell/ui/
   fonts/        Cinzel, Cormorant Garamond and Inter (woff2) with OFL licences
   widgets.ts    UiWidget and every widget (kit and HUD)
   hud.ts        HohHud: the HUD a gameplay scene owns
-  screens.ts    menu screens: Kit, Gift Hand, Choir
+  screens.ts    menu screens: Kit, Gift Hand
+  creation.ts   pure: the character creation flow, Choirs, halo options and
+                the difficulty mirror
+  creationScreen.ts  character creation: Choir, halo, road
   hd.ts         HdScreen: the crisp 1280x720 switch, restored on leave
   UiPreview.ts  the preview scene
-test/heaven-or-hell-ui.ts   tests for the pure modules (npm run test:hoh-ui)
+test/heaven-or-hell-ui*.ts  tests for the pure modules (npm run test:hoh-ui)
 ```
 
 ## Look
@@ -196,7 +199,7 @@ onPreUpdate(engine, elapsed) {
     const hud = this.hud;
     hud.setCorruption(world.corruption, player.stain);   // cheap; no-op when unchanged
     hud.setValues({
-        name: "Ashael · Kindled",
+        name: "The Tenth · Kindled",
         hp, hpMax, hpCap,                    // hpCap < hpMax once the halo has dimmed
         posture, postureMax,
         grace, graceMax,
@@ -248,22 +251,93 @@ Every widget extends `UiWidget`, a `ScreenElement` with one `Canvas`.
 - Menu screens in `screens.ts` sit on a veil at z 110. `KitScreen` shows every
   kit widget. `GiftHandScreen` is a five-card Ascension hand with feathers, Ban,
   Take and Stay; one card turns into a Fallen Gift at Tier III and Stain 25.
-  `ChoirScreen` is the first character creation step: eight Choirs with passives
-  and flaws, plus a detail panel.
+  `CreationScreen` is character creation, covered in the next section.
+
+## Character creation
+
+The player is **the Tenth**, a lesser angel. Creation is three quiet screens,
+each with a single choice and Back and Continue at the bottom (Kindle on the
+last). Dan's direction was an easy, polished look with no eyesores, so
+creation shows names, one line each and an emblem. It never shows stat
+tables, multipliers or numbers; a test checks every string it can display.
+
+- **Step trail.** Three diamonds on a hairline (Choir, Halo, Road), with
+  `Kindle the Tenth` and one line of prompt beneath.
+- **Choir.** Eight cards in a 4x2 grid, each with an emblem, the name and one
+  italic line, such as *Fire held close to the altar*. Hovering a card fades in
+  a single caption under the grid, such as *An echo of the Ophanim. Leans
+  toward awareness and learning.* There are no passives, flaws or stats here;
+  those belong to the in-game codex.
+- **Halo.** The halo, large and lit in its own colour, above "THE TENTH" and
+  the chosen pair in italic. Beside it are two rows of four swatches: Shape
+  (Ring, Twin Ring, Rayed, Crown) and Light (Dawn Gold, White Fire, Pale Silver,
+  Rose Gold).
+- **Road (difficulty).** Four cards, easiest to hardest: Still Waters, The
+  Narrow Way, The Furnace of Affliction and Son of the Morning.
+  - Each card shows an emblem in its accent colour (still water, a narrow
+    gate, a furnace flame, a falling star), a thin accent bar, the name and
+    a one-line subtitle.
+  - Only the selected card adds its KJV epigraph in small italic, with the
+    book name (*Isaiah*). Chapter and verse are dropped by `epigraphSource`,
+    so nothing on screen is a number.
+  - The Narrow Way is preselected. Accents run white, gold, orange and red;
+    orange and red match the theme's warning and danger colours.
+
+Creation happens before the run, so the screen always paints with
+`themeFor(0, 0)`, the Tier 0 look, whatever World Corruption is set to.
+
+Controls: click, or ← → to move the choice, ↑ ↓ to pick the shape or light row
+on the halo step, Enter to continue and Esc or Backspace to go back.
+
+Wiring it into a scene:
+
+```ts
+import { CreationScreen } from "./ui/creationScreen";
+
+const creation = new CreationScreen(this, 1280, 720);
+creation.layout(1, hd.pixelRatio, 0, 0);
+creation.onComplete = (r) => startRun(r);   // { choir, halo: { shape, colour }, difficulty }
+creation.show(true);
+// forward pointer events and keys: pointerMove, pointerDown, move(dx, dy), goNext(), goBack()
+```
+
+The result carries ids only: a Choir id such as `"wheelborn"`, a halo shape
+and colour id, and a difficulty id such as `"narrowWay"`.
+
+### Difficulty integration
+
+`ui/creation.ts` defines `DifficultyOption` (`id`, `name`, `subtitle`,
+`epigraph`, `accent`) and `DIFFICULTY_OPTIONS`. These mirror the display fields
+of `DIFFICULTIES` in `progression/tuning.ts` on the progression branch, so this
+branch builds and merges without depending on it.
+
+`DifficultyDef` has all of these fields plus the tuning, so at integration:
+
+- import `DIFFICULTIES` and `DEFAULT_DIFFICULTY` from `progression/tuning.ts`
+- replace `DIFFICULTY_OPTIONS` in `ui/creation.ts` with `DIFFICULTIES` (it
+  type-checks as `readonly DifficultyOption[]` as is), and
+  `DEFAULT_DIFFICULTY_ID` with `DEFAULT_DIFFICULTY`
+- remove the mirrored data
+
+The creation functions take the list as an optional last argument, so tests
+can also pass `DIFFICULTIES` directly. Keep the picker to the display fields:
+it must never show `minutesPerTier`, enemy multipliers, Stain gain or loot
+bonuses.
 
 ## The preview
 
 `/#heavenorhellui` shows the HUD over a stand-in floor. Its light pool shifts
 from altar gold to a breach, and a fissure opens as corruption rises. Tabs
-switch to Kit, Gift Hand and Choir; on those tabs the HUD hides and the preview
+switch to Kit, Gift Hand and Creation; on those tabs the HUD hides and the preview
 controls fold into a strip along the bottom.
 
 - Drag the Corruption and Stain sliders, or use ← → for corruption, ↑ ↓ for
   Stain and 0–5 to jump to a tier.
 - L cycles lives, H takes a hit, Space advances dialogue, [ ] or Tab switches
   screens, P pauses the dummy values and T sweeps corruption 0→5→0 over 24 s.
+- On the Creation tab the arrows, Enter and Esc drive creation instead.
 - Query parameters: `?c=2.5&s=50&lives=1&tab=0&t=3&paused=1`.
-- `window.__hohUi.set({ corruption, stain, lives, tab, paused, time, sweep })`
+- `window.__hohUi.set({ corruption, stain, lives, tab, paused, time, sweep, step })`
   and `window.__hohUi.state()` are for scripted screenshots.
 
 ## Deepwoken references
