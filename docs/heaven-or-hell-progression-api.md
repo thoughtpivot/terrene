@@ -58,6 +58,7 @@ The difficulty sets the corruption pace. `secondsPerTier(difficulty)` gives the 
 | Meta | `recordWitness`, `buyUpgrade`, `unlockOrigin`, `unlockVariant`, `recordSeen`, `recordStudy`, `recordKill`, `bestiaryTier`, `discoverLandmark`, `learnLore` |
 | Wipe | `wipe`, `settleMeta` |
 | Save | `serializeSave`, `deserializeSave`, `SAVE_KEY`, `SAVE_VERSION` |
+| Save slots | `listSlots`, `loadSlot`, `saveSlot`, `deleteSlot`, `startCharacterInSlot`, `slotMeta`, `migrateLegacySave`, `SLOT_IDS`, `SAVE_SLOT_COUNT` |
 
 ## What combat reads
 
@@ -81,9 +82,40 @@ Combat reports events back by calling progression:
 
 ## Saving
 
-`serializeSave(meta, run)` returns a JSON string with `format` and `version`. The caller stores it in `localStorage` under `SAVE_KEY` after every change, so reloading can't undo being struck down. `deserializeSave(text)` checks the format, refuses saves from newer versions, migrates older ones and fills in meta fields that are missing. It rejects a run with an unknown `difficulty`.
+`serializeSave(meta, run, savedAt?)` returns a JSON string with `format` and `version`. The slot functions below store it after every change, so reloading can't undo being struck down. `deserializeSave(text)` checks the format, refuses saves from newer versions, migrates older ones and fills in meta fields that are missing. It rejects a run with an unknown `difficulty`.
 
 `SAVE_VERSION` is 2. Version 1 saves had no difficulty and a fixed 100 minutes per tier. The migration gives them `"narrowWay"` and scales `elapsedSeconds` by 60/100, so a loaded run stays at the same corruption tier.
+
+## Save slots
+
+After Start on the title menu, the player picks a slot, as in Deepwoken's slot select. There are `SAVE_SLOT_COUNT` (3) slots, with ids and labels `"A"`, `"B"` and `"C"` (`SLOT_IDS`). Each slot holds its own run **and its own meta** (Testimony, Remembrance and unlocks), so a wipe in one slot never touches another.
+
+Every slot function takes a `SlotStorage` (`getItem`, `setItem`, `removeItem`); pass `window.localStorage`. Slot A lives under `slotKey("A")`, which is `"heaven-or-hell-progression:slot-v1:A"`. The `v1` is `SLOT_KEY_VERSION`, for the key layout; the file inside keeps its own `SAVE_VERSION` and migrations.
+
+```ts
+const slots = listSlots(localStorage);            // one SlotSummary per slot, for the menu
+// Empty slot: run character creation against slotMeta(localStorage, id), then
+const started = startCharacterInSlot(localStorage, id, input, seed, Date.now());
+// Filled slot: continue it
+const { meta, run } = loadSlot(localStorage, id).value;
+saveSlot(localStorage, id, meta, run, Date.now()); // after every change, and after a wipe
+deleteSlot(localStorage, id);                     // erases that slot's run and meta
+```
+
+`SlotSummary` is small, and `state` decides what the menu shows:
+
+| `state` | Extra fields | Menu |
+| --- | --- | --- |
+| `"empty"` | – | "New character" |
+| `"character"` | `choirName` (the variant's name if it has one), `difficulty`, `difficultyName`, `tier`, `playSeconds`, `life` (`"bright"`, `"dimmed"`, `"castOut"` or `"fallen"`), `lastPlayed` | Continue |
+| `"noCharacter"` | `testimony`, `lastPlayed` | "New character", keeping the slot's meta |
+| `"corrupt"` | `error` | Offer delete |
+
+Every summary also has `id` and `label`. `lastPlayed` is the `now` passed to the last save, in epoch milliseconds, or `null` for a migrated save that never recorded one.
+
+`startCharacterInSlot` builds the run with the slot's meta, keeps that meta and saves both. It fails with `"slot-occupied"` while the slot still holds a run, so a character is never overwritten by accident. Slot functions fail with `"bad-slot"` for an unknown id, and `loadSlot` fails with `"empty-slot"` when nothing is stored.
+
+**Migration.** `listSlots` and `loadSlot` first call `migrateLegacySave`. It moves the old single save under `SAVE_KEY` (any version, so v1 saves are upgraded on the way) into slot A, then removes the old key. It does nothing when slot A already holds data or the old save can't be read, and leaves the old key in place in those cases.
 
 ## Tests
 
