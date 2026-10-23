@@ -28,7 +28,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "../..");
 const SOURCE = path.join(HERE, "source");
 const SCENE_ART = path.join(ROOT, "src/components/scenes/HeavenOrHell/art");
-const HERO_DIR = path.join(ROOT, "src/components/characters/player/Auriel");
+const HERO_DIR = path.join(ROOT, "src/components/characters/player/Tenth");
 
 /** Footprint height over width for the locked camera (sin of the ~46 degree pitch). */
 const FOOTPRINT_RATIO = 0.72;
@@ -482,9 +482,9 @@ export type PropName = keyof typeof PROP_FRAMES;
         heroItems.push({ name: f.name, img: f.img });
         if (f.glow) heroItems.push({ name: `${f.name}:glow`, img: f.glow.img });
     }
-    const heroPages = packPages(heroItems, "Auriel", HERO_DIR);
+    const heroPages = packPages(heroItems, "Tenth", HERO_DIR);
     if (heroPages.pages.length !== 1) throw new Error("the hero must fit one atlas page");
-    fs.renameSync(path.join(HERO_DIR, heroPages.pages[0]), path.join(HERO_DIR, "Auriel.png"));
+    fs.renameSync(path.join(HERO_DIR, heroPages.pages[0]), path.join(HERO_DIR, "Tenth.png"));
     const partLines = hero.parts.map((p) => {
         const r = heroPages.at.get(p.name)!;
         const g = p.glow ? heroPages.at.get(`${p.name}:glow`)! : null;
@@ -497,7 +497,7 @@ export type PropName = keyof typeof PROP_FRAMES;
         const glow = g && f.glow ? `, glow: { ${rect(g)}, ox: ${f.glow.ox}, oy: ${f.glow.oy} }` : "";
         return `    "${f.name}": { ${rect(r)}, ax: ${round(f.ax)}, ay: ${round(f.ay)}, scale: ${f.scale}, foot: 0${glow} },`;
     });
-    fs.writeFileSync(path.join(HERO_DIR, "Auriel.atlas.ts"), `${HEADER}
+    fs.writeFileSync(path.join(HERO_DIR, "Tenth.atlas.ts"), `${HEADER}
 import type { AtlasFrame, PartFrame } from "../../../scenes/HeavenOrHell/art/types.ts";
 
 /** Stored pixels per on-screen pixel is 1 / HERO_SCALE. */

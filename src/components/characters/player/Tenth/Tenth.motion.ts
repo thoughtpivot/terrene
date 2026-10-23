@@ -1,5 +1,5 @@
 /**
- * How Auriel moves: an eight-way hover with a short dash. Tuned to feel
+ * How the Tenth moves: an eight-way hover with a short dash. Tuned to feel
  * immediate: full speed in about four frames and a stop in about three, so
  * a tap moves the hero at once and a release halts it crisply. Pure.
  */

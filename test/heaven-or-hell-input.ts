@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { canDash, DASH_COOLDOWN, DASH_SPEED, DASH_TIME, freshMotion, startDash, stepMotion, WALK_SPEED } from "../src/components/characters/player/Auriel/Auriel.motion.ts";
+import { canDash, DASH_COOLDOWN, DASH_SPEED, DASH_TIME, freshMotion, startDash, stepMotion, WALK_SPEED } from "../src/components/characters/player/Tenth/Tenth.motion.ts";
 import { BUFFER_MS, facing8, InputBuffer, KEY_ACTIONS, MOUSE_ACTIONS, moveVector, readIntent, viewFor } from "../src/components/scenes/HeavenOrHell/input.ts";
 
 const frame = 1 / 60;

@@ -9,8 +9,8 @@ node tools/heaven-or-hell/build-art.ts
 ```
 
 The script writes `src/components/scenes/HeavenOrHell/art/heaven-props-0.png`
-with `art/atlas.ts`, and `src/components/characters/player/Auriel/Auriel.png`
-with `Auriel.atlas.ts`. The halo, the soft glow dot and the contact shadow
+with `art/atlas.ts`, and `src/components/characters/player/Tenth/Tenth.png`
+with `Tenth.atlas.ts`. The halo, the soft glow dot and the contact shadow
 are drawn by the script itself, not painted.
 
 ## The camera
@@ -57,6 +57,10 @@ the braziers, the altar, the breach and the hero's halo, and falls to
 near-black away from them, so the ruins read as white stone in the dark.
 
 ## Paintings
+
+The three `hero-*` paintings are the Tenth, a lesser angel defending Heaven:
+near-monochrome robes with a glowing white-gold halo, eyes and wing edges.
+The halo is drawn by `build-art.ts`.
 
 | File | Size | Subject (between the style blocks) |
 | --- | --- | --- |

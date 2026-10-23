@@ -2,7 +2,7 @@ import {
     Actor, Color, Engine, Font, FontUnit, ImageFiltering, ImageSource, ImageWrapping, Keys, Scene, ScreenElement, Text, TextAlign, vec,
     type ExcaliburGraphicsContext, type Material, type Subscription,
 } from "excalibur";
-import Auriel, { Resources as AurielResources } from "../../characters/player/Auriel/Auriel.ts";
+import Tenth, { Resources as TenthResources } from "../../characters/player/Tenth/Tenth.ts";
 import { PROP_FRAMES } from "./art/atlas.ts";
 import FloorImage from "./art/floor-tile.png";
 import PropsImage from "./art/heaven-props-0.png";
@@ -31,7 +31,7 @@ const HINT_TIME = 9;
 const Resources = {
     Props: new ImageSource(PropsImage, { filtering: ImageFiltering.Blended }),
     Floor: new ImageSource(FloorImage, { filtering: ImageFiltering.Blended, wrapping: ImageWrapping.Repeat }),
-    Hero: AurielResources.Image,
+    Hero: TenthResources.Image,
 };
 
 export { Resources };
@@ -65,8 +65,8 @@ function pickPixelRatio(): number {
 }
 
 /**
- * Heaven Or Hell, M1: a fallen angel in the dark ruins of Heaven, with Hell
- * breaking through at the edge. A fixed three-quarter camera over painted
+ * Heaven Or Hell, M1: the Tenth, a lesser angel, defends the dark ruins of
+ * Heaven while Hell breaks through at the edge. A fixed three-quarter camera over painted
  * sprites, lit per pixel and bloomed. The map streams in chunks around the
  * hero. Terrene runs at 256x240; this scene switches to 1280x720 with
  * smoothing while it is active and puts the screen back after.
@@ -81,7 +81,7 @@ export default class HeavenOrHell extends Scene {
     private lights = new LightField();
     private streamer: ChunkStreamer | null = null;
     private debug: StreamingDebug | null = null;
-    private hero: Auriel | null = null;
+    private hero: Tenth | null = null;
     private overlays: Actor[] = [];
     /** made once per scene, so re-entering never uploads another copy */
     private vignette: CanvasGraphic | null = null;
@@ -194,7 +194,7 @@ export default class HeavenOrHell extends Scene {
 
         this.streamer = new ChunkStreamer(this, engine, GRID, { props: Resources.Props, floor: Resources.Floor }, this.lit, this.lights);
         const spawn = spawnPoint();
-        const hero = new Auriel(spawn.x, spawn.y);
+        const hero = new Tenth(spawn.x, spawn.y);
         hero.light = this.lights.add({ x: spawn.x, y: spawn.y - 60, r: 280, color: LIGHT.halo, intensity: 0.55, flicker: 0.04 });
         this.hero = hero;
         this.add(hero);

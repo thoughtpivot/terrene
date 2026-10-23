@@ -7,13 +7,13 @@ import { additive, type LiveLight } from "../../../scenes/HeavenOrHell/render/li
 import type { Rect } from "../../../scenes/HeavenOrHell/world/chunks.ts";
 import { depthOf, resolve } from "../../../scenes/HeavenOrHell/world/collide.ts";
 import type { Footprint } from "../../../scenes/HeavenOrHell/world/map.ts";
-import { HERO_EXTRAS, HERO_PARTS, HERO_SCALE } from "./Auriel.atlas.ts";
-import { canDash, freshMotion, RADIUS, startDash, stepMotion, type Motion } from "./Auriel.motion.ts";
-import AurielImage from "./Auriel.png";
-import { AurielRig, type PartDraw } from "./Auriel.rig.ts";
+import { HERO_EXTRAS, HERO_PARTS, HERO_SCALE } from "./Tenth.atlas.ts";
+import { canDash, freshMotion, RADIUS, startDash, stepMotion, type Motion } from "./Tenth.motion.ts";
+import TenthImage from "./Tenth.png";
+import { TenthRig, type PartDraw } from "./Tenth.rig.ts";
 
 const Resources = {
-    Image: new ImageSource(AurielImage, { filtering: ImageFiltering.Blended }),
+    Image: new ImageSource(TenthImage, { filtering: ImageFiltering.Blended }),
 };
 
 export { Resources };
@@ -44,7 +44,7 @@ function frameOf(d: PartDraw): (AtlasRect & { glow?: GlowRect }) | undefined {
 
 /** Draws the rig's parts: each under its root then local transform, with its glow pass added on top. */
 class PuppetGraphic extends Graphic {
-    constructor(private readonly hero: Auriel) {
+    constructor(private readonly hero: Tenth) {
         super({ width: BOX_W, height: BOX_H });
     }
 
@@ -112,14 +112,15 @@ export interface StepResult {
 }
 
 /**
- * Auriel, a fallen angel: dark robes, gold halo and wing edges. The scene
- * feeds an Intent each frame; Auriel owns movement, facing, the puppet and
- * the buffered actions. Moves and aims in ground space, so walking up the
+ * The Tenth, a lesser angel defending Heaven: near-monochrome robes with a
+ * glowing white-gold halo, eyes and wing edges. The scene feeds an Intent
+ * each frame; the Tenth owns movement, facing, the puppet and the buffered
+ * actions. Moves and aims in ground space, so walking up the
  * screen is foreshortened like everything else under this camera.
  */
-export default class Auriel extends Actor {
+export default class Tenth extends Actor {
     mover: Motion;
-    readonly rig = new AurielRig();
+    readonly rig = new TenthRig();
     readonly buffer = new InputBuffer();
     facing = 1;
     parts: PartDraw[] = [];

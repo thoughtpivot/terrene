@@ -1,7 +1,7 @@
 /**
- * Auriel's puppet: painted parts (hood, torso, hem, two wings, the sword arm,
+ * The Tenth's puppet: painted parts (hood, torso, hem, two wings, the sword arm,
  * halo and shadow), the clips that move them, and the springs that make the
- * robe, wings, head and halo lag behind the body. `AurielRig.update` returns
+ * robe, wings, head and halo lag behind the body. `TenthRig.update` returns
  * every part's transform for the frame in draw order; the actor draws them.
  * Pure, so the motion can be tested without a browser.
  */
@@ -10,8 +10,8 @@ import {
     type Clip, type Pose, type Spring,
 } from "../../../scenes/HeavenOrHell/anim/puppet.ts";
 import { viewFor, type View } from "../../../scenes/HeavenOrHell/input.ts";
-import { HERO_CUTS, HERO_EXTRAS, HERO_HEIGHT, HERO_PARTS, HERO_SCALE } from "./Auriel.atlas.ts";
-import { WALK_SPEED } from "./Auriel.motion.ts";
+import { HERO_CUTS, HERO_EXTRAS, HERO_HEIGHT, HERO_PARTS, HERO_SCALE } from "./Tenth.atlas.ts";
+import { WALK_SPEED } from "./Tenth.motion.ts";
 
 export type PartName = "shadow" | "wingL" | "wingR" | "hem" | "torso" | "head" | "arm" | "halo";
 
@@ -108,7 +108,7 @@ function unwrapNear(a: number, ref: number): number {
     return ref + d;
 }
 
-export class AurielRig {
+export class TenthRig {
     readonly player = new ClipPlayer(CLIPS.idle);
     private lean: Spring = spring();
     private hemLag: Spring = spring();

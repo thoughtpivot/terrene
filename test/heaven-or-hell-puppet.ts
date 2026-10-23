@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { AurielRig, CLIPS, HOVER } from "../src/components/characters/player/Auriel/Auriel.rig.ts";
-import { HERO_EXTRAS, HERO_PARTS } from "../src/components/characters/player/Auriel/Auriel.atlas.ts";
-import { WALK_SPEED } from "../src/components/characters/player/Auriel/Auriel.motion.ts";
+import { TenthRig, CLIPS, HOVER } from "../src/components/characters/player/Tenth/Tenth.rig.ts";
+import { HERO_EXTRAS, HERO_PARTS } from "../src/components/characters/player/Tenth/Tenth.atlas.ts";
+import { WALK_SPEED } from "../src/components/characters/player/Tenth/Tenth.motion.ts";
 import {
     blendPoses,
     ClipPlayer,
@@ -100,7 +100,7 @@ test("squash and stretch keeps the volume", () => {
 const idle = { vx: 0, vy: 0, dashing: false, aim: null, facing: 2 };
 
 test("the rig draws every part from the atlas, wings behind when facing the camera", () => {
-    const rig = new AurielRig();
+    const rig = new TenthRig();
     const parts = rig.update(1 / 60, idle);
     const names = parts.map((p) => p.part);
     assert.deepEqual(new Set(names), new Set(["shadow", "wingL", "wingR", "hem", "torso", "head", "arm", "halo"]));
@@ -113,13 +113,13 @@ test("the rig draws every part from the atlas, wings behind when facing the came
         assert.ok(p.w > 0 && p.h > 0);
     }
 
-    const north = new AurielRig();
+    const north = new TenthRig();
     const back = north.update(1 / 60, { ...idle, facing: 6 }).map((p) => p.part);
     assert.ok(back.indexOf("wingL") > back.indexOf("torso"), "facing north the wings are in front");
 });
 
 test("the body parts stack: hem, torso and head meet at the cuts", () => {
-    const rig = new AurielRig();
+    const rig = new TenthRig();
     const parts = rig.update(1 / 60, idle);
     const get = (n: string) => parts.find((p) => p.part === n)!;
     const hem = get("hem");
@@ -135,7 +135,7 @@ test("the body parts stack: hem, torso and head meet at the cuts", () => {
 });
 
 test("facing west mirrors the south-east view", () => {
-    const rig = new AurielRig();
+    const rig = new TenthRig();
     const parts = rig.update(1 / 60, { ...idle, facing: 4 });
     assert.equal(rig.view, "se");
     assert.equal(rig.flip, true);
@@ -143,7 +143,7 @@ test("facing west mirrors the south-east view", () => {
 });
 
 test("walking leans into the motion and the robe and halo lag behind", () => {
-    const rig = new AurielRig();
+    const rig = new TenthRig();
     rig.update(1 / 60, { ...idle, facing: 0 });
     let parts = rig.update(1 / 60, { ...idle, facing: 0 });
     for (let i = 0; i < 6; i++) parts = rig.update(1 / 60, { vx: WALK_SPEED, vy: 0, dashing: false, aim: null, facing: 0 });
@@ -158,7 +158,7 @@ test("walking leans into the motion and the robe and halo lag behind", () => {
 });
 
 test("a facing change pops the squash spring", () => {
-    const rig = new AurielRig();
+    const rig = new TenthRig();
     rig.update(1 / 60, idle);
     const before = rig.update(1 / 60, idle).find((p) => p.part === "torso")!.root.sy;
     let after = before;
