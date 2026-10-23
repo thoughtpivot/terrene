@@ -9,10 +9,12 @@ world is toon-shaded, bevelled 3D seen from one fixed, angled camera, in
 near-black monochrome, and Heaven's white and gold clash with Hell's red and
 orange in glows that bloom against the dark.
 
-The game is built in ExcaliburJS 0.32, like the rest of Terrene. Because the
-camera never rotates, the 3D look is pre-rendered: models are built in
-Blender, rendered at the one fixed angle into high-resolution sprites with
-emissive and normal passes, and lit, bloomed and fogged in Excalibur.
+The game is built entirely in ExcaliburJS 0.32, like the rest of Terrene,
+with no other engine and no 3D tool. It is 2D. Because the camera never
+rotates, every image is painted for that one angle: AI-generated source
+paintings are cut, keyed and packed into high-resolution sprites by
+TypeScript build scripts, and the 3D look comes from the painted volume
+plus Excalibur shaders for lighting, toon bands, outlines, glow and bloom.
 
 This plan turns the Granola notes "Heaven Or Hell" (Dan, October 23, 2026)
 and Dan's follow-up decisions into milestones that fit Terrene's existing
@@ -23,7 +25,7 @@ by Dan and partly still a proposal.
 
 ### Questions that block M1 or M2
 
-None. M1 (one lit area, pre-rendered) and M2 (the combat core with the
+None. M1 (one lit, painted area) and M2 (the combat core with the
 basic sword) can start on the decisions already made. M3 has no open
 blocker either, now that right-click and Choir selection are decided. The
 first milestone with open questions is M4, the run. The full list is in
@@ -41,8 +43,8 @@ follow-up decisions below.
   plus blog articles that explain its gameplay.
 - Look: 2D high-resolution art in an isometric view. It should not look like
   Roblox. It should feel like "Deepwoken done properly on a real engine."
-  *The follow-up replaces the 2D isometric view with a fixed 3D-style
-  camera, pre-rendered.*
+  *The follow-up replaces the 2D isometric view with Death's Door's fixed
+  angled camera, still drawn in 2D with painted sprites.*
 - Palette: very dark backgrounds, very vibrant foregrounds, high contrast and
   bloom. Parallax or animated backgrounds are wanted.
 - Target imagery: dark stone, cyan, orange and red glows, isometric dungeon
@@ -79,12 +81,17 @@ the aesthetics of the game. We're still following the Deepwoken mechanics."
   render.
 - **Little Scavenger** stays a reference for lighting and colour only.
 
-**Engine.** Dan: "Stay in ExcaliburJS." The game is built in Excalibur 0.32
-with pre-rendered 3D, described in [Technical approach](#technical-approach).
-Three.js, Babylon.js and native engines (Godot, Unity) were considered.
-Excalibur won because it reuses `ChatSystem`, `QuestSystem` and
-`DialogueNPC`, it keeps the project rules as they are, and the camera never
-rotates, so pre-rendering at one angle works.
+**Engine.** Dan: "Stay in ExcaliburJS." And later: "I don't plan on
+downloading Blender for this project or using Three.js. I want this to be
+built entirely on Excalibur.js; if there's any problem with anything I ask
+for, let me know." So the game uses Excalibur 0.32 alone, with no Blender,
+no Three.js and no other engine or 3D tool, as described in
+[Technical approach](#technical-approach). Excalibur reuses `ChatSystem`,
+`QuestSystem` and `DialogueNPC` and keeps the project rules as they are.
+Where Excalibur lacks something this plan needs (skeletal animation,
+multi-pass bloom, map streaming), the plan says so and builds it on
+Excalibur, and the problems Dan asked to hear about are listed in
+[Risks](#risks).
 
 **Premise.** The game takes place in Heaven. You are a lesser angel. Hell is
 attacking and invading Heaven, and you defend Heaven from Hell taking it
@@ -162,12 +169,33 @@ dims, and the second time wipes you. Dan likes it.
 world. Orthographic is the default lens, as a starting value to verify
 against Death's Door's screenshots in M1.
 
-**Art production.** There is no modeller, and no art will be bought or
-commissioned. Dan: "Just try your best." The development agent makes the 3D
-models, rigs and animations itself, as scripted Blender in Python: simple
-stylised shapes in a chunky, bevelled, toon-shaded look inspired mostly by
-Death's Door and only a little by Little Scavenger. See
-[Who makes the art](#who-makes-the-art).
+**Art production.** There is no artist, and no art will be bought or
+commissioned. Dan: "Just try your best." AI image generation is allowed for
+the source paintings. Dan: "focus on making them high-resolution sprites
+that give it that 3D look, but it is 2D." The paintings are generated on a
+keyable flat background, all for the same fixed camera angle, and Node and
+TypeScript scripts cut, key and pack them into sprites. The look is chunky,
+bevelled and toon-shaded, inspired mostly by Death's Door and only a little
+by Little Scavenger. See [Who makes the art](#who-makes-the-art).
+
+**Animation.** Dan wants "very crisp animations that give a very immersive
+feel." Excalibur has no skeletal animation, so the plan writes a 2D cutout
+puppet system for it: separate painted parts, keyframed with easing,
+secondary motion, squash and stretch, and hit-stop. See
+[Puppet animation](#puppet-animation).
+
+**Bloom.** Maximum bloom and vibrance is a requirement. Dan: "no true bloom
+is a very bad problem; try your best creating the most bloom and
+vibrance." M1 tests a real multi-pass bloom inside Excalibur. See
+[Bloom](#bloom).
+
+**Deploy.** Each milestone is published to GitHub Pages so it can be played
+at `https://thoughtpivot.github.io/terrene/#heavenorhell`. See
+[Deploy](#deploy).
+
+**Parallel work.** Development is split into workstreams on separate
+branches (rendering, the combat rules and the progression systems), with an
+integration step. See [Workstreams](#workstreams).
 
 **Controls.** Like Deepwoken. The mouse aims and left-click attacks (the
 light attack chain). F parries, holding F blocks, Q rolls and R is the
@@ -215,9 +243,11 @@ the baseline every other weapon is tuned against.
 - **What "Heaven Or Hell" means in play.** Resolved by the premise: you
   defend Heaven against Hell's invasion. The earlier readings (descending
   through hell floors, or choosing up or down at each exit) are dropped.
-- **Pixel art or painted art.** Resolved: neither. The game is high-resolution,
-  toon-shaded 3D, pre-rendered.
-- **The engine.** Resolved: ExcaliburJS 0.32.
+- **Pixel art or painted art.** Resolved: high-resolution painted 2D
+  sprites, not pixel art, painted with volume and lit with toon bands so
+  they read as 3D.
+- **The engine.** Resolved: ExcaliburJS 0.32 alone. No Blender, no
+  Three.js and no other engine.
 - **What the heavenly creatures are to the player.** Resolved: angels are
   allies, demons are the main enemies, and corrupted angels are a smaller
   elite and boss tier.
@@ -226,8 +256,16 @@ the baseline every other weapon is tuned against.
 - **The camera angle and lens.** Decided as a default: Death's Door's look,
   45–50 degrees down along a diagonal, orthographic, one angle everywhere.
   It's verified against the screenshots in M1.
-- **Who makes the 3D models and animations.** Resolved: the development
-  agent, by script, with no bought or commissioned art.
+- **Who makes the art and animations.** Resolved: the development agent,
+  using AI-generated source paintings processed by TypeScript scripts and
+  animated with a puppet system, with no bought or commissioned art.
+- **Animation style.** Resolved: crisp 2D cutout puppets with easing,
+  secondary motion, squash and stretch, held key poses and hit-stop.
+- **Bloom.** Resolved as a requirement: maximum bloom and vibrance, with a
+  real multi-pass bloom tested in M1.
+- **Map streaming.** Resolved: regions and chunks load and unload by
+  distance from the player, with a debug view.
+- **Deploy.** Resolved: every milestone is published to GitHub Pages.
 - **Input scheme.** Resolved: Deepwoken-like mouse and keyboard, with
   right-click always the feint and R the only critical.
 - **Desktop or mobile.** Resolved as the default: desktop browsers.
@@ -398,14 +436,15 @@ Door's "echo" rule for related enemies.
 - A corrupted ophan that rolls through the arena.
 - Abaddon, who leads them.
 
-### Notes for the render pipeline
+### Notes for the art pipeline
 
 Cherubim, ophanim and corrupted versions of them move "without turning," so
-each needs only one facing instead of eight, which saves a lot of render
-work. Locusts and Legion's bodies share one rig each and appear in numbers,
-so they need few animations. The big bosses (Behemoth, Leviathan, the beast
-and the dragon) are the costliest to build and animate, so they come one at
-a time, from M4 on. Wings and eyes should loop in short cycles.
+each needs only one painted view instead of several, which saves a lot of
+painting. Locusts and Legion's bodies share one puppet each and appear in
+numbers, so they need few animations. The big bosses (Behemoth, Leviathan,
+the beast and the dragon) are the costliest to paint consistently and to
+animate, so they come one at a time, from M4 on, painted in parts. Wings,
+eyes and wheels suit puppet loops in short cycles.
 
 ## Art direction
 
@@ -488,16 +527,17 @@ shapes and shading, darken them, and use Little Scavenger's approach to
 light and colour.
 
 - **Camera.** One fixed, angled camera follows the player and never rotates.
-  Every sprite is rendered at that angle, so nothing in the game may rotate
-  the camera, and zoom stays within a narrow range so the baked ink lines
-  keep their width. Decided as the default: Death's Door's look, about
+  Every sprite is painted for that angle, so nothing in the game may rotate
+  the camera, and zoom stays within a narrow range so sprites stay sharp and
+  ink lines keep their width. Decided as the default: Death's Door's look, about
   45–50 degrees down, looking along a diagonal, with an orthographic lens.
   These are starting values. M1 checks them against Death's Door's
   screenshots, for example whether vertical edges converge, which would
   mean a perspective lens. One angle covers the whole world.
 - **High resolution.** The game renders at the display's full resolution,
   with antialiasing on. There is no pixel art and no pixel snapping. Sprites
-  are rendered at the size they're shown on a 1080p screen, not scaled up.
+  are packed at the size they're shown on a 1080p screen or larger, and
+  never scaled up, so nothing blurs.
 - **Value structure.** The environment lives in the bottom 15% of
   brightness. Floors in shadow sit around `#0B0C10` to `#16181F`, and lit
   floor never rises above about 35% brightness. Pure black is kept for edges,
@@ -513,11 +553,12 @@ light and colour.
   shading: three steps, for shadow, mid and lit. On the environment the
   three steps stay inside the value structure, from the shadow floor to the
   35% ceiling. Characters use the same bands plus a rim light. Emissive
-  surfaces skip the bands and draw at full brightness. The same three bands
-  are used in Blender's renders and in the runtime lighting shader, so baked
-  and runtime light match.
-- **Ink outlines.** Every model gets a dark ink outline, baked in Blender at
-  a fixed line width. Environment outlines are pure black, so they merge into
+  surfaces skip the bands and draw at full brightness. Source paintings are
+  prompted for flat, even light, and the runtime lighting `Material`
+  applies the three bands, so every sprite gets the same bands.
+- **Ink outlines.** Every sprite gets a dark ink outline at a fixed line
+  width, drawn by a shader around its alpha edge rather than trusted to the
+  painting. Environment outlines are pure black, so they merge into
   the shadows and only show where a shape meets light. That's why actors
   also need rim light to read. The hero's outline is gold instead of black.
 - **Where the light goes.** Each area has two to four small light sources.
@@ -552,7 +593,7 @@ light and colour.
   get a thin red rim, and related enemies share a shape, as Death's Door's
   Ghost "echoes" its Golem. Each actor gets one strong colour accent, like
   the crow's red sword.
-- **Environment shape language.** Model the environment from chunky,
+- **Environment shape language.** Paint the environment as chunky,
   bevelled, slightly irregular stone kit pieces, with plain ground and
   ornament gathered on focal pieces. Walls and tall pieces on the camera
   side are cut low or left out, so they never hide the player.
@@ -573,7 +614,7 @@ lit ceiling is the brightest lit ground gets, at about 35% brightness.
 
 Corruption is a blend, not a swap. As it spreads from a breach, the ground
 shifts from the region's base toward the corrupted row, and red cracks and
-embers appear. In the render pipeline the environment is rendered in near
+embers appear. In the art pipeline the environment is painted in near
 neutral values and tinted at runtime, so one kit serves every region and
 corruption can be animated.
 
@@ -704,166 +745,322 @@ the run.
 
 ## Technical approach
 
-### Why pre-rendering fits Excalibur
+### Why painted 2D sprites fit Excalibur
 
 Excalibur's [documentation](https://excaliburjs.com/docs/) describes it as
-"a free and open source 2D game engine written in TypeScript." The installed `excalibur` 0.32.0 has no perspective
-projection, no depth test and no meshes. Its only projection is
-`Matrix.ortho()`, its bundle enables only `gl.BLEND`, and `Material` shaders
-take 2D positions. So the 3D look is made in Blender and shown in Excalibur
-as sprites. This works because the camera never rotates: one render angle
-covers the whole game.
+"a free and open source 2D game engine written in TypeScript." The
+installed `excalibur` 0.32.0 has no perspective projection, no depth test
+and no meshes. Its only projection is `Matrix.ortho()`, its bundle enables
+only `gl.BLEND`, and `Material` shaders take 2D positions. Dan has ruled
+out Blender, Three.js and any other engine, so nothing is 3D at any stage.
+The game is 2D, and the 3D look is painted into the sprites and then lit by
+shaders. This works because the camera never rotates: every painting is
+made for the one fixed angle, and that angle covers the whole game.
+
+The honest limit is that painted 2D can't match real 3D in every way.
+Light can't truly wrap around a painted shape, an actor can't turn to an
+angle nobody painted, and the floor can't hide part of a body the way a
+depth buffer would. The plan works with these limits rather than around
+them: a few painted views per actor, layered environment pieces, and
+lighting that only has to suggest the form the painting already shows.
 
 These are the Excalibur 0.32 APIs the plan relies on. Each was checked in
 `node_modules/excalibur/build/dist`:
 
-- `ImageSource`, `SpriteSheet.fromImageSource()`,
-  `SpriteSheet.fromImageSourceWithSourceViews()` (for packed atlases) and
-  `Animation.fromSpriteSheet()` for the rendered frames.
+- `ImageSource` (with `unload()` for streaming),
+  `SpriteSheet.fromImageSourceWithSourceViews()` for packed atlases, and
+  `Sprite` for each puppet part.
+- `Graphic`'s `rotation`, `scale`, `origin`, `flipHorizontal` and `tint`,
+  and `GraphicsGroup`, whose members take an `offset`. These are what the
+  puppet system moves each frame. The easing functions (`easeOutCubic`,
+  `easeInOutQuad` and others) are exported from `Math/easings`.
 - `Actor.z` for draw order. With no depth buffer, sorting is how actors pass
   in front of and behind things.
 - `graphicsContext.createMaterial()` and `Material`, whose `images` option
-  binds extra textures by sampler name. That's how a sprite gets its normal
-  and emissive passes. Materials also get `v_screenuv` and can read the
-  screen texture.
-- `addPostProcessor()` with a `PostProcessor` built on `ScreenShader`, for
-  bloom and the final grade. Post-processors run as a chain of single
-  full-screen passes, each reading the previous pass's output.
+  binds extra textures by sampler name. That's how a sprite gets its
+  normal-ish and emissive maps. Materials also get `v_screenuv` and can read
+  the screen texture.
+- `addPostProcessor()` and `removePostProcessor()`, with a `PostProcessor`
+  built on `ScreenShader`, for bloom and the final grade. How far a
+  post-processor can go beyond a single pass is the M1 bloom test,
+  described in [Bloom](#bloom).
 - `GpuParticleEmitter` for embers, sparks, corruption and hit effects.
 - `ParallaxComponent` for drifting fog and sky layers.
 - `Camera.shake(magnitudeX, magnitudeY, duration)`, which only moves the
   camera, plus `elasticToActor()` and `limitCameraBounds()` to follow the
   hero. `Camera.rotation` is never set.
 - `OffscreenSystem`, which tags entities that leave the view with
-  `ex.offscreen` and emits `enterviewport` and `exitviewport` events, for
-  streaming.
+  `ex.offscreen` and emits `enterviewport` and `exitviewport` events, to
+  pause actors that are off screen.
 - `Engine.timescale` for a whole-game hit-stop when it's needed.
 - `TextureLoader.checkImageSizeSupportedAndLog()`, which checks an image
-  against the GPU's maximum texture size.
+  against the GPU's maximum texture size, and
+  `graphicsContext.textureLoader.delete()`, which releases an image's
+  texture when its chunk unloads.
 
-Excalibur 0.32 has no light types. Darkness uses the method from Oka World
-2's `HollowDark` overlay (`destination-out` radial gradients over a dark
-fill), and light on sprites comes from their normal maps in a `Material`.
+Excalibur 0.32 has no light types, no skeletal animation and no streaming.
+Darkness uses the method from Oka World 2's `HollowDark` overlay
+(`destination-out` radial gradients over a dark fill), light on sprites
+comes from their normal-ish maps in a `Material`, and the plan writes its
+own puppet system and chunk streamer on top of Excalibur.
 
-### The Blender render pipeline
+### The art pipeline
 
-Everything 3D lives in Blender under `tools/heaven-or-hell/` and is rendered
-by script, never by hand, so the look stays consistent and a change to the
-camera or bands can be re-rendered.
+Every sprite starts as an AI-generated source painting and ends as a packed
+high-resolution atlas, and everything between is a Node and TypeScript
+script under `tools/heaven-or-hell/`. Python isn't used, so the whole
+toolchain stays in TypeScript alongside the game. The scripts run on
+Node 22's built-in type stripping, which needs `.ts` import specifiers (the
+same fix as in [Testing](#testing)). `pngjs`, already a dev dependency,
+reads and writes the PNGs.
 
-- **One camera rig.** `rig.blend` holds the fixed camera (orthographic,
-  about 45–50 degrees down along a diagonal, as verified in M1), the key light used for the baked toon bands, the
-  ink outline settings and the render size. Every render uses it. Models
-  turn under the camera to make facings, and the camera itself never moves.
-- **Eight facings for characters.** The hero, demons and most creatures are
-  rendered in 8 facings at 45-degree steps. To save work, render five
-  (south, south-east, east, north-east, north) and mirror the other three at
-  runtime. A mirrored normal map needs its x channel flipped in the shader,
-  and anything held in one hand, like a sword, breaks the mirror, so the hero
-  may need all eight. Creatures that move "without turning" (cherubim,
-  ophanim) need one facing.
-- **Passes per frame.**
-  - *Colour:* toon-shaded in three bands under the dim key light, with the
-    ink outline baked in.
-  - *Emissive:* only the glowing parts, black elsewhere.
-  - *Normal:* surface normals in camera space, for runtime lighting.
-  - *Depth, for environment only:* optional, for the occlusion approach in
-    M1.
-
-  Environment colour is rendered near neutral and tinted by region at
-  runtime.
-- **Animation frame data.** Animations render at a fixed rate, 30 frames per
-  second as a starting value. The start-up, active and recovery frames of
-  each attack are exported as data that `rules.ts` uses, so the sprite and
-  the rules never disagree about timing.
-- **Packing.** `pack_atlas.py` trims empty space, packs frames into atlas
-  pages within the GPU's maximum texture size, and writes
-  `art/atlas.ts`, the way `tools/oka-world/build_art.py` generates Oka
-  World's art.
-- **Environment chunks.** The map is modelled in Blender in fixed-size
-  chunks, and each chunk is rendered at the camera angle into layers:
+- **One camera, one style sheet.** Every painting is drawn for the same
+  fixed Death's Door-style camera: orthographic, about 45–50 degrees down,
+  looking along a diagonal, as verified in M1. M1 produces a style sheet
+  (a lit stone block, a pillar, a floor tile and a standing figure at that
+  angle) that every later prompt is matched against, and is given to the
+  generator as a reference image when it accepts one.
+- **Prompts are recorded.** `tools/heaven-or-hell/prompts.md` keeps one
+  shared style block, repeated word for word in every prompt, then one
+  entry per asset: the full prompt, the generator used, the date, the seed
+  if the generator exposes one, and which output was kept. Any asset can
+  then be regenerated or matched later.
+- **Keyable flat background.** Paintings are generated on one flat colour
+  that the palette never uses, such as pure magenta, as a starting choice.
+  Prompts also ask for flat, even light, a dark ink edge, no cast shadow on
+  the background, and the subject whole and centred.
+- **Cut and key.** `key.ts` removes the background with a colour-distance
+  key and a soft edge, removes the background tint from edge pixels
+  ("despill"), trims empty space and sets a base point at the feet.
+  Generated backgrounds are never perfectly flat, so the tolerance is per
+  asset, recorded next to its prompt.
+- **Parts for puppets.** Characters are generated as separate parts on the
+  flat background (body, head, wings, halo, weapon and so on), in a fixed
+  pose with clear joints. `parts.ts` cuts each part and records its pivot,
+  so the puppet system can move it.
+- **Maps for lighting.** `maps.ts` derives a normal-ish map from each
+  painting's shading (a height guess from brightness, turned into normals),
+  and an emissive mask from the glowing hues, with hand-drawn mask
+  overrides where the guess is wrong. These are approximations, not true
+  normals, which is why the lighting only adds to the painted volume.
+- **Neutral environment, tinted at runtime.** Environment pieces are
+  painted near neutral and tinted per region and by corruption in the
+  `Material`, so one kit serves every region.
+- **Scaling and packing.** `pack.ts` scales each part to its fixed size
+  on a 1080p screen, never upward, then packs colour, normal-ish and
+  emissive atlases with identical layouts, within the GPU's maximum texture
+  size, and writes `art/atlas.ts`, the way `tools/oka-world/` generates Oka
+  World's art. Down-scaling uses a small area-average resampler written in
+  TypeScript, and adding `sharp` is an option if quality or speed needs
+  it, decided in M1.
+- **Environment chunks.** Each chunk is assembled from painted kit pieces
+  (floor tiles, steps, pillars, wall ends, arches, altars) in layers:
   - *ground:* always behind actors;
   - *tall pieces:* pillars, wall ends, statues, each a separate sprite
     sorted by its base;
   - *front:* the cut-low wall stubs on the camera side, always in front.
 
-  Each layer gets its emissive and normal passes.
-
 ### Who makes the art
 
-Decided: nobody is hired and nothing is bought. The development agent makes
-the models, rigs and animations by scripting Blender's Python API, aiming
-for simple, chunky, bevelled, toon-shaded shapes in Death's Door's style.
+Decided: nobody is hired and nothing is bought. The development agent
+generates the source paintings with an AI image generator, runs them
+through the pipeline, and builds the puppets and animations. In Dan's
+words, the aim is "high-resolution sprites that give it that 3D look, but
+it is 2D."
+
+The 3D look comes from two places. The first is painted volume: bevelled
+edges, a lit top face, darker sides and painted form, all at the one camera
+angle. The second is Excalibur shaders: a lighting `Material` that reads the
+normal-ish map, quantises light into the three toon bands and adds a rim
+light; an ink outline drawn around each sprite's alpha edge; emissive glow;
+and bloom.
+
 The work goes in this order:
 
-1. **Greybox.** Block out each chunk and actor from plain primitives, to
-   check scale, the camera, sorting and combat timing before any detail.
-2. **Scripted stylised models.** Build each model in code from bevelled
-   primitives, combined and slightly irregular, with flat toon materials.
-   The silhouette is designed first, because the outline, toon bands and
-   bloom carry most of the look.
-3. **A limited animation budget.** Rigs are generated armatures, and
-   animations are keyframed by script from a few poses each, with easing.
-   As starting assumptions: about 16 animations for the hero (the list in
-   [The real costs of pre-rendering](#the-real-costs-of-pre-rendering)),
-   about 6 for a common demon (idle, move, two attacks, hit, death), and
-   bosses budgeted one by one. Creatures that float or drift, such as
-   seraphim, ophanim and locust swarms, lean on procedural motion like
-   bobbing, wing beats and rotation instead of hand-made clips.
-4. **Modular kits.** Environment chunks are assembled from a small set of
-   generated kit pieces (floor tiles, steps, pillars, wall ends, arches,
-   altars), and related demons share rigs, parts and animations.
+1. **Style sheet first.** Lock the camera angle and the style block on a
+   few test pieces before any real asset, and judge them next to the
+   references.
+2. **Silhouette first.** Each asset is judged as a black shape before its
+   painting is accepted, because the outline, toon bands and bloom carry
+   most of the look.
+3. **Modular kits.** Environment chunks are assembled from a small kit of
+   painted pieces, and related demons share parts.
+4. **Animation by puppet.** Motion comes from moving painted parts, not
+   from painting frames. See [Puppet animation](#puppet-animation).
 
-The risk is fidelity: scripted models will look simpler than hand-made
-ones. The plan accepts that and leans on what scripts do well, which is
-consistency, clean silhouettes, toon shading, ink outlines and bloom, with
-ornament kept for focal pieces.
+The limits, plainly:
 
-Blender isn't installed on the development VM today. Python 3 with Pillow
-and NumPy is.
-So installing Blender headless is the first task in M1. If it can't be
-installed, the fallback is to generate the meshes, or the sprites directly,
-procedurally in Python with NumPy and Pillow, using the same camera angle,
-toon bands and passes.
+- **Fidelity versus real 3D.** Painted sprites can't turn freely, light
+  can't truly wrap around them, and normal-ish maps guessed from a painting
+  are rough. Light on sprites will look more like a tint with bands than
+  like real 3D lighting. The plan keeps lighting moderate and lets the
+  painting carry the form.
+- **Consistency across generated images.** Image generators drift between
+  outputs in style, line weight, light direction, proportion and above all
+  camera angle. A pillar can come out a few degrees off, and the eye
+  catches it next to its neighbours. The mitigations are the shared style
+  block, reference images where the generator accepts them, the style
+  sheet, rejecting off-angle results, and the runtime shaders (bands,
+  outline, tint), which pull different paintings toward one look. Expect
+  to generate several candidates per asset and keep one.
+- **Matching views.** A character needs the same design in several views,
+  and generators don't keep a design identical between them. Fewer views,
+  mirroring and puppet parts reused across views limit the problem without
+  removing it.
+- **Large creatures.** Behemoth, Leviathan, the beast and the dragon are
+  where these limits are worst. Generators make images of limited size and
+  detail, so a large creature is generated in parts, at matching scale,
+  that must join without visible seams, and every part must agree on
+  angle and light. Each boss is budgeted and judged on its own, from M4 on.
+- **Rights.** Terms differ between image generators. Before M6, check that
+  the chosen generator's terms allow use in a published game.
 
-### The real costs of pre-rendering
+### Puppet animation
 
-These costs are why the pipeline is scripted. Each one gets a measurement
-in M1.
+Dan wants "very crisp animations that give a very immersive feel."
+Excalibur 0.32 has no skeletal animation, so the plan writes a 2D cutout
+puppet system for it:
 
-- **Frame count.** The figures here are arithmetic on assumed numbers, not
-  measurements. Suppose the hero has 16 animations (idle, run, three light
-  attacks, a critical, block, block hit, parry, parried, guard break, roll,
-  hit reaction, being struck down and two casts) averaging 12 frames.
-  That's about 190 frames per facing, or about 1,500 across 8 facings, for
-  each pass. Every enemy and creature adds its own set. Mirroring, short loops and sharing
-  animations between related enemies keep this down.
-- **Texture memory.** Again assumed: a 256x256 frame takes 256 KB on the GPU
-  as uncompressed RGBA. At 1,500 frames that's about 375 MB per pass for the
-  hero alone if everything is loaded at once. So frames are trimmed and
-  packed, the normal pass can use half resolution, the emissive pass covers
-  only frames that glow, and only the creatures in nearby regions are
+- **Separate parts.** Each actor is a tree of painted parts, such as body,
+  head, wings, halo and weapon, each with a pivot. A pure solver in
+  `puppet/rig.ts` works out each part's position, rotation and scale from
+  its parent's, and `puppet/view.ts` applies the result to the part
+  sprites (`Graphic` `rotation`, `scale`, `origin` and `GraphicsGroup`
+  offsets) every frame. How one lighting `Material` handles rotated parts,
+  or whether each part needs its own child actor, is checked in M1.
+- **Keyframed transforms with easing.** Clips are data: keys for each
+  part's offset, rotation and scale, with an easing per key, using
+  Excalibur's easing functions. Adding a move costs authoring time, not
+  texture memory.
+- **Overlapping secondary motion.** Wings, robes, halo and hair follow
+  their parent through a damped spring, so they lag, overshoot and settle.
+- **Squash and stretch on impacts.** A short scale pulse on hits, parries,
+  landings and guard breaks, keeping area roughly constant.
+- **Held key poses.** Attacks hold their wind-up and their contact pose
+  for a few frames, so each beat reads, rather than gliding through.
+- **Hit-stop.** The attacker and target freeze on contact, with the
+  starting values in M2.
+- **Immediate input.** An input starts its move on the next fixed update,
+  and an input pressed up to about 150 ms before the current move can be
+  cancelled fires on the first frame it can.
+- **Cancel windows.** Each clip has start-up, active and recovery markers,
+  and a test checks that they match the move's frame data in
+  `combat/moves.ts`, so the animation and the rules never disagree.
+- **Crisp at one scale.** Parts are shown at a consistent scale, never
+  scaled up past their packed size, with no motion blur and no smoothing
+  filter that softens them.
+- **Views.** As starting values: the hero is painted in 5 views (south,
+  south-east, east, north-east and north), mirrored for the other three,
+  and common demons in 3 (towards, side and away), mirrored and snapped to
+  the nearest. A mirrored normal-ish map needs its x channel flipped in the
+  shader, and anything held in one hand, like a sword, breaks the mirror,
+  so the hero's weapon is its own part, moved to the correct hand.
+  Creatures that move "without turning" (cherubim, ophanim) need one view.
+
+**The animation budget.** Deepwoken-style combat needs many moves per
+weapon and per enemy. As starting assumptions: each weapon needs its light
+chain (three hits and a flourish), a critical, a feint and its parry and
+block poses, which is about 8 clips, or about 32 across the four starter
+weapons. The hero also needs about 12 shared clips (idle, run, roll, hit,
+parried, guard break, struck down and casts), a common demon about 6
+(idle, move, two attacks, hit, death) plus its commit poses, and bosses
+are budgeted one by one. Frame-by-frame painting at that scale isn't
+affordable. Puppets are: each view is painted once, and every clip after
+that is keyframe data. Creatures that float or drift, such as seraphim,
+ophanim and locust swarms, lean on procedural motion like bobbing, wing
+beats and rotation.
+
+### Bloom
+
+Maximum bloom and vibrance is a requirement. Dan: "no true bloom is a very
+bad problem; try your best creating the most bloom and vibrance."
+
+Excalibur's post-processors look like a chain of single full-screen passes,
+each reading the previous output. True bloom needs more: a bright pass,
+a blur at reduced resolution, and an additive composite back onto the
+untouched frame. Reading Excalibur 0.32's bundle suggests this can be done
+inside one custom `PostProcessor`:
+
+- `initialize()` receives the `ExcaliburGraphicsContextWebGL`, whose
+  `__gl` (the `WebGL2RenderingContext`) is public, so the post-processor
+  can allocate its own framebuffers and textures. Excalibur's own
+  `RenderTarget` class isn't exported, so these are raw WebGL objects.
+- For each post-processor, Excalibur binds the target framebuffer, uses the
+  shader and layout, binds the previous output to `TEXTURE0`, calls
+  `onDraw()`, then draws the full-screen quad. So inside `onDraw()` the
+  bloom can run its own passes: a bright pass into a half-resolution
+  buffer, a separable blur (horizontal, then vertical) at a quarter
+  resolution or less, repeated at a few sizes for a wide glow.
+- It then restores what Excalibur expects (the framebuffer binding, the
+  viewport, the shader program, the vertex layout, the active texture unit
+  and the texture on `TEXTURE0`, saved at the start), binds the blurred
+  result to `TEXTURE1`, and lets Excalibur's quad draw run its own
+  composite shader, which adds the bloom to the original frame from
+  `TEXTURE0`, then applies the grade and a vibrance boost.
+
+**The M1 test** is whether this works in practice: correct output, no GL
+state left broken for Excalibur's next frame, the frame rate held at 60 at
+full resolution, and no breakage on resize. It depends on internals that
+aren't part of Excalibur's public API, so it's pinned to 0.32.x and
+re-checked on any upgrade.
+
+**The fallback**, if the test fails, is a wide single-pass blur kernel in
+one `ScreenShader`, plus emissive glow layers (soft halo sprites drawn
+additively behind glowing parts) and additive particles. It looks less
+like true bloom, so it's a fallback only.
+
+Either way, bloom applies only to pixels above the bloom threshold, which
+the value structure keeps to light sources, actors and effects.
+
+### Streaming the open map
+
+Excalibur has no streaming, so `streaming.ts` adds a region and chunk
+system:
+
+- **Regions and chunks.** `map.ts` splits Heaven into regions, and each
+  region into fixed-size chunks on a grid.
+- **Load and unload by distance.** Each update, the streamer measures the
+  player's distance to each nearby chunk. Chunks inside the load radius
+  load their images and add their layers and actors to the scene. Chunks
+  beyond a larger unload radius remove them, call `ImageSource.unload()`
+  and release their textures. The gap between the two radii stops chunks
+  flickering at a boundary. Radii are starting values to tune.
+- **Load ahead.** Chunks in the direction of travel start loading early,
+  so images decode before they're needed, and only a few start per frame
+  to avoid stutter.
+- **State lives in the run.** Unloading never loses state. Corruption,
+  killed enemies and opened gates are part of the run's data, and a chunk
+  rebuilds from it when it loads again.
+- **Debug view.** A key toggles an overlay that draws the chunk grid,
+  colours each chunk by state (unloaded, loading, loaded, active), shows
+  both radii around the player, and lists loaded chunks, actors and an
+  estimate of texture memory.
+
+### The real costs of the 2D approach
+
+Each of these gets a measurement in M1.
+
+- **Texture memory.** The figures here are arithmetic on assumed numbers,
+  not measurements. A 2048x2048 atlas page takes 16 MB on the GPU as
+  uncompressed RGBA. Suppose the hero has about 12 parts in each of 5 views,
+  which fits in one or two pages of colour, plus matching normal-ish and
+  emissive pages. That's about 50–100 MB for the hero, if the normal-ish
+  pages are full size. Puppets keep this small compared with frame-by-frame
+  animation, because every clip reuses the same parts. Normal-ish maps can
+  use half resolution, and only chunks and creatures near the player are
   loaded. The target is desktop browsers, so M1 sets the budget from a
   desktop GPU's limits.
 - **Depth sorting with no depth buffer.** Actors sort by their ground
   position through `z`. Anything an actor can walk behind has to be its own
-  sprite with a base point, so environment chunks are split into layers. A
-  second approach is worth testing in M1: render a depth pass per chunk, and
-  in each actor's `Material` discard pixels where the chunk is closer to the
-  camera, using `v_screenuv` and a depth uniform per actor. If it works, it
-  removes most of the layer splitting.
-- **Baked and runtime light must agree.** The toon bands and ink lines are
-  baked, but braziers, glows and corruption move. The runtime `Material`
-  lights each sprite from its normal pass and quantises that light into the
-  same three bands, using one band table shared by Blender and the shader.
-  Ink lines are never lit. The baked key light stays dim, so most of the
-  drama comes from runtime light, which keeps the mismatch small.
-- **Bloom in a chain of single passes.** Excalibur's post-processors pass
-  one image down a chain, so a bloom pass can't blur and then add back to
-  the original. The plan is to bake a soft glow halo into the emissive pass
-  for static glows, and to add a single cheap screen pass, a threshold with
-  a small blur, for moving effects. M1 measures the cost at full
-  resolution.
+  sprite with a base point, which is why chunks are painted in layers.
+  Large actors, such as a wheel boss, may need more than one sort point.
+- **Consistency costs generations.** Each accepted asset may take several
+  generations and some masking by hand. That cost is per asset, so the
+  kits stay small.
+- **Two looks must agree.** The painted shading is fixed, and braziers,
+  glows and corruption move. The lighting `Material` keeps runtime light
+  moderate and quantised into the same three bands for every sprite. Ink
+  lines are never lit.
 
 ### Scene and routing
 
@@ -876,10 +1073,57 @@ in M1.
   The rest of Terrene runs at 256x240 pixel art with `suppressHiDPIScaling`,
   so the pixel ratio follows the display the way `OkaScene.pickPixelRatio()`
   does.
-- `onDeactivate()` also removes post-processors, stops music and timers, and
-  unloads the loaded chunks.
+- `onDeactivate()` also removes post-processors and frees the bloom's
+  framebuffers, stops music and timers, stops the streamer and unloads
+  every loaded chunk.
 - NPCs implement `DialogueNPC` and talk through `ChatSystem`, and quests use
   `QuestSystem`, all unchanged.
+
+### Deploy
+
+Every milestone is published to GitHub Pages so it can be played at
+`https://thoughtpivot.github.io/terrene/#heavenorhell`. The repository's
+Pages site is a legacy build served from the root of the `gh-pages` branch,
+which already exists.
+
+- `npm run build:prod` writes the game to `dist/`.
+- The `gh-pages` package, already a dev dependency, publishes `dist/` to
+  the `gh-pages` branch. A `deploy` script in `package.json` wraps the two
+  steps, as a proposal.
+- Publishing replaces the whole Terrene site, not only Heaven Or Hell, so
+  it's done from the integrated branch, after checking that the other
+  scenes still load.
+- The site is served under `/terrene/`, so every asset path must be
+  relative. The check is to load the published URL, not only the dev
+  server.
+
+### Workstreams
+
+Development is split into parallel workstreams on separate branches, then
+integrated:
+
+- **M1, the scene and rendering** (`cursor/heaven-or-hell-m1-ca84`): the
+  route, screen mode, art pipeline, lighting, bloom test, puppet system and
+  streaming.
+- **The combat rules engine** (`cursor/heaven-or-hell-combat-ca84`): pure
+  code under `src/components/scenes/HeavenOrHell/combat/`, with no
+  Excalibur imports. It covers moves and frame data, posture, parry, block,
+  roll, the input buffer, cancel windows, feints and enemy reads.
+- **The progression systems** (`cursor/heaven-or-hell-progression-ca84`):
+  pure code under `src/components/scenes/HeavenOrHell/progression/`, with no
+  Excalibur imports. It covers Choirs and attributes, Gifts, Vows,
+  Anointings, Trumpets, Stain, Visions, Testimony, Remembrance and
+  corruption tiers.
+- **Integration** merges the two pure branches into the scene, wires input
+  and puppets to the combat engine, and wires the HUD and save to
+  progression.
+
+To keep the branches from colliding, each pure module owns its folder and
+its own test file, and the boundary is plain data: combat takes a
+`CombatStats` object and emits events (hit, parried, struck down), and
+progression produces `CombatStats` from a character and consumes those
+events. Those types are agreed first, so every branch can build against
+them.
 
 ### Code layout
 
@@ -888,61 +1132,79 @@ thin, and the Oka World pipeline, where art is generated from `tools/`:
 
 ```
 src/components/scenes/HeavenOrHell/
-├── HeavenOrHell.ts     # Scene: load, camera, chunk streaming, loop, onDeactivate cleanup
-├── rules.ts            # Pure combat and run rules: posture, parry, roll, lives, frame data
-├── map.ts              # Fixed map of Heaven: regions, chunks, paths, landmarks (pure)
-├── invasion.ts         # Seeded invasion: breaches, corruption spread, camps, events (pure)
-├── corruption.ts       # Corruption level, tiers and what each tier unlocks or spawns (pure)
-├── character.ts        # Creation, Choirs, Gifts, Vows, Anointings, Trumpets, Stain, Visions (pure)
-├── testimony.ts        # What survives a wipe: Testimony, Remembrance, unlocks (pure)
-├── save.ts             # Continuous run save, Testimony and Remembrance in localStorage
-├── input.ts            # Mouse aim, left-click, F, hold F, Q, R, right-click feint, WASD
-├── reads.ts            # Enemy read traits, commitments and feint baiting (pure)
-├── palette.ts          # Region bases, corruption blend, toon bands, glow roles (pure)
-├── chunks.ts           # Loads and unloads chunk layers near the camera
-├── lit.ts              # Normal-map lighting and emissive Material, region tint
-├── bloom.ts            # Bloom and grade PostProcessors built on ScreenShader
+├── HeavenOrHell.ts     # Scene: load, camera, streaming, loop, cleanup
+├── combat/             # Pure, no Excalibur (combat workstream)
+│   ├── moves.ts        # Moves and frame data: start-up, active, recovery
+│   ├── rules.ts        # Posture, parry, block, roll, hit-stop, lives
+│   ├── buffer.ts       # Input buffer (about 150 ms) and cancel windows
+│   ├── reads.ts        # Enemy read traits, commitments, feint baiting
+│   └── types.ts        # CombatStats and combat events, the boundary
+├── progression/        # Pure, no Excalibur (progression workstream)
+│   ├── character.ts    # Creation, Choirs, attributes, Boons, Burdens
+│   ├── gifts.ts        # Gifts, Vows, Anointings, Trumpets, Visions
+│   ├── stain.ts        # Stain, its thresholds and the Fall
+│   ├── corruption.ts   # Corruption level, tiers, unlocks and spawns
+│   ├── testimony.ts    # What survives a wipe: Testimony, Remembrance
+│   └── types.ts        # Character data and CombatStats, the boundary
+├── map.ts              # Regions, chunks, paths, landmarks (pure)
+├── invasion.ts         # Seeded breaches, spread, camps, events (pure)
+├── palette.ts          # Region bases, corruption blend, bands (pure)
+├── puppet/
+│   ├── rig.ts          # Part tree, clips, easing, springs (pure)
+│   └── view.ts         # Applies poses to part sprites
+├── streaming.ts        # Loads and unloads chunks by distance
+├── streaming-debug.ts  # Chunk grid, states, radii and memory overlay
+├── save.ts             # Continuous run save in localStorage
+├── input.ts            # Mouse aim, clicks, F, hold F, Q, R, WASD
+├── lit.ts              # Lighting Material: bands, rim, tint, outline
+├── bloom.ts            # Multi-pass bloom and grade PostProcessor
 ├── darkness.ts         # Dark overlay and light holes, after HollowDark
 ├── fx.ts               # Hit sparks, embers, corruption particles
-├── hud.ts              # Health and halo, posture, Fervour, Grace, cooldown icons
-├── art/atlas.ts        # Generated by tools/heaven-or-hell/pack_atlas.py
+├── hud.ts              # Health and halo, posture, Fervour, Grace
+├── art/atlas.ts        # Generated by tools/heaven-or-hell/pack.ts
 └── sfx/, HeavenOrHell.mp3
-src/components/characters/player/<Hero>/   # one folder per character, per project rules
-src/components/creatures/<Creature>/       # demons and angels alike
-tools/heaven-or-hell/
-├── source/             # reference images and .blend sources
-├── rig.blend           # fixed camera, key light, outline and render settings
-├── greybox.py          # blocks out chunks and actors from primitives
-├── build_models.py     # scripted stylised models, kit pieces, rigs and animations
-├── procedural.py       # fallback if Blender can't be installed: meshes or sprites in NumPy
-├── render_sprites.py   # renders colour, emissive, normal (and depth) passes
-├── pack_atlas.py       # trims, packs atlases, writes atlas.ts and frame data
+src/components/characters/player/<Hero>/  # one folder per character
+src/components/creatures/<Creature>/      # demons and angels alike
+tools/heaven-or-hell/   # Node and TypeScript only, no Python
+├── source/             # reference images and kept source paintings
+├── prompts.md          # style block and every prompt, per asset
+├── key.ts              # keys out the flat background, trims, despills
+├── parts.ts            # cuts puppet parts and records pivots
+├── maps.ts             # normal-ish and emissive maps from paintings
+├── pack.ts             # scales, packs atlases, writes atlas.ts
 └── references.md       # one line per reference: what to take from it
-test/heaven-or-hell-rules.ts
+test/heaven-or-hell-combat.ts
+test/heaven-or-hell-progression.ts
+test/heaven-or-hell-world.ts
 docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
 ```
 
 ### Testing
 
-- `rules.ts`, `reads.ts`, `map.ts`, `invasion.ts`, `corruption.ts`,
-  `character.ts`, `testimony.ts` and `palette.ts` import nothing from
-  Excalibur, so `node:test` covers the parry window, posture overflow, roll
+- `combat/`, `progression/`, `map.ts`, `invasion.ts`, `palette.ts` and
+  `puppet/rig.ts` import nothing from Excalibur, so `node:test` covers the
+  parry window, posture overflow, roll
   i-frames, input buffering, feint baits and adaptive memory, the two-lives
   state, seeded invasions, corruption tiers, Choir bonuses, Stain
   thresholds and the Fall, what survives a wipe and the palette's value
   limits, all deterministically. Enemy reads use the run's seeded random
-  numbers, so a bait test always plays out the same way.
+  numbers, so a bait test always plays out the same way. Each workstream
+  owns its test file, so the branches don't collide.
+- A test checks that every puppet clip's start-up, active and recovery
+  markers match the move's frame data in `combat/moves.ts`, and that the
+  rig solver gives the same pose for the same time.
 - **Fix this first:** `node --test test/street-rules.ts` fails today with
   `ERR_MODULE_NOT_FOUND` because `Street/level.ts` imports `./rules` without
   an extension, and Node 22's type stripping needs one. The fix is to use
   `.ts` import specifiers (with `allowImportingTsExtensions` in tsconfig) or
   to add a TypeScript runner such as `tsx`. Then wire `test/*.ts` into
   `npm test`, which today points at a `test/test.js` that doesn't exist.
-- A check in `pack_atlas.py` fails the build if an atlas page is larger than
-  the agreed maximum or the total texture budget is exceeded.
+- A check in `pack.ts` fails the build if an atlas page is larger than the
+  agreed maximum, the total texture budget is exceeded, or a sprite would be
+  scaled up past its source.
 - Each milestone also ends with a manual run in the browser at
-  `/#heavenorhell`: a screen recording, a clean console and a frame-rate
-  reading.
+  `/#heavenorhell`, on the dev server and on the published GitHub Pages
+  URL: a screen recording, a clean console and a frame-rate reading.
 
 ## Milestones
 
@@ -950,8 +1212,10 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
 
 - Gather 4–5 more visual references, as the meeting asked. Sources: Google
   Images and specific itch.io profile pages. They should be stylised,
-  toon-shaded 3D under a fixed camera, darker than Death's Door, and include
-  some depictions of seraphim, cherubim and ophanim.
+  toon-shaded art under a fixed angled camera, darker than Death's Door,
+  and include some depictions of seraphim, cherubim and ophanim. They also
+  serve as reference images for the AI-generated paintings, so prefer ones
+  close to the fixed camera angle.
 - Store them in `tools/heaven-or-hell/source/` and give each one a line in
   `references.md` saying what to take from it (palette, shape, glow, camera,
   creature, UI). Follow the sourcing notes. Call an itch page a "specific
@@ -963,51 +1227,71 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
   Little Scavenger (see [Art direction](#art-direction)). The engine, the
   premise, the world structure, the palette, pixel art versus painted, the
   creatures' allegiance, the roguelite structure, the camera default, who
-  makes the art, the controls, and the platform are
+  makes the art (AI-generated source paintings, no Blender and no other
+  engine), the animation approach, bloom as a requirement, streaming, the
+  deploy target, the workstreams, the controls and the platform are
   settled. The Deepwoken wiki is linked, but the combat blog articles aren't
   collected yet, and `references.md` doesn't exist yet.
 - **Done when** there are at least 5 tagged references. The open decisions
   each block a later milestone, not M0.
 
-### M1: One lit area, pre-rendered
+### M1: One lit, painted area
 
-- **First task: install Blender headless** on the development VM and run a
-  scripted render from the command line. If it can't be installed, switch to
-  the procedural Python fallback in
-  [Who makes the art](#who-makes-the-art) and adjust the rest of M1 to it.
-- **Verify the camera.** Compare a test render at the orthographic,
-  45–50 degree default against Death's Door's Steam screenshots: the pitch,
-  the diagonal, and whether vertical edges converge. Lock the angle in
-  `rig.blend` before any real asset.
-- `greybox.py` and the first `build_models.py` kit pieces.
-- The Blender pipeline end to end: `rig.blend`, `render_sprites.py` and
-  `pack_atlas.py`, producing colour, emissive and normal passes and
-  `art/atlas.ts`.
+Built on `cursor/heaven-or-hell-m1-ca84`, in parallel with the combat and
+progression workstreams (see [Workstreams](#workstreams)).
+
+- **Lock the camera and the style sheet first.** Generate a few test
+  pieces (a stone block, a pillar, a floor tile and a standing figure) at
+  the orthographic, 45–50 degree default and compare them with Death's
+  Door's Steam screenshots: the pitch, the diagonal, and whether vertical
+  edges converge. Write the angle and the shared style block into
+  `prompts.md` before any real asset.
+- **The art pipeline end to end:** `key.ts`, `parts.ts`, `maps.ts` and
+  `pack.ts`, producing colour, normal-ish and emissive atlases and
+  `art/atlas.ts`, with every prompt recorded.
 - The `#heavenorhell` route in its high-resolution mode, restoring the screen
   settings on leaving.
-- One chunk of Heaven as a greybox: bevelled stone kit pieces rendered at the
-  fixed angle, split into ground, tall-piece and front layers, in the
-  default bone-grey base, then replaced by scripted kit pieces. The 2D packs
-  in `src/assets/` don't fit this look.
-- The hero as a scripted placeholder model, rendered in 8 facings with idle
-  and run, walking in 8 directions. Sorted against pillars and walls by `z`, with the
-  depth-pass `Material` tried as the alternative.
-- Runtime lighting from normal maps in three bands, a gold outline on the
-  hero, altars glowing white and gold, a breach glowing red, the bloom
-  approach, near-black fog and one drifting parallax layer.
+- One chunk of Heaven from painted kit pieces at the fixed angle, split into
+  ground, tall-piece and front layers, in the default bone-grey base. The 2D
+  packs in `src/assets/` don't fit this look.
+- **The hero as a puppet,** painted as separate parts in its 5 views, with
+  idle and run clips using easing and secondary motion on the wings and
+  halo, walking in 8 directions, at a consistent scale with no blur.
+  Sorted against pillars and walls by `z`.
+- **The lighting `Material`:** normal-ish light in three bands, a rim
+  light, region tint, the ink outline, a gold outline on the hero, altars
+  glowing white and gold, and a breach glowing red. Near-black fog and one
+  drifting parallax layer.
+- **The bloom test** in `bloom.ts`, as described in [Bloom](#bloom): a
+  multi-pass bloom inside one custom `PostProcessor`, with GL state
+  restored. If it fails, build the fallback and record why.
+- **A streaming prototype:** a small grid of chunks (some can repeat the
+  same kit) loaded and unloaded by distance as the hero walks, with the
+  debug view.
 - One `ChatSystem` line from a placeholder `DialogueNPC`.
 - **Done when**
   - a screenshot reads as "near-black monochrome Heaven, white against red"
-    next to the M0 references;
-  - the frame rate holds at 60 at full resolution;
-  - the measured texture memory and frame count for the hero are written
-    down, with a projection for the full roster;
-  - baked and runtime bands visibly match;
+    next to the M0 references, and the painted pieces read as one style at
+    one angle;
+  - the bloom test's result is written down: multi-pass bloom works with
+    no broken GL state, or the fallback is in place with the reason;
+  - the frame rate holds at 60 at full resolution with bloom on;
+  - the hero's idle and run read as crisp, with no blurring;
+  - walking across the chunk grid loads and unloads chunks with no visible
+    stutter, and the debug view shows it;
+  - the measured texture memory for the hero and the chunk is written down,
+    with a projection for the full roster;
   - the camera angle and lens are checked against the screenshots and
     written down;
-  - switching to another hash restores the screen settings.
+  - switching to another hash restores the screen settings;
+  - the build is published to GitHub Pages and playable at
+    `https://thoughtpivot.github.io/terrene/#heavenorhell`.
 
 ### M2: The combat core
+
+The rules are built on `cursor/heaven-or-hell-combat-ca84` as pure code in
+`combat/`, starting alongside M1. M2 finishes with the first integration:
+the combat engine merged into the M1 scene, driving the hero's puppet.
 
 - **The basic sword is the first weapon** (see
   [Weapons](./heaven-or-hell-progression.md#13-weapons) in the progression
@@ -1015,8 +1299,11 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
   wind-up of about 0.35 seconds and the standard parry window. It's the
   baseline every other weapon is tuned against. Its critical, *Rising Cut*,
   comes in M3. The Flaming Sword is a later progression weapon.
-- `rules.ts` covers the light attack chain with its flourish, block and
-  posture, parry with its cooldown, and roll with i-frames.
+- `combat/rules.ts` covers the light attack chain with its flourish, block
+  and posture, parry with its cooldown, and roll with i-frames, using the
+  frame data in `combat/moves.ts` and the buffer in `combat/buffer.ts`.
+- The sword's puppet clips: three hits and a flourish, block, parry and
+  roll, with held key poses and squash and stretch on contact.
 - `input.ts` maps the decided controls: WASD to move, the mouse to aim,
   left-click for the light attack chain, F to parry, holding F to block and
   Q to roll. A tap of F parries and a hold past a short threshold blocks,
@@ -1032,8 +1319,8 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
     the current action can be cancelled fires on the first frame it can.
   - *Hit-stop:* the attacker and target freeze on contact. Start at 50 ms
     for a light hit, 120 ms for a parry and 150 ms for a guard break. The
-    freeze lives in `rules.ts`, so it's tested. `Engine.timescale` is used
-    only for the parry, if a whole-screen pause feels better.
+    freeze lives in `combat/rules.ts`, so it's tested. `Engine.timescale` is
+    used only for the parry, if a whole-screen pause feels better.
   - *Camera shake:* translation only, through `Camera.shake()`, never
     rotation. Start at 2 px for 80 ms on a hit, 4 px for 120 ms on a parry
     and 6 px for 200 ms on a guard break, at 1080p.
@@ -1050,11 +1337,16 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
     the hero hits or parries, red sparks and a darker sound when the hero is
     hurt. Parry, hit, block and guard break each get a distinct sound. The
     sparks use `GpuParticleEmitter`.
-- **Done when** unit tests cover every timing rule and buffer, and in manual
+- **Done when** unit tests cover every timing rule and buffer, in manual
   play a clean parry, a guard break and a dodge through an attack each work
-  and feel distinct.
+  and feel distinct, and the integrated build is published to GitHub Pages.
 
 ### M3: Depth of combat
+
+Feints, reads and criticals continue on the combat branch, and Choirs and
+attributes are built on `cursor/heaven-or-hell-progression-ca84` as pure
+code in `progression/`. M3 integrates both into the scene, through the
+`CombatStats` boundary.
 
 - Critical attacks on R, starting with the basic sword's *Rising Cut*, an
   upward cut that deals 1.5 times a light hit's posture damage on a
@@ -1062,7 +1354,7 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
   feinted.
 - Feints on right-click, always, and Fervour and Outcry (Deepwoken's Tempo
   and Vent).
-- **Feints that fool the AI.** `reads.ts` implements the model in
+- **Feints that fool the AI.** `combat/reads.ts` implements the model in
   [section 14](./heaven-or-hell-progression.md#14-combat-controls-and-feints)
   of the progression doc. All numbers are starting values to tune:
   - *The feint:* right-click on any frame of an M1 wind-up before its
@@ -1086,8 +1378,8 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
     lands in M4, so M3 records what the player has learned.
   - The three M3 demons cover three traits: the melee demon is gullible,
     the ranged demon is wary, and the corrupted elite is adaptive. Commit
-    poses reuse the first frames of each enemy's parry, block and roll
-    animations, so the animation budget doesn't grow.
+    poses reuse the first keys of each enemy's parry, block and roll
+    clips, so the animation budget doesn't grow.
 - Two more demon types: a ranged one with telegraphed area attacks, and a
   heavy one with hyperarmor.
 - One corrupted angel as an elite. A corrupted seraph is the cheapest,
@@ -1115,22 +1407,27 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
   all three together is winnable with no damage taken, unit tests cover
   every bait outcome and the adaptive memory, a feint visibly fools the
   gullible demon in manual play and stops fooling the adaptive elite when
-  spammed, and a character made with each Choir starts with that Choir's
-  bonuses and Gifts.
+  spammed, a character made with each Choir starts with that Choir's
+  bonuses and Gifts, and the integrated build is published to GitHub Pages.
 
 ### M4: The run
 
+Corruption, Testimony and Remembrance come from the progression branch, and
+M4 is mostly integration work on the scene: the full map, streaming at
+scale and the save.
+
 - `map.ts` describes Heaven's fixed regions, built from chunks, and
-  `chunks.ts` streams them in and out as the hero moves (see
-  [Risks](#risks)).
+  `streaming.ts` loads and unloads them by distance as the hero moves,
+  grown from the M1 prototype to the full map, with the debug view (see
+  [Streaming the open map](#streaming-the-open-map)).
 - `invasion.ts` seeds each run's breaches, local corruption spread, demon
   camps and events. An open breach pulls its region up to a tier ahead of
   the world. Sealing it slows the local spread and keeps the region a tier
   behind, protecting its altar, merchants and rewards.
-- `corruption.ts` runs the run's clock: World Corruption rises with time
-  at a steady, designed rate, crossing tiers, and nothing lowers it. The
-  starting pace is one tier about every 2 hours of play, which depends on
-  open decision 4.
+- `progression/corruption.ts` runs the run's clock: World Corruption rises
+  with time at a steady, designed rate, crossing tiers, and nothing lowers
+  it. The starting pace is one tier about every 2 hours of play, which
+  depends on open decision 4.
 - **Corruption tiers.** The tiers are in section 10 of the
   [progression doc](./heaven-or-hell-progression.md#10-corruption-tiers-the-power-curve):
   six tiers, from Tier 0 (the Calm Courts) to Tier 5 (War in Heaven). Every
@@ -1155,8 +1452,9 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
 - **Done when** a run can be played from character creation through at
   least three corruption tiers, being struck down and cast out behave as
   designed, two seeds produce different invasions on the same map, closing
-  and reopening the tab resumes the run without undoing a life lost, and
-  Testimony and Remembrance survive a wipe.
+  and reopening the tab resumes the run without undoing a life lost,
+  Testimony and Remembrance survive a wipe, crossing the map streams with
+  no visible stutter, and the build is published to GitHub Pages.
 
 ### M5: Builds and variety
 
@@ -1174,76 +1472,104 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
 - More demons and bosses from the roster, more allied angels, and more
   corrupted angels.
 - **Done when** two runs with different Choirs, Tongues and Vows play
-  noticeably differently, and a run pushed to 100 Stain ends in the Fall
-  while keeping Testimony and Remembrance.
+  noticeably differently, a run pushed to 100 Stain ends in the Fall
+  while keeping Testimony and Remembrance, and the build is published to
+  GitHub Pages.
 
 ### M6: Polish and release
 
-- An original score and sound effects, built by a script such as
+- An original score and sound effects, built by a TypeScript script in
+  `tools/heaven-or-hell/`, taking its approach from
   `tools/oka-world/compose_music.py`.
 - The title and chapter cards, `docs/heaven-or-hell.md`, and a README entry.
-- **Done when** the GitHub Pages build serves `/#heavenorhell` and the
-  console has no errors on a fresh `localStorage`.
+- The image generator's terms checked for use in a published game.
+- **Done when** the GitHub Pages build serves `/#heavenorhell` at
+  `https://thoughtpivot.github.io/terrene/#heavenorhell` and the console
+  has no errors on a fresh `localStorage`.
 
 ## Risks
 
-- **Scripted art fidelity.** With no modeller, every model, rig and
-  animation is scripted, and may look simpler or stiffer than the
-  references. Keep shapes simple, design silhouettes first, let toon bands,
-  ink lines and bloom carry the look, and hold animation to the budget in
-  [Who makes the art](#who-makes-the-art). Judge it on M1 screenshots next
-  to the references.
-- **Blender may not install headless** on the development VM. That's why
-  it's M1's first task, with the procedural Python fallback ready if it
-  fails. The fallback is likely to look plainer and makes rigged animation
-  harder.
-- **Frame counts and texture memory.** High-resolution sprites in 8 facings,
-  three passes each, add up fast (see
-  [The real costs of pre-rendering](#the-real-costs-of-pre-rendering)).
+- **Fidelity of 2D against real 3D.** Painted sprites lit by normal-ish
+  maps can't match real 3D lighting or turning, and may look flatter than
+  the references. Let the painting carry the form, keep runtime light
+  moderate, design silhouettes first, and let toon bands, ink lines and
+  bloom carry the look. Judge it on M1 screenshots next to the references.
+- **Consistency across generated images.** Generators drift in style, line
+  weight and light direction between outputs, and a character's design
+  drifts between its views. Use the shared style block in `prompts.md`,
+  reference images, the M1 style sheet and the runtime shaders to pull
+  assets together, and budget several generations per kept asset.
+- **Camera-angle drift.** A painting a few degrees off the fixed angle
+  stands out next to its neighbours, and there's no way to re-render it.
+  Check every asset against the style sheet before it's packed, reject
+  off-angle results, and lock the angle in M1 before any real asset.
+- **Large creatures.** Behemoth, Leviathan, the beast and the dragon must be
+  generated in parts that join without seams and agree on angle, scale and
+  light, which is where generated art is weakest. Their atlases are also
+  large, and several can be on the map at higher tiers. Budget and judge
+  each boss on its own, and load them only near the player.
+- **The bloom test fails, or breaks GL state.** The multi-pass bloom uses
+  raw WebGL inside an Excalibur `PostProcessor` and relies on internals
+  outside the public API. If it leaves any state wrong, Excalibur's next
+  draw breaks in ways that are hard to trace. Save and restore every piece
+  of state it touches, test resize and scene switches, and keep the
+  single-pass fallback ready. If only the fallback works, the bloom is
+  weaker than Dan wants, and he should hear that from the M1 result.
+- **Puppet animation cost and feel.** The puppet system is new code, and
+  cutout motion can look stiff if the clips lack overlap, holds and squash.
+  The combat needs many clips (see
+  [Puppet animation](#puppet-animation)). Build the secondary motion and
+  hit-stop into the system so every clip gets them, and judge crispness in
+  M1 and M2 recordings.
+- **Lighting rotated parts.** A puppet part's normal-ish map rotates with
+  the part, so one `Material` per actor may light rotated parts wrongly.
+  Check it in M1, and fall back to a child actor per part if needed.
+- **Texture memory.** Painted parts in several views with three maps each
+  add up (see
+  [The real costs of the 2D approach](#the-real-costs-of-the-2d-approach)).
   Measure the hero in M1, set a budget per creature, and enforce it in
-  `pack_atlas.py`.
+  `pack.ts`.
 - **Depth sorting** with tall pieces and big creatures, such as a wheel
-  boss, is a common source of visual bugs. Settle the layer split or the
-  depth-pass `Material` in M1, before combat depends on it.
-- **Baked and runtime look drifting apart.** If the band table or the
-  outline width changes in one place and not the other, sprites and runtime
-  light stop matching. Keep one band table in `palette.ts`, export it to
-  Blender, and re-render when it changes.
-- **The camera angle is locked in by every render.** Changing the angle or
-  lens after M1 means re-rendering everything. Verify the default against
-  the screenshots and lock it before the first real asset.
-- **Streaming a large map.** Excalibur has no built-in streaming. Chunks have
-  to be loaded, added to the scene, removed and unloaded by `chunks.ts`, with
-  `OffscreenSystem`'s viewport events as a trigger. Loading images while the
-  hero runs can stutter, so chunks next to the current one load ahead of
-  time, and textures for far chunks are released. The map's size (open
-  decision 1) decides how hard this is.
+  boss, is a common source of visual bugs. Settle the layer split in M1,
+  before combat depends on it.
+- **Streaming a large map.** Excalibur has no built-in streaming, so
+  `streaming.ts` loads, adds, removes and unloads chunks itself. Loading
+  images while the hero runs can stutter, and textures that aren't released
+  leak memory, so chunks load ahead in the direction of travel, unload with
+  a gap between radii, and the debug view shows what's loaded. The map's
+  size (open decision 1) decides how hard this is.
+- **Publishing to GitHub Pages.** Each publish replaces the whole Terrene
+  site on `gh-pages`, and the site lives under `/terrene/`, so a bad build
+  or an absolute asset path breaks every scene there. Publish only from the
+  integrated branch, and load the published URL after each publish.
+- **Integration merges.** Three branches moving in parallel can drift
+  apart. Agree the `CombatStats` and event types first, keep each pure
+  module in its own folder with its own tests, and integrate at the end of
+  each milestone rather than once at the end.
 - **Saving a long run.** A long permadeath run has to survive a closed tab
   or a crash without letting a player undo being struck down by reloading.
   The save has to be continuous and small, and `localStorage` has a size
   limit, so the save stores the seed and the changes, not the whole map.
-- **Boss render cost.** Behemoth, Leviathan and the dragon are large, so
-  their frames are large, and several can be on the map at higher tiers.
-  Budget each boss on its own, render large bosses in parts, and load them
-  only near the player.
 - **Corruption balance.** Corruption rises at its own rate with no cap on
   the player, so if it rises faster than a player can grow, long runs
   become hopeless, and if slower, they lose tension. Tune the rate against
   the Ascension pace for each tier in play in M4, and keep the rates and
-  scaling tables as data in `corruption.ts` so they can be tested and
-  changed.
+  scaling tables as data in `progression/corruption.ts` so they can be
+  tested and changed.
 - **Feint AI that feels unfair or exploitable.** Gullible enemies can make
   feints feel like a cheat, and adaptive ones can feel like they read your
   mind. Every commitment needs a visible tell, adaptive memory must fade,
   and M3's manual play should check both ends. Keep the trait numbers as
-  data in `reads.ts`.
-- **Bloom cost.** A full-screen pass at full resolution every frame can drop
-  the frame rate on low-end GPUs. Baked halos keep most of the glow out of
-  the screen pass, and the screen pass can run at a lower resolution than
-  the frame, as `HollowDark` paints its lighting at 480x270.
+  data in `combat/reads.ts`.
+- **Bloom cost.** Several blur passes every frame can drop the frame rate
+  on low-end GPUs. The blur passes run at reduced resolution, as
+  `HollowDark` paints its lighting at 480x270, and the number of blur sizes
+  can drop on slower GPUs.
 - **White and red readability.** White allies, the gold hero and white
   altars can blur together, and red corruption can hide red danger. Check
   each in M1 and M3 screenshots.
 - **Combat feel** is hard to judge from tests alone. Each combat milestone
   needs a manual play session and a recording, not only green tests.
-- **Engine pin.** Every API used must exist in ExcaliburJS 0.32.x.
+- **Engine pin.** Every API used must exist in ExcaliburJS 0.32.x, and the
+  bloom's reliance on Excalibur's post-processor internals must be
+  re-checked on any upgrade.
