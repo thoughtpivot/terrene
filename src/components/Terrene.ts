@@ -13,6 +13,7 @@ import OkaWorldTwo, { OKA_WORLD_TWO_SCENE } from "./scenes/OkaWorld/2/OkaWorldTw
 import SapWorld, { SAP_WORLD_SCENE } from "./scenes/SapWorld/SapWorld";
 import Street, { STREET_SCENE } from "./scenes/Street/Street";
 import HeavenOrHell, { HEAVEN_OR_HELL_SCENE } from "./scenes/HeavenOrHell/HeavenOrHell";
+import HeavenOrHellUi, { HEAVEN_OR_HELL_UI_SCENE } from "./scenes/HeavenOrHell/ui/UiPreview";
 import ZeldaCave from "./scenes/ZeldaCave/ZeldaCave";
 import ZeldaLand from "./scenes/ZeldaLand/ZeldaLand";
 import { ZELDA_CAVE_SCENE, ZELDA_LAND_SCENE } from "./scenes/ZeldaLand/run";
@@ -46,6 +47,7 @@ const ROUTED_SCENES = [
     SAP_WORLD_SCENE,
     STREET_SCENE,
     HEAVEN_OR_HELL_SCENE,
+    HEAVEN_OR_HELL_UI_SCENE,
 ];
 
 const HASH_ALIASES: Record<string, string> = {
@@ -65,6 +67,7 @@ const SCENE_TITLES: Record<string, string> = {
     [SAP_WORLD_SCENE]: "Forest Last Sap World",
     [STREET_SCENE]: "Street",
     [HEAVEN_OR_HELL_SCENE]: "Heaven Or Hell",
+    [HEAVEN_OR_HELL_UI_SCENE]: "Heaven Or Hell UI",
 };
 
 function sceneFromHash(): string {
@@ -164,6 +167,7 @@ class Terrene extends Engine {
         add(SAP_WORLD_SCENE, () => new SapWorld());
         add(STREET_SCENE, () => new Street());
         add(HEAVEN_OR_HELL_SCENE, () => new HeavenOrHell());
+        add(HEAVEN_OR_HELL_UI_SCENE, () => new HeavenOrHellUi());
     }
 }
 
