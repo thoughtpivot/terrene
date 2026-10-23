@@ -7,13 +7,13 @@
     "scripts": {
         "test": "npm run build:prod && node ./test/test.js",
         "test:hoh": "vitest run",
-        "test:hoh-ui": "tsx --test test/heaven-or-hell-ui*.ts",
         "webpack": "webpack",
         "dev": "npx tsc -p tsconfig.json && webpack serve --config webpack.development.js",
         "start": "npm run dev",
         "desktop": "npx electron .",
         "build:dev": "webpack --config webpack.development.js",
         "build:prod": "webpack --config webpack.production.js",
+        "test:hoh-ui": "tsx --test test/heaven-or-hell-ui*.ts",
         "asperite": "../aseprite/build/bin/aseprite",
         "tiled": "../tiled/default/install-root/usr/local/Tiled.app/Contents/MacOS/Tiled"
     },
