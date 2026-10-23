@@ -11,6 +11,7 @@
         "music:hoh": "tsx tools/heaven-or-hell/music/render.ts",
         "music:hoh:demo": "tsx tools/heaven-or-hell/music/demo.ts",
         "music:hoh:qa": "tsx tools/heaven-or-hell/music/qa.ts",
+        "music:hoh:hitmap": "tsx tools/heaven-or-hell/music/hitmap.ts",
         "webpack": "webpack",
         "dev": "npx tsc -p tsconfig.json && webpack serve --config webpack.development.js",
         "start": "npm run dev",

@@ -1,4 +1,5 @@
 import { BAR_SEC, LOOP_BARS, LOOP_SAMPLES, STEPS_PER_BAR, StemId } from "../../../src/components/scenes/HeavenOrHell/audio/musicSpec";
+import { Bass808Id, bass808Notes } from "../../../src/components/scenes/HeavenOrHell/audio/bass808";
 import { circularProcessStereo, foldTail } from "./loop";
 import {
     GHOST_PLAN,
@@ -382,45 +383,15 @@ export function hellBrass(): Stereo {
 
 // ---------------------------------------------------------------- 808s
 
-function bassMidi(root: number): number {
-    return root < 28 ? root + 12 : root;
-}
-
-type Decorate = (bar: number, step: number, root: number, idx: number) => Partial<BassNote>;
-
-/**
- * One 808 note per kick step, on the chord root. With `autoSlide`, a note whose
- * pitch differs from the previous one glides in from it (including the wrap
- * from bar 31 into bar 0).
- */
-function bassLine(chords: typeof HEAVEN_CHORDS, stepsFor: (bar: number) => number[], decorate: Decorate, autoSlide: boolean): BassNote[] {
-    const notes: BassNote[] = [];
-    for (let bar = 0; bar < LOOP_BARS; bar++) {
-        const chord = chords[Math.floor(bar / SLOT_BARS)];
-        const steps = stepsFor(bar);
-        steps.forEach((step, idx) => {
-            const nextStep = idx + 1 < steps.length ? steps[idx + 1] : STEPS_PER_BAR;
-            const root = bassMidi(chord.root);
-            const extra = decorate(bar, step, root, idx);
-            notes.push({
-                at: stepAt(bar, step),
-                hold: (nextStep - step) * STEP - 0.03,
-                midi: extra.midi ?? root,
-                vel: idx === 0 ? 1 : 0.85,
-                ...extra,
-            });
-        });
-    }
-    if (autoSlide) {
-        notes.forEach((note, i) => {
-            const prev = notes[(i - 1 + notes.length) % notes.length];
-            if (note.slideFrom === undefined && prev.midi !== note.midi) {
-                note.slideFrom = prev.midi;
-                note.slideSec = 0.11;
-            }
-        });
-    }
-    return notes;
+/** The 808 stems render exactly the notes the runtime hit map reports. */
+function bassLine(id: Bass808Id): BassNote[] {
+    return bass808Notes(id).map((n) => ({
+        at: stepAt(n.bar, n.step),
+        hold: n.hold,
+        midi: n.midi,
+        vel: n.vel,
+        ...(n.slideFrom !== undefined ? { slideFrom: n.slideFrom, slideSec: n.slideSec } : {}),
+    }));
 }
 
 /**
@@ -441,31 +412,19 @@ function withGritBand(s: Stereo, drive: number, centerHz: number, amount: number
 }
 
 export function heaven808(): Stereo {
-    const notes = bassLine(HEAVEN_CHORDS, softKickSteps, () => ({}), false);
+    const notes = bassLine("heaven808");
     const style: BassStyle = { decay: 0.3, drive: 1.1, harmonic: 0.18, tone: 900, punch: 2 };
     return duck(render808Loop(notes, style), softKickTriggerSamples(), 0.5, 0.05);
 }
 
 export function grit808(): Stereo {
-    const notes = bassLine(HEAVEN_CHORDS, kickSteps, (bar, step, root) => {
-        if (step === 14 || (bar % 4 === 3 && step === 11)) return { midi: root + 12, slideFrom: root, slideSec: 0.07 };
-        return {};
-    }, true);
+    const notes = bassLine("grit808");
     const style: BassStyle = { decay: 0.55, drive: 3.2, harmonic: 0.35, tone: 4500, punch: 5 };
     return duck(withGritBand(render808Loop(notes, style), 9, 1400, 0.22), kickTriggerSamples(), 0.45, 0.05);
 }
 
 export function hell808(): Stereo {
-    const notes = bassLine(HELL_CHORDS, (bar) => (bar % 2 === 1 ? [...kickSteps(bar), 7].sort((a, b) => a - b) : kickSteps(bar)), (bar, step, root, idx) => {
-        const slot = Math.floor(bar / SLOT_BARS) % 4;
-        // Phrygian b2 slide: F creeps up to Gb under the Gb/F chord.
-        if (slot === 1 && bar % 2 === 1 && step >= 10) return { midi: root + 1, slideFrom: root, slideSec: 0.16 };
-        // 808 dive: start an octave up and fall onto the root.
-        if (idx === 0 && bar % 4 === 2) return { midi: root, slideFrom: root + 12, slideSec: 0.14 };
-        if (step === 14) return { midi: root + 12, slideFrom: root, slideSec: 0.06 };
-        if (step === 7) return { midi: root + 7 };
-        return {};
-    }, true);
+    const notes = bassLine("hell808");
     const style: BassStyle = { decay: 0.75, drive: 5.5, harmonic: 0.5, tone: 5000, punch: 7 };
     const loop = withGritBand(render808Loop(notes, style), 14, 1800, 0.3);
     const crushed = new Stereo(lowpass(bitcrush(loop.l, 10, 1, 0.3), 6500), lowpass(bitcrush(loop.r, 10, 1, 0.3), 6500));

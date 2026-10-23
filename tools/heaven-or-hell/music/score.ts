@@ -15,6 +15,7 @@
  * while every other note falls into Phrygian: C Ab B Gb Eb F, an octave down.
  */
 
+import { kickSteps, softKickSteps } from "../../../src/components/scenes/HeavenOrHell/audio/bass808";
 import { BAR_SEC, LOOP_BARS, SAMPLE_RATE, STEPS_PER_BAR, STEP_SEC } from "../../../src/components/scenes/HeavenOrHell/audio/musicSpec";
 
 export const SLOT_BARS = 2;
@@ -169,24 +170,7 @@ export const GHOST_PLAN = phrasePlan(GHOST_A, GHOST_B);
 
 // ---------------------------------------------------------------- rhythm
 
-/** Kick steps per bar, half-time trap: kick on 1, syncopations around the beat-3 snare. */
-export function kickSteps(bar: number): number[] {
-    switch (bar % 4) {
-        case 0:
-            return [0, 10];
-        case 1:
-            return [0, 6, 10];
-        case 2:
-            return [0, 10, 14];
-        default:
-            return bar % 8 === 7 ? [0, 3, 10] : [0, 3, 11];
-    }
-}
-
-/** The heaven kit is sparser: just the downbeat and the pickup. */
-export function softKickSteps(bar: number): number[] {
-    return bar % 2 === 0 ? [0, 10] : [0, 11];
-}
+export { kickSteps, softKickSteps } from "../../../src/components/scenes/HeavenOrHell/audio/bass808";
 
 export const SNARE_STEP = 8;
 
