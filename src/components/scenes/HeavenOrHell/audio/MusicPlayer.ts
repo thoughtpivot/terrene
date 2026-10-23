@@ -1,4 +1,6 @@
 import { AudioContextFactory, Sound, WebAudio } from "excalibur";
+import { Bass808Id } from "./bass808";
+import { Beat808Hit, Beat808Scheduler, BeatMixView } from "./beatScheduler";
 import { MusicCommand, MusicDirector } from "./director";
 import { AutomationPoint, FILTER_OPEN_HZ, Gains, MusicSet, valueAt } from "./mixer";
 import { STEM_URLS, STINGER_URLS } from "./musicAssets";
@@ -43,6 +45,15 @@ export interface MusicSnapshot {
     loaded: number;
     total: number;
     lastCommand: MusicCommand | null;
+    /** Estimated delay from the audio clock to the speakers, in ms. */
+    outputLatencyMs: number;
+}
+
+/** Subset of AudioContext output-timing APIs; not every browser has them. */
+interface OutputTiming {
+    outputLatency?: number;
+    baseLatency?: number;
+    getOutputTimestamp?: () => AudioTimestamp;
 }
 
 interface Bus {
@@ -81,6 +92,10 @@ export class HeavenOrHellMusic {
     private heardTier: Tier = 0;
     private stateValue: MusicPlayerState = "idle";
     private generation = 0;
+    private sourceStart = new Map<StemId, number>();
+    private beats = new Beat808Scheduler();
+    private beatListeners = new Set<(hit: Beat808Hit) => void>();
+    private clockMap: { audio: number; perf: number } | null = null;
 
     /** Called for every scheduled transition (stinger or crossfade). */
     onCommand: ((command: MusicCommand) => void) | null = null;
@@ -145,15 +160,36 @@ export class HeavenOrHellMusic {
         this.corruption = corruption;
     }
 
-    /** Drive the director; call once per frame (e.g. from the scene's onPreUpdate). */
+    /**
+     * Subscribe to 808 hits as they reach the listener. Callbacks fire from
+     * `update()`, on the frame each hit becomes audible (output latency included),
+     * only for hits whose stem is actually audible then. Returns an unsubscribe function.
+     */
+    onBeat808(listener: (hit: Beat808Hit) => void): () => void {
+        this.beatListeners.add(listener);
+        return () => this.beatListeners.delete(listener);
+    }
+
+    /** Drive the director and the 808 beat callbacks; call once per frame (e.g. from the scene's onPreUpdate). */
     update(): void {
         if (this.stateValue !== "playing" || !this.ctx || !this.director) return;
-        const elapsed = this.ctx.currentTime - this.epoch;
-        if (elapsed < 0) return;
-        const before = this.director.tier;
-        const command = this.director.tick(elapsed, this.corruption);
-        if (command) this.heardTier = before;
-        if (command) this.apply(command);
+        const now = this.ctx.currentTime;
+        const elapsed = now - this.epoch;
+        if (elapsed >= 0) {
+            const before = this.director.tier;
+            const command = this.director.tick(elapsed, this.corruption);
+            if (command) {
+                this.heardTier = before;
+                this.apply(command);
+            }
+        }
+        if (this.beatListeners.size === 0) return;
+        this.beats.schedule(now, this.epoch);
+        const perfNow = performance.now();
+        this.refreshClockMap(perfNow);
+        for (const hit of this.beats.due(perfNow, (t) => this.audibleAtMs(t), this.mixView())) {
+            for (const listener of this.beatListeners) listener(hit);
+        }
     }
 
     /** 0..1 user volume on top of the mastering gain. */
@@ -187,6 +223,7 @@ export class HeavenOrHellMusic {
             loaded: this.sources.size,
             total: STEMS.length,
             lastCommand: this.lastCommand,
+            outputLatencyMs: this.outputLatencyMs(),
         };
     }
 
@@ -222,6 +259,9 @@ export class HeavenOrHellMusic {
             for (const g of Object.values(stemGains)) g.disconnect();
         }, (fadeSec + 0.2) * 1000);
         this.sources.clear();
+        this.sourceStart.clear();
+        this.beats.reset();
+        this.clockMap = null;
         this.master = null;
         this.buses = {} as Record<StemSet, Bus>;
         this.stemGains = {} as Record<StemId, GainNode>;
@@ -237,7 +277,73 @@ export class HeavenOrHellMusic {
         this.stemSounds.clear();
         this.stingerSounds.clear();
         this.onCommand = null;
+        this.beatListeners.clear();
         this.ctx = null;
+    }
+
+    /** Output latency in ms: from getOutputTimestamp when available, else outputLatency/baseLatency. */
+    private outputLatencyMs(): number {
+        const ctx = this.ctx;
+        if (!ctx) return 0;
+        const timing = ctx as unknown as OutputTiming;
+        const ts = timing.getOutputTimestamp?.();
+        if (ts && ts.contextTime && ts.contextTime > 0) return Math.max(0, (ctx.currentTime - ts.contextTime) * 1000);
+        return ((timing.outputLatency || timing.baseLatency || 0) as number) * 1000;
+    }
+
+    /**
+     * Map the audio clock to performance.now() at the speakers. getOutputTimestamp
+     * pairs the frame being played out with its performance time, which already
+     * includes output latency; otherwise add outputLatency (or baseLatency) by hand.
+     * The map is smoothed so per-frame jitter in either clock does not wobble hits.
+     */
+    private refreshClockMap(perfNow: number): void {
+        const ctx = this.ctx;
+        if (!ctx) return;
+        const timing = ctx as unknown as OutputTiming;
+        const ts = timing.getOutputTimestamp?.();
+        let audio: number;
+        let perf: number;
+        if (ts && ts.contextTime && ts.performanceTime && ts.contextTime > 0 && ts.performanceTime > 0) {
+            audio = ts.contextTime;
+            perf = ts.performanceTime;
+        } else {
+            audio = ctx.currentTime;
+            perf = perfNow + ((timing.outputLatency || timing.baseLatency || 0) as number) * 1000;
+        }
+        const offset = perf - audio * 1000;
+        if (!this.clockMap) {
+            this.clockMap = { audio, perf };
+            return;
+        }
+        const current = this.clockMap.perf - this.clockMap.audio * 1000;
+        // Re-sync on big jumps (suspend/resume), otherwise follow slowly.
+        const next = Math.abs(offset - current) > 50 ? offset : current + (offset - current) * 0.1;
+        this.clockMap = { audio, perf: audio * 1000 + next };
+    }
+
+    private audibleAtMs(audioTime: number): number {
+        const map = this.clockMap;
+        if (!map) return performance.now();
+        return map.perf + (audioTime - map.audio) * 1000;
+    }
+
+    private mixView(): BeatMixView {
+        return {
+            epoch: this.epoch,
+            gainAt: (stem: Bass808Id, audioTime: number) => {
+                const started = this.sourceStart.get(stem);
+                if (started === undefined || audioTime < started || !this.lanes[stem]) return 0;
+                if (this.volume <= 0) return 0;
+                const fade = Math.min(1, Math.max(0, (audioTime - this.epoch) / FADE_IN_SEC));
+                return valueAt(this.lanes[stem], audioTime - this.epoch) * fade;
+            },
+            tierAt: (audioTime: number) => {
+                const cmd = this.lastCommand;
+                if (cmd && audioTime < this.epoch + cmd.boundarySec) return this.heardTier;
+                return this.director?.tier ?? 0;
+            },
+        };
     }
 
     private buildGraph(ctx: AudioContext): void {
@@ -295,6 +401,7 @@ export class HeavenOrHellMusic {
         const into = Math.max(0, when - this.epoch) % LOOP_SEC;
         source.start(when, LOOP_START_SEC + into);
         this.sources.set(id, source);
+        this.sourceStart.set(id, when);
     }
 
     private apply(command: MusicCommand): void {
