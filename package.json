@@ -5,7 +5,7 @@
     "main": "main.ts",
     "description": "a webpack starter for excaliburjs projects",
     "scripts": {
-        "test": "npm run build:prod && node ./test/test.js",
+        "test": "npm run build:prod && npm run test:hoh && npm run test:street",
         "test:hoh": "vitest run",
         "test:street": "tsx --test test/street-rules.ts",
         "webpack": "webpack",
