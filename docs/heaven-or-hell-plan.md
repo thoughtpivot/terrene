@@ -812,6 +812,13 @@ system Dan listed is in, each given angel and Heaven flavour. The detail is
 in [heaven-or-hell-progression.md](./heaven-or-hell-progression.md), which
 lists what Dan has decided and proposes the rest. In short:
 
+- **Save slots (decided).** The flow is Title (Start), then slot select,
+  then character creation for an empty slot or continue for a filled one,
+  then the game. There are three slots, A, B and C, as in Deepwoken's slot
+  select. Each holds its own character and run plus its own Testimony and
+  Remembrance, so a wipe in one slot never affects another. Each slot is
+  saved under its own versioned `localStorage` key, and the old single save
+  moves into slot A on first load (`progression/save.ts`).
 - You are one of **the Tenth**, lesser angels kindled to refill Heaven's
   choirs after the War in Heaven. Each Choir is an echo of a higher choir,
   such as the Kindled (Seraphim) or the Wheelborn (Ophanim), with the same
