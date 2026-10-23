@@ -31,9 +31,9 @@ export interface BloomSettings {
 }
 
 export const DEFAULT_BLOOM: BloomSettings = {
-    threshold: 0.6,
-    knee: 0.28,
-    intensity: 1.45,
+    threshold: 0.66,
+    knee: 0.26,
+    intensity: 1.7,
     weights: [0.55, 0.85, 1.1, 1.35],
     vibrance: 0.22,
     black: 0.0,
