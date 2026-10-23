@@ -30,7 +30,7 @@ const CSS = `
   font: 14px/1.4 ui-monospace, Menlo, Consolas, monospace; color: #f4ecd8; background: radial-gradient(circle at 50% 30%, #2a2418, #0b0906 70%);
   transition: background 1.2s; }
 #${ROOT_ID}.hell { color: #ffd9c2; background: radial-gradient(circle at 50% 70%, #3a0d06, #070202 70%); }
-#${ROOT_ID} .panel { width: min(760px, 94vw); padding: 22px 26px; border: 1px solid currentColor; border-radius: 10px; background: rgba(0,0,0,.35); }
+#${ROOT_ID} .panel { width: min(760px, 94vw); max-height: 94vh; overflow: auto; box-sizing: border-box; padding: 18px 24px; border: 1px solid currentColor; border-radius: 10px; background: rgba(0,0,0,.35); }
 #${ROOT_ID} h1 { margin: 0 0 4px; font-size: 20px; letter-spacing: .08em; text-transform: uppercase; color: #e8c66a; }
 #${ROOT_ID}.hell h1 { color: #ff6a2a; }
 #${ROOT_ID} .sub { opacity: .7; margin-bottom: 14px; }
@@ -249,7 +249,7 @@ export default class HeavenOrHellMusicPreview extends Scene {
             set("status", "Music stopped. Keys still move the corruption value.");
             return;
         }
-        set("tier", String(snap.tier));
+        set("tier", snap.pendingTier !== null && snap.pendingTier !== snap.tier ? `${snap.tier}→${snap.pendingTier}` : String(snap.tier));
         set("set", snap.set);
         set("bar", snap.state === "playing" ? String(snap.bar % 32 + 1) + " / 32" : "-");
         root.classList.toggle("hell", snap.set === "hell");
@@ -260,7 +260,15 @@ export default class HeavenOrHellMusicPreview extends Scene {
                 ? "Loading stems…"
                 : `${snap.state} · stems running ${snap.loaded}/${snap.total} · heaven LP ${Math.round(snap.filterHz.heaven)} Hz · hell LP ${Math.round(snap.filterHz.hell)} Hz`,
         );
-        set("event", performance.now() < this.eventUntil ? this.eventText : "");
+        if (snap.pendingTier !== null) this.eventUntil = performance.now() + 4000;
+        set(
+            "event",
+            snap.pendingTier !== null
+                ? `${this.eventText} · lands in ${snap.pendingInSec.toFixed(1)} s`
+                : performance.now() < this.eventUntil
+                  ? this.eventText
+                  : "",
+        );
         for (const stem of STEMS) {
             const m = this.meters.get(stem.id);
             if (!m) continue;

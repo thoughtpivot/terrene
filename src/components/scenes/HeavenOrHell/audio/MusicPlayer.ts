@@ -27,8 +27,13 @@ export type MusicPlayerState = "idle" | "loading" | "playing" | "stopped";
 /** Live snapshot for HUDs and the preview scene. */
 export interface MusicSnapshot {
     state: MusicPlayerState;
+    /** Tier the listener is hearing now. */
     tier: Tier;
     set: MusicSet;
+    /** Tier of a scheduled transition that has not reached its bar line yet. */
+    pendingTier: Tier | null;
+    /** Seconds until that bar line. */
+    pendingInSec: number;
     corruption: number;
     bar: number;
     /** Beat within the bar, 0..3. */
@@ -73,6 +78,7 @@ export class HeavenOrHellMusic {
     private lanes = {} as Record<StemId, AutomationPoint[]>;
     private filterLanes: Record<MusicSet, AutomationPoint[]> = { heaven: [], hell: [] };
     private lastCommand: MusicCommand | null = null;
+    private heardTier: Tier = 0;
     private stateValue: MusicPlayerState = "idle";
     private generation = 0;
 
@@ -104,6 +110,7 @@ export class HeavenOrHellMusic {
 
         this.buildGraph(ctx);
         this.director = new MusicDirector(corruption);
+        this.heardTier = this.director.tier;
         const first = this.director.tier >= 4 ? "hell" : "heaven";
         const priority = STEMS.filter((s) => s.set === first || s.set === "neutral").map((s) => s.id);
         const rest = STEMS.map((s) => s.id).filter((id) => !priority.includes(id));
@@ -143,7 +150,9 @@ export class HeavenOrHellMusic {
         if (this.stateValue !== "playing" || !this.ctx || !this.director) return;
         const elapsed = this.ctx.currentTime - this.epoch;
         if (elapsed < 0) return;
+        const before = this.director.tier;
         const command = this.director.tick(elapsed, this.corruption);
+        if (command) this.heardTier = before;
         if (command) this.apply(command);
     }
 
@@ -159,11 +168,14 @@ export class HeavenOrHellMusic {
         const now = this.ctx && this.stateValue === "playing" ? this.ctx.currentTime - this.epoch : 0;
         const gains = {} as Gains;
         for (const stem of STEMS) gains[stem.id] = this.lanes[stem.id] ? valueAt(this.lanes[stem.id], now) : 0;
-        const tier = this.director?.tier ?? 0;
+        const pending = this.lastCommand && now < this.lastCommand.boundarySec ? this.lastCommand : null;
+        const tier = pending ? this.heardTier : this.director?.tier ?? 0;
         return {
             state: this.stateValue,
             tier,
             set: tier >= 4 ? "hell" : "heaven",
+            pendingTier: pending ? pending.tier : null,
+            pendingInSec: pending ? pending.boundarySec - now : 0,
             corruption: this.corruption,
             bar: Math.max(0, Math.floor(now / BAR_SEC)),
             beat: Math.max(0, Math.floor(now / BEAT_SEC)) % 4,
