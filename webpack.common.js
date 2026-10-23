@@ -32,7 +32,10 @@ module.exports = {
       },
       {
         test: /\.ts$/,
-        use: "ts-loader",
+        loader: "ts-loader",
+        options: {
+          configFile: path.resolve(__dirname, "tsconfig.webpack.json"),
+        },
         exclude: /node_modules/,
       },
       {
