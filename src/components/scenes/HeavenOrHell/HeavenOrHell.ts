@@ -83,6 +83,8 @@ export default class HeavenOrHell extends Scene {
     private debug: StreamingDebug | null = null;
     private hero: Auriel | null = null;
     private overlays: Actor[] = [];
+    /** made once per scene, so re-entering never uploads another copy */
+    private vignette: CanvasGraphic | null = null;
     private fog: FogGraphic | null = null;
     private hint: ScreenElement | null = null;
     private subs: Subscription[] = [];
@@ -206,7 +208,8 @@ export default class HeavenOrHell extends Scene {
         const fogEl = new ScreenElement({ x: 0, y: 0, z: Z.overlay - 1 });
         fogEl.graphics.use(fog);
         const vignette = new ScreenElement({ x: 0, y: 0, z: Z.overlay });
-        vignette.graphics.use(new CanvasGraphic(vignetteCanvas(VIEW_W, VIEW_H), VIEW_W, VIEW_H));
+        this.vignette = this.vignette ?? new CanvasGraphic(vignetteCanvas(VIEW_W, VIEW_H), VIEW_W, VIEW_H);
+        vignette.graphics.use(this.vignette);
         this.overlays = [fogEl, vignette];
         for (const o of this.overlays) this.add(o);
 
