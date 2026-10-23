@@ -54,18 +54,29 @@ export function encodeMp3(wavPath: string, mp3Path: string, kbps: number, channe
     ]);
 }
 
-/** Decode any audio file to stereo float at 44.1 kHz. */
+/** Channel count of an audio file, via ffprobe. */
+export function channelCount(path: string): number {
+    const out = execFileSync("ffprobe", ["-v", "error", "-select_streams", "a:0", "-show_entries", "stream=channels", "-of", "csv=p=0", path]);
+    return Number(String(out).trim()) || 2;
+}
+
+/**
+ * Decode any audio file to stereo float at 44.1 kHz. Mono files are copied to
+ * both channels at unity, as WebAudio's "speakers" up-mix does; ffmpeg's own
+ * `-ac 2` treats mono as a centre channel and drops it by 3 dB.
+ */
 export function decodeToStereo(path: string): Stereo {
-    const raw = execFileSync("ffmpeg", ["-loglevel", "error", "-i", path, "-f", "f32le", "-ac", "2", "-ar", String(SR), "-"], {
+    const channels = Math.min(2, channelCount(path));
+    const raw = execFileSync("ffmpeg", ["-loglevel", "error", "-i", path, "-f", "f32le", "-ac", String(channels), "-ar", String(SR), "-"], {
         maxBuffer: 1 << 30,
     });
     const f = new Float32Array(raw.buffer, raw.byteOffset, raw.length / 4);
-    const n = f.length / 2;
+    const n = f.length / channels;
     const l = new Float32Array(n);
     const r = new Float32Array(n);
     for (let i = 0; i < n; i++) {
-        l[i] = f[2 * i];
-        r[i] = f[2 * i + 1];
+        l[i] = f[channels * i];
+        r[i] = f[channels * i + channels - 1];
     }
     return new Stereo(l, r);
 }
