@@ -137,7 +137,7 @@ const C = {
 const BAR = {
     hp: { heaven: [hex("#fff1cc"), hex("#d8ae5c")], hell: [hex("#ffd9b0"), hex("#d98a4a")] },
     posture: { heaven: [hex("#f4f1ea"), hex("#b9b2a4")], hell: [hex("#f6ece6"), hex("#bba69e")] },
-    grace: { heaven: [hex("#eaf0fa"), hex("#9aa6c0")], hell: [hex("#efe0e4"), hex("#a68c98")] },
+    grace: { heaven: [hex("#dfe8ff"), hex("#7f93c4")], hell: [hex("#e6dcf0"), hex("#8f7ea8")] },
     fervour: { heaven: [hex("#fff4dc"), hex("#e6c07a")], hell: [hex("#ffe2c4"), hex("#ee9e5c")] },
     sanctity: { heaven: [hex("#ddd4ee"), hex("#8a80a8")], hell: [hex("#dcc8d2"), hex("#8c6878")] },
 };

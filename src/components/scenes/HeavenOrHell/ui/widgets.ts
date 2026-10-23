@@ -554,10 +554,10 @@ export class VitalsWidget extends UiWidget {
         const halo = haloState(v.lives, t.stain, v.maxLives ?? 2);
         const time = this.time;
 
-        drawFrame(ctx, { x: 44, y: 38, w: this.w - 44, h: 110, theme: t, time, seed: this.seed, personal: true, bevel: 8 });
+        drawFrame(ctx, { x: 66, y: 38, w: this.w - 66, h: 110, theme: t, time, seed: this.seed, personal: true, bevel: 8 });
 
         drawHalo(ctx, 46, 84, 25, halo, t, time, this.seed + 1);
-        drawLives(ctx, 46, 134, halo, t, time);
+        drawLives(ctx, 46, 131, halo, t, time);
 
         const x0 = 100;
         const bw = this.w - x0 - 18;
@@ -596,7 +596,8 @@ export class VitalsWidget extends UiWidget {
             alarm: hpv.critical,
         });
 
-        drawBar(ctx, { x: x0, y: 91, w: bw, h: 4, fill: this.grace.fill, colors: t.bars.grace, theme: t, time });
+        const gw = bw - 44;
+        drawBar(ctx, { x: x0, y: 91, w: gw, h: 4, fill: this.grace.fill, colors: t.bars.grace, theme: t, time });
 
         const fv = fervourView(v.fervour, v.fervourMax);
         const fw = Math.round(bw * 0.62);
@@ -611,7 +612,9 @@ export class VitalsWidget extends UiWidget {
         inkText(ctx, fv.canOutcry ? "FERVOUR · G" : "FERVOUR", x0, 117, fv.canOutcry ? css(mix(t.textDim, t.goldBright, 0.6)) : label, t, 2);
         inkText(ctx, "SANCTITY", sx, 117, label, t, 2);
         ctx.textAlign = "right";
-        inkText(ctx, "GRACE", x0 + bw, 117, label, t, 2);
+        ctx.textBaseline = "middle";
+        inkText(ctx, "GRACE", x0 + bw, 93, css(mix(t.textDim, t.bars.grace.hi, 0.35), 0.9), t, 2);
+        ctx.textBaseline = "alphabetic";
         setSpacing(ctx, 0);
 
         COOLDOWN_ORDER.forEach((c, i) => {
@@ -1105,14 +1108,15 @@ export class EmberLayer {
         this.sprite.tint = Color.fromRGB(Math.round(tint.r), Math.round(tint.g), Math.round(tint.b));
     }
 
-    update(dt: number): void {
+    /** Advance the embers; with `spawn` off the live ones burn out and no new ones rise. */
+    update(dt: number, spawn = true): void {
         const rate = this.theme.embers * 16;
-        this.spawnDebt += rate * dt;
+        this.spawnDebt += spawn ? rate * dt : 0;
         while (this.spawnDebt >= 1 && this.sources.length) {
             this.spawnDebt -= 1;
             if (this.embers.length < this.max) this.spawn();
         }
-        if (!this.sources.length) this.spawnDebt = 0;
+        if (!this.sources.length || !spawn) this.spawnDebt = 0;
         for (const e of this.embers) {
             e.age += dt;
             e.vx += Math.sin(e.age * 2.1 + e.size * 7) * 6 * dt;

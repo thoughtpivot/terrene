@@ -302,7 +302,7 @@ export function hudLayout(width: number, height: number): HudLayout {
         hotbar,
         tier: rect(width - m - SIZES.tier.w * s, m, SIZES.tier),
         dialogue,
-        prompt: rect(width / 2 - (SIZES.prompt.w * s) / 2, height * 0.6, SIZES.prompt),
+        prompt: rect(width / 2 - (SIZES.prompt.w * s) / 2, height * 0.52, SIZES.prompt),
         toasts: { x: width / 2, y: m, w: SIZES.toast.w * s, gap: 8 * s },
     };
 }

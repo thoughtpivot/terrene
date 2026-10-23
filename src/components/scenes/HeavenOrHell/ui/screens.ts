@@ -401,18 +401,18 @@ class ChoirDetail extends UiWidget {
             setSpacing(ctx, 2);
             inkText(ctx, label, 26, y, css(t.textDim), t, 2);
             setSpacing(ctx, 0);
-            y += 20;
+            y += 18;
             font(ctx, FAMILY.displayBold, 15);
             inkText(ctx, title, 26, y, css(color), t, 3);
-            y += 21;
+            y += 20;
             if (body) {
-                font(ctx, FAMILY.body, 15.5);
+                font(ctx, FAMILY.body, 14.5);
                 for (const l of wrapText(ctx, body, this.w - 52)) {
                     inkText(ctx, l, 26, y, css(t.text, 0.92), t, 2);
-                    y += 19;
+                    y += 18;
                 }
             }
-            y += 14;
+            y += 10;
         };
         section("SIGNATURE PASSIVE", c.passive, c.passiveText);
         section("LEANS TOWARD", c.leans, "");
@@ -425,7 +425,7 @@ export class ChoirScreen extends UiScreen {
     private heading = this.add(new Heading({ w: 640, h: 80, title: "Kindle the Tenth", subtitle: "Choose your Choir. Nothing is rolled.", seed: 71 }));
     private steps = this.add(new TabBar({ w: 1012, tabs: ["Choir", "Tongues", "Arms", "Boons", "Origin", "Appearance", "Testimony"], seed: 72 }));
     private tiles = CHOIRS.map((c, i) => this.add(new ChoirTile({ w: 156, h: 150, seed: 80 + i }, c)));
-    private detail = this.add(new ChoirDetail({ w: 336, h: 314, seed: 90 }));
+    private detail = this.add(new ChoirDetail({ w: 336, h: 326, seed: 90 }));
     private kindle = this.add(new Button({ w: 336, h: 44, label: "Kindle", hint: "E", seed: 91 }));
     private selected = 0;
 
@@ -441,7 +441,7 @@ export class ChoirScreen extends UiScreen {
         at(this.steps, 134, 156);
         this.tiles.forEach((t, i) => at(t, 134 + (i % 4) * 166, 212 + Math.floor(i / 4) * 164));
         at(this.detail, 810, 212);
-        at(this.kindle, 810, 536);
+        at(this.kindle, 810, 552);
     }
 
     pointerMove(x: number, y: number, down: boolean): void {

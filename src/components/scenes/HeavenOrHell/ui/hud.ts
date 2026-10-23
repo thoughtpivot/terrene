@@ -131,7 +131,7 @@ export class HohHud {
         this.dialogue.visible = this.dialogue.open && this.vitals.visible;
         this.prompt.visible = !!this.promptLabel && this.vitals.visible && (this.options.promptDuringDialogue || !this.dialogue.open);
         for (const w of this.widgets) w.update(dt);
-        this.embers.update(this.vitals.visible ? dt : 0);
+        this.embers.update(dt, this.vitals.visible);
     }
 
     destroy(): void {

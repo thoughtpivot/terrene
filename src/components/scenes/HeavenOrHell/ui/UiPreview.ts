@@ -85,18 +85,44 @@ function smooth(x: number): number {
     return x * x * (3 - 2 * x);
 }
 
-/** Scrub World Corruption and Stain, pick lives, and toggle the animation. */
+type Track = { x: number; y: number; w: number };
+
+/**
+ * Scrub World Corruption and Stain, pick lives, and toggle the animation.
+ * Over the HUD it is a panel top-left; over the menu screens it folds into a
+ * strip along the bottom so it never covers them.
+ */
 class Controls extends UiWidget {
     lives = 2;
     paused = false;
     sweeping = false;
-    readonly track = { x: 22, w: 236 };
-    readonly corruptionY = 76;
-    readonly stainY = 134;
-    readonly livesY = 172;
+    compact = false;
+    corruptionTrack: Track = { x: 22, y: 76, w: 236 };
+    stainTrack: Track = { x: 22, y: 134, w: 236 };
+    livesAt = { x: 22, y: 172 };
 
     constructor() {
         super({ w: 280, h: 212, pad: 20, z: 120, seed: 7 });
+    }
+
+    setCompact(on: boolean): void {
+        if (on === this.compact) return;
+        this.compact = on;
+        if (on) {
+            this.corruptionTrack = { x: 150, y: 34, w: 220 };
+            this.stainTrack = { x: 410, y: 34, w: 200 };
+            this.livesAt = { x: 650, y: 30 };
+            this.resize(940, 52);
+        } else {
+            this.corruptionTrack = { x: 22, y: 76, w: 236 };
+            this.stainTrack = { x: 22, y: 134, w: 236 };
+            this.livesAt = { x: 22, y: 172 };
+            this.resize(280, 212);
+        }
+    }
+
+    track(kind: "corruption" | "stain"): Track {
+        return kind === "corruption" ? this.corruptionTrack : this.stainTrack;
     }
 
     protected paint(ctx: Ctx): void {
@@ -106,46 +132,50 @@ class Controls extends UiWidget {
         setSpacing(ctx, 3);
         ctx.textAlign = "left";
         ctx.textBaseline = "alphabetic";
-        inkText(ctx, "UI PREVIEW", 22, 28, css(t.heading), t, 2);
+        inkText(ctx, "UI PREVIEW", 22, this.compact ? 31 : 28, css(t.heading), t, 2);
         setSpacing(ctx, 0);
         font(ctx, FAMILY.ui, 9);
         ctx.textAlign = "right";
-        inkText(ctx, this.paused ? "PAUSED · P" : this.sweeping ? "SWEEPING · T" : "LIVE · P", this.w - 22, 28, css(t.textDim), t, 2);
-        drawRule(ctx, 12, 38, this.w - 24, t, 0.45);
+        inkText(ctx, this.paused ? "PAUSED · P" : this.sweeping ? "SWEEPING · T" : "LIVE · P", this.w - 22, this.compact ? 31 : 28, css(t.textDim), t, 2);
+        if (!this.compact) drawRule(ctx, 12, 38, this.w - 24, t, 0.45);
 
         const tv = tierView(t.corruption);
-        this.slider(ctx, "WORLD CORRUPTION", `${t.corruption.toFixed(2)} · Tier ${ROMAN[tv.tier]}`, this.corruptionY, t.corruption / MAX_CORRUPTION, [0.2, 0.4, 0.6, 0.8], t);
-        font(ctx, FAMILY.bodyItalic, 13);
-        ctx.textAlign = "left";
-        inkText(ctx, TIER_NAMES[tv.tier], this.track.x, this.corruptionY + 24, css(t.textDim), t, 2);
+        const ct = this.corruptionTrack;
+        this.slider(ctx, this.compact ? "CORRUPTION" : "WORLD CORRUPTION", `${t.corruption.toFixed(2)} · Tier ${ROMAN[tv.tier]}`, ct, t.corruption / MAX_CORRUPTION, [0.2, 0.4, 0.6, 0.8], t);
+        if (!this.compact) {
+            font(ctx, FAMILY.bodyItalic, 13);
+            ctx.textAlign = "left";
+            inkText(ctx, TIER_NAMES[tv.tier], ct.x, ct.y + 24, css(t.textDim), t, 2);
+        }
         const halo = haloState(this.lives, t.stain);
-        this.slider(ctx, "STAIN", `${Math.round(t.stain)} · ${HALO_MARK_LABELS[halo.mark]}`, this.stainY, t.stain / MAX_STAIN, [0.25, 0.5, 0.75], t);
+        this.slider(ctx, "STAIN", `${Math.round(t.stain)} · ${HALO_MARK_LABELS[halo.mark]}`, this.stainTrack, t.stain / MAX_STAIN, [0.25, 0.5, 0.75], t);
 
+        const { x: lx, y: ly } = this.livesAt;
         font(ctx, FAMILY.ui, 9);
         setSpacing(ctx, 1.6);
         ctx.textAlign = "left";
-        inkText(ctx, "LIVES · L", this.track.x, this.livesY + 4, css(t.textDim), t, 2);
+        inkText(ctx, "LIVES · L", lx, ly + 4, css(t.textDim), t, 2);
         setSpacing(ctx, 0);
         [2, 1, 0].forEach((n, i) => {
-            const x = this.track.x + 96 + i * 46;
+            const x = lx + 72 + i * 40;
             const on = this.lives === n;
-            drawFrame(ctx, { x, y: this.livesY - 10, w: 40, h: 22, theme: t, time: this.time, seed: 70 + i, bevel: 4, focus: on ? 1 : 0, fillAlpha: on ? 1.2 : 0.7 });
+            drawFrame(ctx, { x, y: ly - 10, w: 34, h: 22, theme: t, time: this.time, seed: 70 + i, bevel: 4, focus: on ? 1 : 0, fillAlpha: on ? 1.2 : 0.7 });
             font(ctx, FAMILY.uiBold, 10);
             ctx.textAlign = "center";
-            inkText(ctx, String(n), x + 20, this.livesY + 5, css(on ? t.text : t.textDim), t, 2);
+            inkText(ctx, String(n), x + 17, ly + 5, css(on ? t.text : t.textDim), t, 2);
         });
     }
 
-    private slider(ctx: Ctx, label: string, value: string, y: number, share: number, ticks: number[], t: UiTheme): void {
-        const { x, w } = this.track;
+    private slider(ctx: Ctx, label: string, value: string, track: Track, share: number, ticks: number[], t: UiTheme): void {
+        const { x, y, w } = track;
         font(ctx, FAMILY.ui, 9);
         setSpacing(ctx, 1.6);
         ctx.textAlign = "left";
-        inkText(ctx, label, x, y - 14, css(t.textDim), t, 2);
+        inkText(ctx, label, x, y - 12, css(t.textDim), t, 2);
         setSpacing(ctx, 0);
         font(ctx, FAMILY.uiBold, 10);
         ctx.textAlign = "right";
-        inkText(ctx, value, x + w, y - 14, css(t.text), t, 2);
+        inkText(ctx, value, x + w, y - 12, css(t.text), t, 2);
         drawBar(ctx, { x, y: y - 2, w, h: 4, fill: share, colors: { hi: t.goldBright, lo: mix(t.goldBright, t.danger, share) }, theme: t, time: this.time });
         for (const k of ticks) {
             ctx.fillStyle = css(t.ink, 0.9);
@@ -167,11 +197,13 @@ class Controls extends UiWidget {
     hit(px: number, py: number): { kind: "corruption" | "stain"; share: number } | { kind: "lives"; lives: number } | null {
         if (!this.contains(px, py)) return null;
         const p = this.local(px, py);
-        const share = clamp((p.x - this.track.x) / this.track.w);
-        if (Math.abs(p.y - this.corruptionY) < 12) return { kind: "corruption", share };
-        if (Math.abs(p.y - this.stainY) < 12) return { kind: "stain", share };
-        if (Math.abs(p.y - this.livesY) < 13) {
-            const i = Math.floor((p.x - this.track.x - 96) / 46);
+        for (const kind of ["corruption", "stain"] as const) {
+            const tr = this.track(kind);
+            if (Math.abs(p.y - tr.y) < 12 && p.x >= tr.x - 8 && p.x <= tr.x + tr.w + 8) return { kind, share: clamp((p.x - tr.x) / tr.w) };
+        }
+        const { x: lx, y: ly } = this.livesAt;
+        if (Math.abs(p.y - ly) < 13) {
+            const i = Math.floor((p.x - lx - 72) / 40);
             if (i >= 0 && i < 3) return { kind: "lives", lives: [2, 1, 0][i] };
         }
         return null;
@@ -319,15 +351,26 @@ export default class UiPreview extends Scene {
         const pr = this.hd.pixelRatio;
         this.hud?.layout(VIEW_W, VIEW_H, pr);
         this.backdrop?.place(0, 0, 1, pr);
-        this.controls?.place(22, 22, 1, pr);
+        this.placeControls();
         this.tabBar?.place(VIEW_W / 2 - 220, 22, 1, pr);
         for (const s of this.screens) s.layout(1, pr, 0, 0);
+    }
+
+    private placeControls(): void {
+        if (!this.controls) return;
+        const pr = this.hd.pixelRatio;
+        this.controls.setCompact(this.tab > 0);
+        if (this.controls.compact) this.controls.place(22, VIEW_H - 22 - this.controls.h, 1, pr);
+        else this.controls.place(22, 22, 1, pr);
     }
 
     private setTab(i: number): void {
         this.tab = i;
         this.tabBar?.select(i);
         this.screens.forEach((s, k) => s.show(k === i - 1));
+        // a menu screen takes the place of the in-world HUD
+        this.hud?.setVisible(i === 0);
+        this.placeControls();
     }
 
     private applyTheme(): void {
@@ -411,7 +454,8 @@ export default class UiPreview extends Scene {
         }
         if (this.dragging && this.controls) {
             const p = this.controls.local(x, y);
-            const share = clamp((p.x - this.controls.track.x) / this.controls.track.w);
+            const tr = this.controls.track(this.dragging);
+            const share = clamp((p.x - tr.x) / tr.w);
             if (this.dragging === "corruption") this.corruption = share * MAX_CORRUPTION;
             else this.stain = share * MAX_STAIN;
             this.controls.invalidate();

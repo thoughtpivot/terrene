@@ -281,59 +281,71 @@ function drawCrest(ctx: Ctx, cx: number, cy: number, half: number, t: UiTheme, t
  */
 export function drawVeins(ctx: Ctx, x: number, y: number, w: number, h: number, amount: number, t: UiTheme, time: number, seed: number): void {
     const r = rng(seed * 7 + 3);
-    const band = Math.min(9, h * 0.18);
-    const starts: Array<{ px: number; py: number; dx: number; dy: number; nx: number; ny: number; span: number }> = [
-        { px: x + 2, py: y + 2, dx: 1, dy: 0, nx: 0, ny: 1, span: w },
-        { px: x + 2, py: y + 2, dx: 0, dy: 1, nx: 1, ny: 0, span: h },
-        { px: x + w - 2, py: y + h - 2, dx: -1, dy: 0, nx: 0, ny: -1, span: w },
-        { px: x + w - 2, py: y + h - 2, dx: 0, dy: -1, nx: -1, ny: 0, span: h },
-        { px: x + w - 2, py: y + 2, dx: -1, dy: 0, nx: 0, ny: 1, span: w },
-        { px: x + 2, py: y + h - 2, dx: 1, dy: 0, nx: 0, ny: -1, span: w },
+    const small = Math.min(w, h) < 80;
+    const band = Math.min(8, h * 0.16);
+    const all: Array<{ px: number; py: number; dx: number; dy: number; nx: number; ny: number; span: number }> = [
+        { px: x + 3, py: y + 3, dx: 1, dy: 0, nx: 0, ny: 1, span: w },
+        { px: x + w - 3, py: y + h - 3, dx: 0, dy: -1, nx: -1, ny: 0, span: h },
+        { px: x + 3, py: y + 3, dx: 0, dy: 1, nx: 1, ny: 0, span: h },
+        { px: x + w - 3, py: y + h - 3, dx: -1, dy: 0, nx: 0, ny: -1, span: w },
+        { px: x + w - 3, py: y + 3, dx: -1, dy: 0, nx: 0, ny: 1, span: w },
+        { px: x + 3, py: y + h - 3, dx: 1, dy: 0, nx: 0, ny: -1, span: w },
     ];
+    const starts = small ? all.slice(0, 2) : all;
+    const strength = small ? amount * 0.6 : amount;
     const pulse = 0.85 + 0.15 * Math.sin(time * 1.6 + seed);
     ctx.save();
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     starts.forEach((s, i) => {
         // later veins only start once the first ones are well along
-        const own = clamp((amount - i * 0.08) / (1 - i * 0.08));
+        const lag = i * 0.09;
+        const own = clamp((strength - lag) / (1 - lag));
         if (own <= 0) return;
-        const length = own * s.span * (0.32 + r() * 0.2);
-        const step = 5;
+        const length = own * s.span * (0.22 + r() * 0.2);
+        const step = 4;
         const pts: Array<[number, number]> = [[s.px, s.py]];
-        let off = 0;
+        let off = 1 + r() * 2;
+        let drift = 0;
         for (let d = step; d <= length; d += step) {
-            off = clamp(off + (r() - 0.45) * 2.6, 0, band);
+            drift = clamp(drift + (r() - 0.5) * 1.4, -1.6, 1.6);
+            off = clamp(off + drift, 0.5, band);
             pts.push([s.px + s.dx * d + s.nx * off, s.py + s.dy * d + s.ny * off]);
         }
-        if (pts.length < 2) return;
-        const alpha = (0.35 + 0.5 * own) * pulse;
-        ctx.shadowColor = css(t.danger, 0.55 * own);
-        ctx.shadowBlur = 5;
-        ctx.strokeStyle = css(t.vein, alpha);
-        ctx.lineWidth = 0.6 + 0.8 * own;
+        if (pts.length < 3) return;
+        // taper: thick and bright at the root, fading toward the tip
+        const n = pts.length - 1;
+        ctx.shadowColor = css(t.danger, 0.4 * own);
+        ctx.shadowBlur = 4;
+        for (let k = 0; k < n; k++) {
+            const f = 1 - k / n;
+            ctx.strokeStyle = css(t.vein, (0.2 + 0.5 * own) * pulse * (0.25 + 0.75 * f));
+            ctx.lineWidth = 0.45 + 0.75 * own * f;
+            ctx.beginPath();
+            ctx.moveTo(pts[k][0], pts[k][1]);
+            ctx.lineTo(pts[k + 1][0], pts[k + 1][1]);
+            ctx.stroke();
+        }
+        ctx.shadowBlur = 0;
+        // a few fine twigs reaching inward
+        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = css(t.vein, 0.4 * own * pulse);
         ctx.beginPath();
-        ctx.moveTo(pts[0][0], pts[0][1]);
-        for (const p of pts) ctx.lineTo(p[0], p[1]);
-        ctx.stroke();
-        // twigs
-        ctx.lineWidth = 0.6;
-        ctx.beginPath();
-        for (let k = 2; k < pts.length; k += 3 + Math.floor(r() * 3)) {
+        for (let k = 3; k < n; k += 5 + Math.floor(r() * 5)) {
             const [px, py] = pts[k];
-            const len = 2 + r() * 5 * own;
-            const side = r() < 0.5 ? -0.6 : 0.6;
+            const len = 2 + r() * 4 * own;
+            const side = r() < 0.5 ? -0.7 : 0.7;
             ctx.moveTo(px, py);
             ctx.lineTo(px + s.nx * len + s.dx * len * side, py + s.ny * len + s.dy * len * side);
         }
         ctx.stroke();
-        if (own > 0.6) {
-            ctx.shadowBlur = 0;
-            ctx.strokeStyle = css(mix(t.danger, t.goldBright, 0.3), (own - 0.6) * 0.8 * pulse);
+        if (own > 0.65) {
+            // a hot core near the root at the highest tiers
+            ctx.strokeStyle = css(mix(t.danger, t.goldBright, 0.35), (own - 0.65) * 0.9 * pulse);
             ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(pts[0][0], pts[0][1]);
-            for (const p of pts.slice(0, Math.floor(pts.length * 0.6))) ctx.lineTo(p[0], p[1]);
+            for (const p of pts.slice(0, Math.max(2, Math.floor(n * 0.35)))) ctx.lineTo(p[0], p[1]);
             ctx.stroke();
         }
     });
@@ -509,14 +521,16 @@ export function drawBar(ctx: Ctx, o: BarOptions): void {
         ctx.restore();
     }
 
-    // frame: dark ink keyline, then a thin gold line
+    // an ink keyline; only the thick bars also get a gold line, or thin ones turn into stripes
     ctx.strokeStyle = css(t.ink, 0.95);
     ctx.lineWidth = 1;
-    ctx.strokeRect(x - 1.5, y - 1.5, w + 3, h + 3);
-    ctx.strokeStyle = o.alarm
-        ? css(mix(t.gold, t.danger, 0.7), 0.45 + 0.45 * (0.5 + 0.5 * Math.sin(time * 6)))
-        : css(t.gold, 0.38);
-    ctx.strokeRect(x - 2.5, y - 2.5, w + 5, h + 5);
+    ctx.strokeRect(x - 0.5, y - 0.5, w + 1, h + 1);
+    if (h >= 6) {
+        ctx.strokeStyle = o.alarm
+            ? css(mix(t.gold, t.danger, 0.7), 0.45 + 0.45 * (0.5 + 0.5 * Math.sin(time * 6)))
+            : css(t.gold, 0.38);
+        ctx.strokeRect(x - 1.5, y - 1.5, w + 3, h + 3);
+    }
     ctx.restore();
 }
 
@@ -540,8 +554,8 @@ export function drawHalo(ctx: Ctx, cx: number, cy: number, radius: number, halo:
     ctx.save();
     // medallion
     const disc = ctx.createRadialGradient(cx, cy, radius * 0.2, cx, cy, radius * 1.45);
-    disc.addColorStop(0, css(t.panel, 0.2));
-    disc.addColorStop(1, css(t.panelDeep, 0.92));
+    disc.addColorStop(0, css(mix(t.panel, t.panelDeep, 0.4)));
+    disc.addColorStop(1, css(t.panelDeep));
     ctx.fillStyle = disc;
     ctx.beginPath();
     ctx.arc(cx, cy, radius * 1.42, 0, Math.PI * 2);
@@ -678,8 +692,8 @@ export function drawHalo(ctx: Ctx, cx: number, cy: number, radius: number, halo:
         ctx.strokeStyle = css(passed ? redCore : t.gold, passed ? 0.95 : 0.55);
         ctx.lineWidth = 1.2;
         ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(a) * (tr - 3), cy + Math.sin(a) * (tr - 3));
-        ctx.lineTo(cx + Math.cos(a) * (tr + 3), cy + Math.sin(a) * (tr + 3));
+        ctx.moveTo(cx + Math.cos(a) * (tr - 2), cy + Math.sin(a) * (tr - 2));
+        ctx.lineTo(cx + Math.cos(a) * (tr + 2), cy + Math.sin(a) * (tr + 2));
         ctx.stroke();
     }
     // the Fall marker at the top
@@ -787,8 +801,9 @@ export function drawSlot(ctx: Ctx, o: SlotPaint): void {
     const empty = !o.glyph;
     drawFrame(ctx, { x, y, w: s, h: s, theme: t, time: o.time, seed: o.seed, bevel: 5, focus: o.active ? 1 : 0, fillAlpha: empty ? 0.55 : 1 });
     if (o.glyph) {
-        const dim = o.affordable === false;
-        const c = dim ? css(t.textDim, 0.55) : css(mix(t.text, t.goldBright, 0.15));
+        const cooling = o.cooldown?.state === "cooling";
+        const dim = o.affordable === false || cooling;
+        const c = dim ? css(t.textDim, cooling ? 0.28 : 0.55) : css(mix(t.text, t.goldBright, 0.15));
         ctx.save();
         ctx.strokeStyle = c;
         ctx.fillStyle = c;
@@ -804,7 +819,12 @@ export function drawSlot(ctx: Ctx, o: SlotPaint): void {
         ctx.clip();
         drawSweep(ctx, x + s / 2, y + s / 2, s, o.cooldown.remaining, css(t.ink, 0.66));
         ctx.restore();
-        font(ctx, FAMILY.uiBold, Math.round(s * 0.27));
+        const plate = ctx.createRadialGradient(x + s / 2, y + s / 2, 0, x + s / 2, y + s / 2, s * 0.36);
+        plate.addColorStop(0, css(t.ink, 0.85));
+        plate.addColorStop(1, css(t.ink, 0));
+        ctx.fillStyle = plate;
+        ctx.fillRect(x, y, s, s);
+        font(ctx, FAMILY.uiBold, Math.round(s * 0.29));
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         inkText(ctx, o.cooldown.label, x + s / 2, y + s / 2 + 1, css(t.text), t, 4);
@@ -874,7 +894,8 @@ export function drawGiftCard(ctx: Ctx, o: GiftCardPaint): void {
 
     if (o.rarity !== "common" || o.fallen) {
         ctx.save();
-        const halo = ctx.createRadialGradient(x + w / 2, y + h * 0.3, 10, x + w / 2, y + h * 0.4, h * 0.75);
+        // the radius stays inside the filled rect so the glow never shows an edge
+        const halo = ctx.createRadialGradient(x + w / 2, y + h * 0.3, 10, x + w / 2, y + h * 0.3, Math.min(w / 2, h * 0.3) + 28);
         const gc = o.fallen ? t.danger : o.rarity === "advanced" ? mix(t.glow, WHITE, 0.4 * (1 - t.tarnish)) : t.glow;
         halo.addColorStop(0, css(gc, (o.rarity === "advanced" ? 0.22 : 0.12) + 0.1 * hover));
         halo.addColorStop(1, css(gc, 0));
@@ -903,8 +924,8 @@ export function drawGiftCard(ctx: Ctx, o: GiftCardPaint): void {
 
     // medallion with the glyph
     const mx = x + w / 2;
-    const my = y + h * 0.33;
-    const mr = Math.min(w, h) * 0.2;
+    const my = y + h * 0.28;
+    const mr = Math.min(w, h) * 0.17;
     ctx.save();
     const md = ctx.createRadialGradient(mx, my - mr * 0.3, 2, mx, my, mr * 1.1);
     md.addColorStop(0, css(mix(t.panel, accent, 0.18), 0.95));
@@ -937,17 +958,32 @@ export function drawGiftCard(ctx: Ctx, o: GiftCardPaint): void {
     ctx.textAlign = "center";
     ctx.textBaseline = "alphabetic";
     const nameLines = wrapText(ctx, o.name, w - 26);
-    nameLines.forEach((l, i) => inkText(ctx, l, mx, y + h * 0.56 + i * 18, css(t.heading), t));
-    const afterName = y + h * 0.56 + (nameLines.length - 1) * 18;
+    const nameY = y + h * 0.48;
+    nameLines.forEach((l, i) => inkText(ctx, l, mx, nameY + i * 18, css(t.heading), t));
+    const afterName = nameY + (nameLines.length - 1) * 18;
     font(ctx, FAMILY.ui, 9.5);
     setSpacing(ctx, 1.5);
     inkText(ctx, o.category.toUpperCase(), mx, afterName + 16, css(t.textDim), t, 2);
     setSpacing(ctx, 0);
     drawRule(ctx, x + 18, afterName + 25, w - 36, t, 0.5);
 
-    font(ctx, FAMILY.body, 14);
-    const bodyLines = wrapText(ctx, o.text, w - 28);
-    bodyLines.slice(0, 4).forEach((l, i) => inkText(ctx, l, mx, afterName + 43 + i * 16, css(t.text, 0.92), t, 2));
+    // step the body text down until it fits above the requirement line
+    const top = afterName + 43;
+    const room = y + h - 34 - top;
+    let bodyLines: string[] = [];
+    let lh = 16;
+    for (const [size, step] of [[14, 16], [13, 14.5], [12, 13.5]]) {
+        font(ctx, FAMILY.body, size);
+        bodyLines = wrapText(ctx, o.text, w - 28);
+        lh = step;
+        if ((bodyLines.length - 1) * lh <= room) break;
+    }
+    const fit = Math.max(1, Math.floor(room / lh) + 1);
+    if (bodyLines.length > fit) {
+        bodyLines = bodyLines.slice(0, fit);
+        bodyLines[fit - 1] = bodyLines[fit - 1].replace(/\s*\S*$/, "") + "…";
+    }
+    bodyLines.forEach((l, i) => inkText(ctx, l, mx, top + i * lh, css(t.text, 0.92), t, 2));
 
     font(ctx, FAMILY.bodyItalic, 13);
     inkText(ctx, o.requirement, mx, y + h - 14, css(t.textDim), t, 2);
