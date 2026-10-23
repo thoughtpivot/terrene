@@ -12,7 +12,7 @@ import OkaWorld, { OKA_WORLD_SCENE } from "./scenes/OkaWorld/OkaWorld";
 import OkaWorldTwo, { OKA_WORLD_TWO_SCENE } from "./scenes/OkaWorld/2/OkaWorldTwo";
 import SapWorld, { SAP_WORLD_SCENE } from "./scenes/SapWorld/SapWorld";
 import Street, { STREET_SCENE } from "./scenes/Street/Street";
-import HeavenOrHell, { HEAVEN_OR_HELL_SCENE } from "./scenes/HeavenOrHell/HeavenOrHell";
+import HeavenOrHellCards, { HEAVEN_OR_HELL_CARDS_SCENE } from "./scenes/HeavenOrHell/cards/HeavenOrHellCards";
 import ZeldaCave from "./scenes/ZeldaCave/ZeldaCave";
 import ZeldaLand from "./scenes/ZeldaLand/ZeldaLand";
 import { ZELDA_CAVE_SCENE, ZELDA_LAND_SCENE } from "./scenes/ZeldaLand/run";
@@ -45,7 +45,7 @@ const ROUTED_SCENES = [
     WORLD_ONE_SCENE,
     SAP_WORLD_SCENE,
     STREET_SCENE,
-    HEAVEN_OR_HELL_SCENE,
+    HEAVEN_OR_HELL_CARDS_SCENE,
 ];
 
 const HASH_ALIASES: Record<string, string> = {
@@ -53,9 +53,11 @@ const HASH_ALIASES: Record<string, string> = {
     sapwell: SAP_WORLD_SCENE,
     sap: SAP_WORLD_SCENE,
     sceneone: STREET_SCENE,
-    "heaven-or-hell": HEAVEN_OR_HELL_SCENE,
-    heaven: HEAVEN_OR_HELL_SCENE,
-    hoh: HEAVEN_OR_HELL_SCENE,
+    "heaven-or-hell": HEAVEN_OR_HELL_CARDS_SCENE,
+    heaven: HEAVEN_OR_HELL_CARDS_SCENE,
+    hoh: HEAVEN_OR_HELL_CARDS_SCENE,
+    hohcards: HEAVEN_OR_HELL_CARDS_SCENE,
+    heavenorhell: HEAVEN_OR_HELL_CARDS_SCENE,
 };
 
 const SCENE_TITLES: Record<string, string> = {
@@ -64,7 +66,7 @@ const SCENE_TITLES: Record<string, string> = {
     [WORLD_ONE_SCENE]: "World 1-1",
     [SAP_WORLD_SCENE]: "Forest Last Sap World",
     [STREET_SCENE]: "Street",
-    [HEAVEN_OR_HELL_SCENE]: "Heaven Or Hell",
+    [HEAVEN_OR_HELL_CARDS_SCENE]: "Heaven Or Hell: Cards",
 };
 
 function sceneFromHash(): string {
@@ -101,9 +103,9 @@ class Terrene extends Engine {
 
     initialize(): Promise<void> {
         const first = sceneFromHash();
-        // Heaven Or Hell is a DOM scene. Waiting on World 1-1 art here left
-        // "Loading Terrene..." up forever when that sheet stalled, and the hash
-        // scene never mounted.
+        // The Heaven Or Hell card slice is a DOM scene. Waiting on World 1-1 art
+        // here left "Loading Terrene..." up forever when that sheet stalled, and
+        // the hash scene never mounted.
         const blockOnWorldOne = first === WORLD_ONE_SCENE;
         const loader = new SilentLoader(blockOnWorldOne ? [WorldOneResources.Image] : []);
         if (!blockOnWorldOne) {
@@ -117,14 +119,14 @@ class Terrene extends Engine {
                 ? `🏰 Engine started, loading ${SCENE_TITLES[first]} as the default scene`
                 : `🏰 Engine started, opening ${SCENE_TITLES[first]} from the URL`);
 
-            if (first === HEAVEN_OR_HELL_SCENE) {
-                this.addScene(HEAVEN_OR_HELL_SCENE, new HeavenOrHell());
+            if (first === HEAVEN_OR_HELL_CARDS_SCENE) {
+                this.addScene(HEAVEN_OR_HELL_CARDS_SCENE, new HeavenOrHellCards());
                 void this.goToScene(first).catch((error: unknown) => console.error(error));
             }
 
-            this.addScenes(first === HEAVEN_OR_HELL_SCENE ? HEAVEN_OR_HELL_SCENE : undefined);
+            this.addScenes(first === HEAVEN_OR_HELL_CARDS_SCENE ? HEAVEN_OR_HELL_CARDS_SCENE : undefined);
 
-            if (first !== HEAVEN_OR_HELL_SCENE) {
+            if (first !== HEAVEN_OR_HELL_CARDS_SCENE) {
                 void this.goToScene(first).catch((error: unknown) => console.error(error));
             }
 
@@ -163,7 +165,7 @@ class Terrene extends Engine {
         add(OKA_WORLD_TWO_SCENE, () => new OkaWorldTwo());
         add(SAP_WORLD_SCENE, () => new SapWorld());
         add(STREET_SCENE, () => new Street());
-        add(HEAVEN_OR_HELL_SCENE, () => new HeavenOrHell());
+        add(HEAVEN_OR_HELL_CARDS_SCENE, () => new HeavenOrHellCards());
     }
 }
 

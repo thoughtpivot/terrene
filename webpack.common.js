@@ -22,7 +22,7 @@ module.exports = {
       {
         test: /\.css$/,
         type: "javascript/auto",
-        use: [path.resolve(__dirname, "src/components/scenes/HeavenOrHell/cssInjectLoader.js")],
+        use: [path.resolve(__dirname, "src/components/scenes/HeavenOrHell/cards/cssInjectLoader.js")],
       },
       {
         test: /\.js$/,

@@ -1,1 +1,1 @@
-export { createRun, startApp } from "./components/scenes/HeavenOrHell/app.js";
+export { createRun, startApp } from "./components/scenes/HeavenOrHell/cards/app.js";

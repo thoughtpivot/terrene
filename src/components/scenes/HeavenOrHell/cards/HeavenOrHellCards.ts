@@ -2,9 +2,9 @@ import { Color, Engine, Scene } from "excalibur";
 import { startApp } from "./app.js";
 import "./heavenOrHell.css";
 
-export const HEAVEN_OR_HELL_SCENE = "heavenorhell";
+export const HEAVEN_OR_HELL_CARDS_SCENE = "heavenorhellcards";
 
-const TITLE = "Heaven Or Hell";
+const TITLE = "Heaven Or Hell: Cards";
 const ROOT_ID = "heaven-or-hell";
 
 interface CssHost {
@@ -12,10 +12,10 @@ interface CssHost {
 }
 
 /**
- * Heaven Or Hell. Terrene constructs this scene and opens it at #heavenorhell.
+ * Heaven Or Hell. Terrene constructs this scene and opens it at #heavenorhellcards.
  * onActivate mounts the DOM game; onDeactivate removes it so other scenes keep the canvas.
  */
-export default class HeavenOrHell extends Scene {
+export default class HeavenOrHellCards extends Scene {
     private root: HTMLElement | null = null;
     private styleEl: HTMLStyleElement | null = null;
     private hostTitle: string | null = null;
@@ -27,7 +27,7 @@ export default class HeavenOrHell extends Scene {
     onInitialize(engine: Engine): void {
         this.backgroundColor = Color.fromHex("#1a1410");
         void engine;
-        console.log("🏰 Heaven Or Hell scene ready to boot");
+        console.log("🏰 Heaven Or Hell card scene ready to boot");
     }
 
     onActivate(context: { engine: Engine }): void {
@@ -53,7 +53,7 @@ export default class HeavenOrHell extends Scene {
             document.title = this.hostTitle;
             this.hostTitle = null;
         }
-        console.log("🏰 Heaven Or Hell scene deactivated");
+        console.log("🏰 Heaven Or Hell card scene deactivated");
     }
 
     private mountRoot(): void {

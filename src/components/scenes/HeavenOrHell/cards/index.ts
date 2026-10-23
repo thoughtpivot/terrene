@@ -1,4 +1,4 @@
-export { default, HEAVEN_OR_HELL_SCENE } from "./HeavenOrHell.js";
+export { default, HEAVEN_OR_HELL_CARDS_SCENE } from "./HeavenOrHellCards.js";
 export { createRun, startApp } from "./app.js";
 export { emptyMeta, freshRun, META_KEY } from "./core/state.js";
 export {
