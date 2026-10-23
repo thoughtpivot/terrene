@@ -1,5 +1,7 @@
 import { Color, Engine, Keys, Scene } from "excalibur";
 import { HeavenOrHellMusic } from "./MusicPlayer";
+import { BeatPulse, beatPulse, glowLevel, vibrationOffset } from "./beatPulse";
+import { Beat808Hit } from "./beatScheduler";
 import { HYSTERESIS } from "./mixer";
 import { BPM, MAX_CORRUPTION, STEMS, StemSet } from "./musicSpec";
 
@@ -47,6 +49,10 @@ const CSS = `
 #${ROOT_ID} .stems .set { grid-column: 1 / -1; margin-top: 8px; opacity: .6; text-transform: uppercase; font-size: 11px; letter-spacing: .12em; }
 #${ROOT_ID} .stems .on { opacity: 1; } #${ROOT_ID} .stems .off { opacity: .45; }
 #${ROOT_ID} button { font: inherit; font-size: 18px; padding: 14px 26px; border-radius: 8px; border: 1px solid #e8c66a; background: #e8c66a; color: #1a1410; cursor: pointer; }
+#${ROOT_ID} .panel { will-change: transform, box-shadow; }
+#${ROOT_ID} .b808 { display: inline-block; min-width: 46px; text-align: center; padding: 1px 6px; border-radius: 4px; border: 1px solid currentColor; opacity: .35; }
+#${ROOT_ID} .b808.lit { opacity: 1; background: #e8c66a; color: #1a1410; }
+#${ROOT_ID}.hell .b808.lit { background: #ff5a1f; color: #160302; }
 #${ROOT_ID} .help { margin-top: 14px; opacity: .7; font-size: 12px; }
 #${ROOT_ID} kbd { border: 1px solid currentColor; border-radius: 3px; padding: 0 4px; }
 #${ROOT_ID} .event { min-height: 1.4em; color: #e8c66a; } #${ROOT_ID}.hell .event { color: #ff8a4a; }
@@ -70,6 +76,11 @@ export default class HeavenOrHellMusicPreview extends Scene {
     private uiMs = 0;
     private eventText = "";
     private eventUntil = 0;
+    private pulse: BeatPulse | null = null;
+    private pulseAtMs = 0;
+    private hitCount = 0;
+    private lastHit: Beat808Hit | null = null;
+    private unsubscribeBeat: (() => void) | null = null;
     private meters = new Map<string, { bar: HTMLElement; value: HTMLElement; row: HTMLElement[] }>();
 
     onInitialize(engine: Engine): void {
@@ -86,6 +97,9 @@ export default class HeavenOrHellMusicPreview extends Scene {
     }
 
     onDeactivate(): void {
+        this.unsubscribeBeat?.();
+        this.unsubscribeBeat = null;
+        this.pulse = null;
         this.music?.dispose();
         this.music = null;
         this.unmount();
@@ -125,6 +139,7 @@ export default class HeavenOrHellMusicPreview extends Scene {
         if (delta !== 0) this.setCorruption(this.corruption + delta);
 
         this.music?.update();
+        this.applyPulse();
         this.uiMs += deltaMs;
         if (this.uiMs >= UI_INTERVAL_MS) {
             this.uiMs = 0;
@@ -148,6 +163,12 @@ export default class HeavenOrHellMusicPreview extends Scene {
     private start(): void {
         if (!this.music) {
             this.music = new HeavenOrHellMusic();
+            this.unsubscribeBeat = this.music.onBeat808((hit) => {
+                this.pulse = beatPulse(hit, hit.tier);
+                this.pulseAtMs = performance.now();
+                this.hitCount++;
+                this.lastHit = hit;
+            });
             this.music.onCommand = (cmd) => {
                 const label = cmd.stinger ? cmd.stinger.id : "crossfade";
                 this.eventText = `${label} → tier ${cmd.tier} on bar ${cmd.boundaryBar}`;
@@ -179,6 +200,7 @@ export default class HeavenOrHellMusicPreview extends Scene {
             <div class="meter corruption"><i data-k="cbar"></i></div>
             <div class="ticks"><span>0 heaven</span><span>1</span><span>2</span><span>3</span><span>4 switch-up</span><span>5 hell</span></div>
             <div class="event" data-k="event"></div>
+            <div class="row"><span class="b808" data-k="b808">808</span><span data-k="beatinfo">808 pulse: waiting for the music</span></div>
             <div class="row" data-k="status"></div>
             <div class="stems" data-k="stems"></div>
             <div class="help"><kbd>←</kbd>/<kbd>→</kbd> scrub (<kbd>Shift</kbd> = bigger) · <kbd>0</kbd>–<kbd>5</kbd> jump to tier ·
@@ -235,6 +257,22 @@ export default class HeavenOrHellMusicPreview extends Scene {
         this.meters.clear();
     }
 
+    /** The 808 demo: a tier-scaled vibration of the panel and a glow pulse, every frame. */
+    private applyPulse(): void {
+        const panel = this.root?.querySelector(".panel") as HTMLElement | null;
+        if (!panel) return;
+        const pulse = this.pulse;
+        const elapsed = performance.now() - this.pulseAtMs;
+        const { x, y } = pulse ? vibrationOffset(pulse, elapsed) : { x: 0, y: 0 };
+        const glow = pulse ? glowLevel(pulse, elapsed) : 0;
+        panel.style.transform = x || y ? `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px)` : "";
+        const hell = this.root?.classList.contains("hell");
+        const rgb = hell ? "255, 90, 31" : "232, 198, 106";
+        panel.style.boxShadow = glow > 0.005 ? `0 0 ${Math.round(12 + 70 * glow)}px ${Math.round(4 + 26 * glow)}px rgba(${rgb}, ${Math.min(0.9, glow * 1.4).toFixed(3)})` : "";
+        panel.style.filter = glow > 0.005 ? `brightness(${(1 + glow * 0.35).toFixed(3)})` : "";
+        this.root?.querySelector("[data-k=b808]")?.classList.toggle("lit", glow > 0.08);
+    }
+
     private render(): void {
         const root = this.root;
         if (!root) return;
@@ -254,6 +292,13 @@ export default class HeavenOrHellMusicPreview extends Scene {
         set("bar", snap.state === "playing" ? String(snap.bar % 32 + 1) + " / 32" : "-");
         root.classList.toggle("hell", snap.set === "hell");
         root.querySelectorAll(".beat").forEach((dot, i) => dot.classList.toggle("lit", snap.state === "playing" && i === snap.beat));
+        const h = this.lastHit;
+        if (h && this.pulse) {
+            set(
+                "beatinfo",
+                `hits ${this.hitCount} · last: ${h.stem} vel ${h.velocity.toFixed(2)}${h.slide ? ` (${h.glide})` : ""} · tier ${h.tier} · ${this.pulse.vibratePx.toFixed(2)}px / ${Math.round(this.pulse.vibrateMs)}ms · glow ${this.pulse.glowBoost.toFixed(2)} · output latency ${snap.outputLatencyMs.toFixed(0)}ms · fired ${h.lateMs >= 0 ? "+" : ""}${h.lateMs.toFixed(1)}ms`,
+            );
+        }
         set(
             "status",
             snap.state === "loading"
