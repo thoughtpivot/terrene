@@ -392,6 +392,10 @@ function buildHero(): { parts: HeroPart[]; extras: Frame[]; viewHeight: number; 
     ];
     const ring = halo(22 * STORE, 7 * STORE, 1.6 * STORE);
     extras.push({ name: "halo", img: ring, ax: ring.w / 2, ay: ring.h / 2, scale: 1 / STORE, foot: 0 });
+    const contact = shadow(64 * STORE, 22 * STORE);
+    extras.push({ name: "shadow", img: contact, ax: contact.w / 2, ay: contact.h / 2, scale: 1 / STORE, foot: 0 });
+    const dot = glowDot(64 * STORE);
+    extras.push({ name: "glow", img: dot, ax: dot.w / 2, ay: dot.h / 2, scale: 1 / STORE, foot: 0 });
     return { parts, extras, viewHeight: HERO_HEIGHT, scale: 1 / STORE };
 }
 

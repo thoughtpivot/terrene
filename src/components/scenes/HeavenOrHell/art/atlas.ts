@@ -22,7 +22,7 @@ export const PROP_FRAMES = {
     "arch-wall-1": { page: 0, x: 841, y: 746, w: 133, h: 580, ax: 66.5, ay: 531.39, scale: 0.5004, foot: 66.18 },
     "arch-wall-2": { page: 0, x: 1114, y: 746, w: 132, h: 580, ax: 66, ay: 474.39, scale: 0.5004, foot: 66.18 },
     "arch-wall-3": { page: 0, x: 1250, y: 746, w: 132, h: 580, ax: 66, ay: 411.39, scale: 0.5004, foot: 66.18 },
-    "rubble": { page: 0, x: 4, y: 1810, w: 237, h: 200, ax: 173.5, ay: 130.74, scale: 0.5009, foot: 94.97 },
+    "rubble": { page: 0, x: 4, y: 1810, w: 237, h: 200, ax: 118.5, ay: 130.74, scale: 0.5009, foot: 94.97 },
     "hell-spikes": { page: 0, x: 982, y: 1356, w: 280, h: 370, ax: 137, ay: 293.4, scale: 0.5003, foot: 105.06, glow: { page: 0, x: 1683, y: 1356, w: 240, h: 279, ox: 22, oy: 70 } },
     "breach": { page: 0, x: 4, y: 746, w: 833, h: 606, ax: 416.5, ay: 303, scale: 0.6723, foot: 560, glow: { page: 0, x: 414, y: 1356, w: 564, h: 427, ox: 138, oy: 83 } },
     "floor-plaza": { page: 0, x: 4, y: 4, w: 943, h: 738, ax: 471.5, ay: 369, scale: 0.8059, foot: 760 },

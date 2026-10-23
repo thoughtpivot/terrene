@@ -12,24 +12,26 @@ export const HERO_CUTS = { neck: 0.4, waist: 0.66 };
 
 /** Body parts per painted view, placed relative to the hem's bottom centre. */
 export const HERO_PARTS = {
-    "s-head": { page: 0, x: 671, y: 4, w: 79, h: 77, ox: -39.5, oy: -171, glow: { page: 0, x: 342, y: 4, w: 82, h: 80, ox: -1, oy: -2 } },
-    "s-torso": { page: 0, x: 328, y: 151, w: 109, h: 57, ox: -54.5, oy: -107, glow: { page: 0, x: 1838, y: 4, w: 113, h: 60, ox: -2, oy: -2 } },
-    "s-hem": { page: 0, x: 1428, y: 4, w: 103, h: 65, ox: -51.5, oy: -63, glow: { page: 0, x: 1017, y: 4, w: 107, h: 69, ox: -2, oy: -2 } },
-    "se-head": { page: 0, x: 831, y: 4, w: 72, h: 74, ox: -30, oy: -166, glow: { page: 0, x: 511, y: 4, w: 76, h: 78, ox: -2, oy: -2 } },
-    "se-torso": { page: 0, x: 441, y: 151, w: 100, h: 55, ox: -50, oy: -104, glow: { page: 0, x: 4, y: 151, w: 104, h: 59, ox: -2, oy: -2 } },
-    "se-hem": { page: 0, x: 1535, y: 4, w: 90, h: 64, ox: -50, oy: -62, glow: { page: 0, x: 1234, y: 4, w: 94, h: 67, ox: -2, oy: -1 } },
-    "ne-head": { page: 0, x: 754, y: 4, w: 73, h: 74, ox: -31.5, oy: -166, glow: { page: 0, x: 591, y: 4, w: 76, h: 78, ox: -1, oy: -2 } },
-    "ne-torso": { page: 0, x: 545, y: 151, w: 95, h: 55, ox: -47.5, oy: -104, glow: { page: 0, x: 112, y: 151, w: 99, h: 59, ox: -2, oy: -2 } },
-    "ne-hem": { page: 0, x: 1629, y: 4, w: 88, h: 64, ox: -47.5, oy: -62, glow: { page: 0, x: 1332, y: 4, w: 92, h: 67, ox: -2, oy: -1 } },
-    "n-head": { page: 0, x: 428, y: 4, w: 79, h: 78, ox: -39.5, oy: -174, glow: { page: 0, x: 255, y: 4, w: 83, h: 82, ox: -2, oy: -2 } },
-    "n-torso": { page: 0, x: 215, y: 151, w: 109, h: 58, ox: -54.5, oy: -109, glow: { page: 0, x: 1721, y: 4, w: 113, h: 61, ox: -2, oy: -2 } },
-    "n-hem": { page: 0, x: 1128, y: 4, w: 102, h: 67, ox: -51.5, oy: -65, glow: { page: 0, x: 907, y: 4, w: 106, h: 70, ox: -2, oy: -1 } },
+    "s-head": { page: 0, x: 803, y: 4, w: 79, h: 77, ox: -39.5, oy: -171, glow: { page: 0, x: 474, y: 4, w: 82, h: 80, ox: -1, oy: -2 } },
+    "s-torso": { page: 0, x: 445, y: 151, w: 109, h: 57, ox: -54.5, oy: -107, glow: { page: 0, x: 4, y: 151, w: 113, h: 60, ox: -2, oy: -2 } },
+    "s-hem": { page: 0, x: 1560, y: 4, w: 103, h: 65, ox: -51.5, oy: -63, glow: { page: 0, x: 1149, y: 4, w: 107, h: 69, ox: -2, oy: -2 } },
+    "se-head": { page: 0, x: 963, y: 4, w: 72, h: 74, ox: -30, oy: -166, glow: { page: 0, x: 643, y: 4, w: 76, h: 78, ox: -2, oy: -2 } },
+    "se-torso": { page: 0, x: 558, y: 151, w: 100, h: 55, ox: -50, oy: -104, glow: { page: 0, x: 121, y: 151, w: 104, h: 59, ox: -2, oy: -2 } },
+    "se-hem": { page: 0, x: 1667, y: 4, w: 90, h: 64, ox: -50, oy: -62, glow: { page: 0, x: 1366, y: 4, w: 94, h: 67, ox: -2, oy: -1 } },
+    "ne-head": { page: 0, x: 886, y: 4, w: 73, h: 74, ox: -31.5, oy: -166, glow: { page: 0, x: 723, y: 4, w: 76, h: 78, ox: -1, oy: -2 } },
+    "ne-torso": { page: 0, x: 662, y: 151, w: 95, h: 55, ox: -47.5, oy: -104, glow: { page: 0, x: 229, y: 151, w: 99, h: 59, ox: -2, oy: -2 } },
+    "ne-hem": { page: 0, x: 1761, y: 4, w: 88, h: 64, ox: -47.5, oy: -62, glow: { page: 0, x: 1464, y: 4, w: 92, h: 67, ox: -2, oy: -1 } },
+    "n-head": { page: 0, x: 560, y: 4, w: 79, h: 78, ox: -39.5, oy: -174, glow: { page: 0, x: 387, y: 4, w: 83, h: 82, ox: -2, oy: -2 } },
+    "n-torso": { page: 0, x: 332, y: 151, w: 109, h: 58, ox: -54.5, oy: -109, glow: { page: 0, x: 1853, y: 4, w: 113, h: 61, ox: -2, oy: -2 } },
+    "n-hem": { page: 0, x: 1260, y: 4, w: 102, h: 67, ox: -51.5, oy: -65, glow: { page: 0, x: 1039, y: 4, w: 106, h: 70, ox: -2, oy: -1 } },
 } satisfies Record<string, PartFrame>;
 
 export const HERO_EXTRAS = {
     "wing": { page: 0, x: 130, y: 4, w: 121, h: 141, ax: 14.52, ay: 121.26, scale: 0.5, foot: 0, glow: { page: 0, x: 4, y: 4, w: 122, h: 143, ox: 1, oy: -1 } },
-    "arm": { page: 0, x: 756, y: 151, w: 163, h: 41, ax: 13.04, ay: 20.5, scale: 0.5, foot: 0, glow: { page: 0, x: 923, y: 151, w: 112, h: 34, ox: 50, oy: 7 } },
-    "halo": { page: 0, x: 644, y: 151, w: 108, h: 48, ax: 54, ay: 24, scale: 0.5, foot: 0 },
+    "arm": { page: 0, x: 1005, y: 151, w: 163, h: 41, ax: 13.04, ay: 20.5, scale: 0.5, foot: 0, glow: { page: 0, x: 1172, y: 151, w: 112, h: 34, ox: 50, oy: 7 } },
+    "halo": { page: 0, x: 761, y: 151, w: 108, h: 48, ax: 54, ay: 24, scale: 0.5, foot: 0 },
+    "shadow": { page: 0, x: 873, y: 151, w: 128, h: 44, ax: 64, ay: 22, scale: 0.5, foot: 0 },
+    "glow": { page: 0, x: 255, y: 4, w: 128, h: 128, ax: 64, ay: 64, scale: 0.5, foot: 0 },
 } satisfies Record<string, AtlasFrame>;
 
 export type HeroView = "s" | "se" | "ne" | "n";
