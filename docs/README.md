@@ -22,7 +22,7 @@ Welcome to the Terrene documentation! This directory contains comprehensive guid
 ### Plans
 
 - **[heaven-or-hell-plan.md](./heaven-or-hell-plan.md)** - Heaven Or Hell, a Deepwoken-inspired isometric roguelite: decisions from the meeting notes, mechanics scope, technical approach and milestones
-- **[heaven-or-hell-progression.md](./heaven-or-hell-progression.md)** - Heaven Or Hell character creation and progression: a proposal that keeps Deepwoken's systems and reflavours them for angels, the companion to the plan
+- **[heaven-or-hell-progression.md](./heaven-or-hell-progression.md)** - Heaven Or Hell character creation and progression: Deepwoken's systems reflavoured for angels, with Dan's decisions, the Choirs, corruption tiers, Stain, weapons and feint AI; the companion to the plan
 
 ## Quick Links
 
