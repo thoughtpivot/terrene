@@ -19,6 +19,12 @@ Welcome to the Terrene documentation! This directory contains comprehensive guid
 - **[oka-world.md](./oka-world.md)** - Oka World, the painted cave platformer and default scene: rules, code layout, physics and the art and music pipeline
 - **[oka-world-2.md](./oka-world-2.md)** - Oka World 2: The Hollow Beneath, the dark sequel that follows Oka World: shared scene config, dark variants, lighting and its pipeline
 
+### Plans
+
+- **[heaven-or-hell-plan.md](./heaven-or-hell-plan.md)** - Heaven Or Hell, a Deepwoken-inspired isometric roguelite: decisions from the meeting notes, mechanics scope, technical approach and milestones
+- **[heaven-or-hell-bestiary.md](./heaven-or-hell-bestiary.md)** - Heaven Or Hell creature bible: 8 ally angels and 35 enemies from scripture and tradition, with sprite briefs, AI image prompts and a tier table; a proposal and the companion to the plan
+- **[heaven-or-hell-progression.md](./heaven-or-hell-progression.md)** - Heaven Or Hell character creation and progression: Deepwoken's systems reflavoured for angels, with Dan's decisions, the Choirs, corruption tiers, Stain, weapons and feint AI; the companion to the plan
+
 ## Quick Links
 
 ### For New Contributors
