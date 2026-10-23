@@ -82,13 +82,21 @@ over.
 **World structure.** Dan: "You're walking on an open map where you have to
 traverse heaven." The game is an open, traversable map of Heaven, not
 discrete floors of rooms. It is still a roguelite, the way Deepwoken is an
-open world with permadeath. How the two fit is proposed in
-[World and run structure](#world-and-run-structure), for Dan to confirm.
+open world with permadeath. Dan has since confirmed this, and
+[World and run structure](#world-and-run-structure) describes how the two
+fit.
 
 **Creatures.** Heaven is full of "biblically accurate" heavenly creatures,
 for immersion: seraphim with six wings, ophanim as wheels within wheels
-covered in eyes, cherubim with four faces, thrones and others. Whether they
-fight for you, ignore you or fight against you is open decision 1.
+covered in eyes, cherubim with four faces, thrones and others.
+
+**Allegiance.** The angels are on the player's side, fighting Hell's
+corruption with you. The enemies are mainly demons and frightening creatures
+of Hell as the Bible or tradition depicts them: the locusts of Revelation 9
+and their king Abaddon, the beast of Revelation 13, the dragon of
+Revelation 12, Leviathan and Behemoth from Job 40–41, Legion from Mark 5,
+and named demons from traditional demonology. A smaller tier of corrupted
+angels serves as elites and bosses. See [Creatures](#creatures).
 
 **Palette.** The red of Hell and the white of Heaven are the main clash.
 Both pop vividly, with bloom, against a dark, high-contrast monochrome base.
@@ -97,9 +105,53 @@ Both pop vividly, with bloom, against a dark, high-contrast monochrome base.
 swinging the weapon and parrying and dodging." This is now a design pillar,
 with game-feel targets in M2 and M3.
 
-**Mechanics are unchanged.** Everything above is premise, world and
-aesthetics. The Deepwoken mechanics in [Mechanics scope](#mechanics-scope)
-stay as planned.
+**Roguelite, confirmed.** It's a roguelite, not a roguelike: open-world
+permadeath like Deepwoken. A run is meant to last a long time, with so much
+to do that you progress differently each run. When you're wiped, Heaven
+resets entirely. What you keep is small and mostly knowledge: each death
+teaches you something, such as a bestiary entry that reveals a demon's
+patterns and weaknesses, lore, map knowledge or a small unlock. It is not
+big stat creep. The meta progress is renamed from Graces to Revelations,
+because what carries over is what has been revealed to you.
+
+**Corruption is the clock.** While a run goes on, Hell's invasion slowly
+corrupts more and more of Heaven. The longer you last, the stronger the
+demons get and the more bosses spawn around the open map. As Heaven
+corrupts, more aspects and mechanics also open up, so the player can gain
+more and grow stronger to match. The tiers are sketched in M4 as a
+proposal, and a separate design proposal for them is coming.
+
+**Camera angle.** By default, copy Death's Door's look: a fixed camera about
+45–50 degrees down, looking along a diagonal, with one angle for the whole
+world. Orthographic is the default lens, as a starting value to verify
+against Death's Door's screenshots in M1.
+
+**Art production.** There is no modeller, and no art will be bought or
+commissioned. Dan: "Just try your best." The development agent makes the 3D
+models, rigs and animations itself, as scripted Blender in Python: simple
+stylised shapes in a chunky, bevelled, toon-shaded look inspired mostly by
+Death's Door and only a little by Little Scavenger. See
+[Who makes the art](#who-makes-the-art).
+
+**Controls.** Like Deepwoken. The mouse aims and left-click attacks (the
+light attack chain). F parries, holding F blocks, Q rolls and R is the
+critical attack. Dan also wants right-click to be a critical attack, but
+Deepwoken uses right-click to feint, so that's open decision 1. Movement
+is assumed to be WASD.
+
+**Platform.** Desktop browsers, as the default. Dan didn't object.
+
+**Character creation and progression.** It starts like Deepwoken, with a
+character creation step where you customise your angel. Races, which
+Deepwoken calls Aspects, give different buffs and are all inspired by
+angels. Dan also wants Deepwoken's Mantras, Oaths, Talents, Enchantments,
+Aspects, Deep Shrines and Resonance, all given angel and Heaven flavour. See
+[Character creation and progression](#character-creation-and-progression).
+
+**Mechanics are unchanged, with additions.** None of the decisions above
+change the Deepwoken mechanics already planned. Dan's request for the full
+set of progression systems adds Aspects, Oaths, Enchantments and Resonance
+to [Mechanics scope](#mechanics-scope).
 
 ### Resolved since the first draft
 
@@ -109,43 +161,39 @@ stay as planned.
 - **Pixel art or painted art.** Resolved: neither. The game is high-resolution,
   toon-shaded 3D, pre-rendered.
 - **The engine.** Resolved: ExcaliburJS 0.32.
+- **What the heavenly creatures are to the player.** Resolved: angels are
+  allies, demons are the main enemies, and corrupted angels are a smaller
+  elite and boss tier.
+- **Roguelite or roguelike.** Confirmed: a roguelite, with open-world
+  permadeath and knowledge as the main thing kept.
+- **The camera angle and lens.** Decided as a default: Death's Door's look,
+  45–50 degrees down along a diagonal, orthographic, one angle everywhere.
+  It's verified against the screenshots in M1.
+- **Who makes the 3D models and animations.** Resolved: the development
+  agent, by script, with no bought or commissioned art.
+- **Input scheme.** Resolved: Deepwoken-like mouse and keyboard, apart from
+  right-click (open decision 1).
+- **Desktop or mobile.** Resolved as the default: desktop browsers.
 
 ### Not decided yet
 
 Each open decision blocks a specific milestone, marked in brackets.
 
-1. **What the heavenly creatures are to the player.** Allies, neutral
-   wildlife, or also enemies (fallen or corrupted angels) alongside Hell's
-   demons? *Proposal:* a mix. Uncorrupted creatures are allies and NPCs,
-   corrupted ones are elite enemies and bosses, and demons are the common
-   enemies. See [Creatures](#creatures). [M3]
-2. **The fixed camera angle and lens.** The camera is fixed, but its pitch,
-   yaw and lens still need choosing. The lens is either orthographic, with no
-   perspective, or perspective with a narrow field of view. The sources
-   gathered so far don't say which one Death's Door uses. Its store
-   screenshots don't all use the same yaw: some look straight along a room's
-   walls and others look along a diagonal. Pre-rendering makes this choice
-   expensive to change later, because every sprite is rendered at it. A
-   reasonable starting point is the common isometric setup that Unity's
-   camera tutorial describes, about 45 degrees of yaw and 35 degrees of
-   pitch, tuned against the screenshots. [M1]
-3. **Who makes the 3D models and animations.** Bought model packs, original
-   models built in Blender, generated models, or a mix. Someone has to model,
-   rig and animate in Blender, and run the render pipeline. [M1]
-   *Partial answer:* the Death's Door concept sheets show a workable format
-   for source sheets: one area per sheet, with props, a flat elevation of
-   each key piece and short notes on how it's used.
-4. **Desktop only, or mobile too.** This decides the sprite resolution, how
-   much texture memory the game can use and how much bloom it can afford.
-   [M1]
-5. **How big Heaven's map is.** The number of regions and their size set the
-   art budget and the streaming work. [M4]
-6. **Whether Heaven's map has a hub.** *Proposal:* a sanctuary region where
-   Graces are spent and allied NPCs talk, which an attack never reaches.
-   [M4]
-7. **Input scheme.** Deepwoken is mouse plus keyboard. Terrene's scenes are
-   keyboard-first. This plan assumes keyboard-first, with the mouse for aiming
-   as an option. [M2]
+1. **What right-click does.** Dan wants right-click to be a critical attack,
+   and Deepwoken uses it to feint. *Proposed resolution:* right-click during
+   your own attack's wind-up feints it, and at any other time it's a
+   critical attack, the same as R. [M3]
+2. **How big Heaven's map is.** The number of regions and their size set the
+   art budget, the streaming work and how long a run can last. [M4]
+3. **Whether Heaven's map has a hub.** *Proposal:* a sanctuary region where
+   allied NPCs talk and the bestiary and lore are read, which corruption
+   reaches only at the last tier. [M4]
+4. **How a run ends well.** Corruption only rises, so does a run have a
+   victory, such as defeating the dragon at the last tier, or does it only
+   end when you're wiped, with the score being how long Heaven held? [M4]
+5. **How long a run should last, and how it's saved.** A long run with
+   permadeath has to survive closing the tab. *Proposal:* the run saves
+   continuously to `localStorage`, so quitting never undoes a death. [M4]
 
 ## Design pillars
 
@@ -153,8 +201,9 @@ Each open decision blocks a specific milestone, marked in brackets.
    Inputs act at once, hits land with weight, and every enemy attack can be
    read. Posture, parry and roll matter more than numbers. A skilled player
    with starting gear can hold the first region.
-2. **Death matters, a run doesn't end on the first mistake.** Deepwoken's two
-   lives fit the "roguelite" choice well.
+2. **Death matters, a run doesn't end on the first mistake, and every death
+   teaches.** Deepwoken's two lives fit the "roguelite" choice well. What
+   survives a wipe is mostly knowledge, not power.
 3. **Dark world, bright actors.** Anything you can interact with glows. The
    environment stays close to black.
 4. **Small systems, kept separate.** Rules live in pure TypeScript and are
@@ -162,50 +211,108 @@ Each open decision blocks a specific milestone, marked in brackets.
 
 ## World and run structure
 
-This section is a proposal for Dan to confirm. It reconciles the open map
-with the roguelite decision the way Deepwoken does: the world stays, and the
-character's run ends.
+Decided: a roguelite with open-world permadeath like Deepwoken's, long runs,
+a full reset of Heaven on a wipe, knowledge as the main thing kept, and
+corruption that escalates through the run. The details below are proposals
+for Dan to confirm, apart from where they restate those decisions.
 
 - **Heaven's map is fixed.** The regions, paths and landmarks are the same
-  every run, so players learn the map. Region names are placeholders, for
-  example the Outer Gates, the Courts, the Sea of Glass (from Revelation
+  every run, so map knowledge carries over. Region names are placeholders,
+  for example the Outer Gates, the Courts, the Sea of Glass (from Revelation
   4:6) and the approach to the Throne.
 - **Hell's invasion is reseeded every run.** Each run places breaches where
   Hell is pushing in, spreads corruption out from them, and sets up demon
-  camps, roaming patrols and events. Where the corrupted elites stand also
-  changes. The same seed always gives the same invasion, so it can be tested.
-- **A run is a defence.** You seal breaches, which pushes corruption back
-  and opens the way to the next region. Sealing a breach is the open-map
-  equivalent of clearing a floor, so it's when the talent draft happens. A
-  run is won by holding Heaven against the invasion's leader at the end.
+  camps, roaming patrols and events. Where the elites and bosses appear also
+  changes. The same seed always gives the same invasion, so it can be
+  tested.
+- **Corruption is the run's clock.** A single corruption level rises with
+  time in the run and with every breach left open. Sealing a breach slows it
+  and cleanses the ground nearby, but the level itself never goes down. Each
+  tier makes demons stronger and spawns more bosses across the map, and also
+  opens up new aspects and mechanics for the player. Tiers are sketched in
+  M4.
+- **A run is long, and different every time.** There's more to do than one
+  run can finish: breaches, camps, bosses, quests from allied angels, Deep
+  Shrines and Oath trials. So two runs progress differently even on the
+  same map. Whether a run can be won is open decision 4.
 - **Two lives, in angel terms.** Your first fall dims your halo. That's
   Deepwoken's stained health: the dimmed part of your health bar can't be
   healed until you pray at an altar or level up. A second fall casts you
-  out, and the run ends.
-- **Meta progress survives the fall.** Deepwoken's Echoes become Graces
-  (a placeholder name). They're earned during a run, kept after it ends, and
-  spent on starting options.
+  out, and the run ends. Deepwoken sends a drowned character to the Depths
+  for one last chance before wiping, and an angel equivalent could come
+  later.
+- **A wipe resets Heaven entirely.** The character, their build and every
+  change to the map are gone.
+- **Revelations survive the wipe.** What carries over is mostly knowledge:
+  - *bestiary entries* that reveal a demon's patterns and weaknesses, filled
+    in by fighting it and dying to it;
+  - *lore* found in the world;
+  - *map knowledge*, such as marked altars, shortcuts and Deep Shrine sites;
+  - *small unlocks*, such as a cosmetic, an Aspect to choose at character
+    creation, or skipping a trial you've completed before.
+
+  There's no stat creep. Deepwoken itself keeps a small "Knowledge" currency
+  across a wipe, which can, for example, skip an Oath's progression that you
+  have already finished once. Revelations follow that idea, so the old
+  Echoes row becomes Revelations.
 
 ## Creatures
 
-Heaven is full of "biblically accurate" heavenly creatures. Their designs
-start from the scripture descriptions below, quoted from the ESV. The roles
-are a proposal (see open decision 1).
+The creature designs start from the descriptions below. Scripture is quoted
+from the ESV, apart from Tobit and Matthew, which are quoted from the
+NRSVUE. Decided: the angels are allies, demons and creatures of Hell are the
+main enemies, and corrupted angels are a smaller elite and boss tier. The
+role of each creature is a proposal.
 
-| Creature | Scripture description | Proposed role |
+### Angels: allies and NPCs
+
+| Creature | Description | Proposed role |
 | --- | --- | --- |
-| Seraphim | Isaiah 6:2–7: "Each had six wings: with two he covered his face, and with two he covered his feet, and with two he flew." They call "Holy, holy, holy," and one carries "a burning coal that he had taken with tongs from the altar." | Allies and NPCs. A corrupted seraph is an elite whose burning coals become ranged attacks |
-| Cherubim (the living creatures) | Ezekiel 1:5–14: "a human likeness," "four faces," "four wings," "human hands" under the wings, legs "straight," feet like "a calf's foot," sparkling "like burnished bronze." Each "went straight forward, without turning," and they "darted to and fro, like the appearance of a flash of lightning." Ezekiel 10:14 lists the faces as a cherub's, a human's, a lion's and an eagle's | Guardians and NPCs. A corrupted cherub is a boss that attacks in all four directions without turning |
-| Ophanim (the wheels) | Ezekiel 1:15–21 and 10:9–13: "a wheel within a wheel," gleaming "like sparkling beryl," with rims "full of eyes all around." They move "in any of their four directions without turning" and are called "the whirling wheels." *Ophanim* is Hebrew for "wheels" | Ally sentinels that watch the map. A corrupted ophan is a boss that rolls through the arena |
-| Thrones | Colossians 1:16 names "thrones or dominions or rulers or authorities" among things created "in heaven." Some Christian angelology treats Thrones as one of the choirs of angels and identifies them with the ophanim. Jewish angelic hierarchies keep the two apart | To be chosen: either the same creature as the ophanim, or a separate ruler class that guards the Throne region |
-| The four living creatures of Revelation | Revelation 4:6–8: "like a lion," "like an ox," "with the face of a man," and "like an eagle in flight," "each of them with six wings," "full of eyes all around and within" | Guardians of the Throne region, and part of the final defence |
 | The player | A lesser angel. The premise echoes Revelation 12:7, where "war arose in heaven, Michael and his angels fighting against the dragon" | The hero |
-| Demons | Not drawn from a scripture description. Original designs | The common enemies: the melee, ranged and heavy types of M2 and M3 |
+| Seraphim | Isaiah 6:2–7: "Each had six wings: with two he covered his face, and with two he covered his feet, and with two he flew." They call "Holy, holy, holy," and one carries "a burning coal that he had taken with tongs from the altar" | Allies who fight beside you at breaches, and altar keepers who clear a dimmed halo |
+| Cherubim (the living creatures) | Ezekiel 1:5–14: "a human likeness," "four faces," "four wings," "human hands" under the wings, legs "straight," feet like "a calf's foot," sparkling "like burnished bronze." Each "went straight forward, without turning," and they "darted to and fro, like the appearance of a flash of lightning." Ezekiel 10:14 lists the faces as a cherub's, a human's, a lion's and an eagle's | Guardians of gates and quest givers |
+| Ophanim (the wheels) | Ezekiel 1:15–21 and 10:9–13: "a wheel within a wheel," gleaming "like sparkling beryl," with rims "full of eyes all around." They move "in any of their four directions without turning" and are called "the whirling wheels." *Ophanim* is Hebrew for "wheels" | Sentinels that watch the map. Talking to one reveals nearby breaches, which is a natural source of map knowledge |
+| Thrones | Colossians 1:16 names "thrones or dominions or rulers or authorities" among things created "in heaven." Some Christian angelology treats Thrones as one of the choirs of angels and identifies them with the ophanim. Jewish angelic hierarchies keep the two apart | To be chosen: either the same creature as the ophanim, or a ruler class that grants Oaths |
+| The four living creatures of Revelation | Revelation 4:6–8: "like a lion," "like an ox," "with the face of a man," and "like an eagle in flight," "each of them with six wings," "full of eyes all around and within" | Guardians of the Throne region and keepers of lore |
 
-Two notes for the render pipeline. Cherubim and ophanim move "without
-turning," so each needs only one facing instead of eight, which saves a lot
-of render work. Wings and eyes are costly to animate, so they should loop
-in short cycles.
+### Hell: the enemies
+
+| Creature | Description | Proposed role |
+| --- | --- | --- |
+| Locusts of the pit | Revelation 9:3–10: they rise from the smoke of "the bottomless pit," "like horses prepared for battle," with "crowns of gold," "human faces," "hair like women's hair," "teeth like lions' teeth," "breastplates like breastplates of iron," wings that sound "like the noise of many chariots," and "tails and stings like scorpions" | The common swarm enemy from the first tier. Their stings are the first orange telegraphs a player learns |
+| Abaddon (Apollyon) | Revelation 9:11: the locusts' king is "the angel of the bottomless pit," named Abaddon in Hebrew and Apollyon in Greek. The ESV notes that the names mean "destruction" and "destroyer" | A boss. As an angel of the pit, he sits in the corrupted-angel tier and leads the locust swarms |
+| Legion | Mark 5:2–13: a man "with an unclean spirit" lived "among the tombs" and "wrenched the chains apart." Asked his name, he answered, "My name is Legion, for we are many," and the spirits went into a herd of "about two thousand" pigs | An elite that splits into many bodies when hurt and possesses lesser demons |
+| Behemoth | Job 40:15–24: he "eats grass like an ox," "makes his tail stiff like a cedar," and "his bones are tubes of bronze, his limbs like bars of iron." He lies "in the shelter of the reeds and in the marsh." The ESV calls him "a large animal, exact identity uncertain" | A heavy boss with hyperarmor that charges across open regions |
+| Leviathan | Job 41: "his back is made of rows of shields," "out of his mouth go flaming torches," "out of his nostrils comes forth smoke," and "his breath kindles coals." "Though the sword reaches him, it does not avail." He "makes the deep boil like a pot" and is "king over all the sons of pride." The ESV calls him "a large sea animal, exact identity uncertain" | A boss of the Sea of Glass whose armour has to be broken before it takes damage |
+| The beast from the sea | Revelation 13:1–2: "with ten horns and seven heads, with ten diadems on its horns and blasphemous names on its heads," "like a leopard," with feet "like a bear's" and a mouth "like a lion's mouth." "The dragon gave his power" to it | A late boss |
+| The dragon | Revelation 12:3–9: "a great red dragon, with seven heads and ten horns, and on his heads seven diadems." "His tail swept down a third of the stars of heaven." He fought Michael's angels "and was thrown down" | The invasion's leader and the last-tier boss |
+| Named demons | Tobit 3:8 names "the wicked demon Asmodeus," and Matthew 12:24 names "Beelzebul, the ruler of the demons." The Ars Goetia, part of a 17th-century grimoire called the Lesser Key of Solomon, lists 72 spirits with ranks, such as King Bael, Duke Astaroth, King Asmodeus and King Belial | Lieutenants who command camps and lead breaches. Their names and ranks come from these sources, but no descriptions of them have been gathered yet, so their designs are original |
+| Lesser demons | No single source. Original designs, kept in the same shape language | The melee, ranged and heavy types of M2 and M3 |
+
+Behemoth and Leviathan appear in Job as creatures of God's making, not as
+demons. Casting them as Hell's is this game's choice. So is casting the
+beast and the dragon, who come to earth in Revelation, as invaders of
+Heaven.
+
+### Corrupted angels: the elite and boss tier
+
+A smaller tier. Each is an allied creature that Hell has taken, so it shares
+the ally's shape and gets red where the ally has white. That follows Death's
+Door's "echo" rule for related enemies.
+
+- A corrupted seraph, whose burning coals become ranged attacks.
+- A corrupted cherub that attacks in all four directions without turning.
+- A corrupted ophan that rolls through the arena.
+- Abaddon, who leads them.
+
+### Notes for the render pipeline
+
+Cherubim, ophanim and corrupted versions of them move "without turning," so
+each needs only one facing instead of eight, which saves a lot of render
+work. Locusts and Legion's bodies share one rig each and appear in numbers,
+so they need few animations. The big bosses (Behemoth, Leviathan, the beast
+and the dragon) are the costliest to build and animate, so they come one at
+a time, from M4 on. Wings and eyes should loop in short cycles.
 
 ## Art direction
 
@@ -290,7 +397,11 @@ light and colour.
 - **Camera.** One fixed, angled camera follows the player and never rotates.
   Every sprite is rendered at that angle, so nothing in the game may rotate
   the camera, and zoom stays within a narrow range so the baked ink lines
-  keep their width. The angle and lens are open decision 2.
+  keep their width. Decided as the default: Death's Door's look, about
+  45–50 degrees down, looking along a diagonal, with an orthographic lens.
+  These are starting values. M1 checks them against Death's Door's
+  screenshots, for example whether vertical edges converge, which would
+  mean a perspective lens. One angle covers the whole world.
 - **High resolution.** The game renders at the display's full resolution,
   with antialiasing on. There is no pixel art and no pixel snapping. Sprites
   are rendered at the size they're shown on a 1080p screen, not scaled up.
@@ -332,8 +443,8 @@ light and colour.
   - Warm light sources that only light the area use a dim amber that doesn't
     compete with these.
   - Cyan is no longer a role. It's an optional accent, allowed once per
-    region for something special, like the beryl gleam of an ophan, the way
-    Death's Door uses its pink crystal.
+    region for something special, the way Death's Door uses its pink
+    crystal.
   - Glow colours are fully saturated and bright, so they pop against the
     monochrome base, and the white-against-red clash is the strongest
     contrast on screen.
@@ -396,14 +507,19 @@ corruption can be animated.
 | Death's Door on Steam | [store.steampowered.com/app/894020](https://store.steampowered.com/app/894020/Deaths_Door/) | The 12 store screenshots used to measure how bright the game is and to compare camera angles |
 | Death's Door Artbook on Steam | [store.steampowered.com/app/1662730](https://store.steampowered.com/app/1662730/Deaths_Door_Artbook/) | A free 43-page PDF of concepts curated by Frits Olsen. It needs the base game and hasn't been reviewed yet |
 | Death's Door on Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Death%27s_Door_(video_game)) | Lists Unity as the engine |
-| Unity Learn, camera views | [learn.unity.com](https://learn.unity.com/pathway/creative-core/unit/creative-core-cameras/tutorial/explore-camera-views?version=6.0) | Isometric views usually face 45 degrees and sit 35 degrees above the focus, with orthographic or perspective cameras. A starting point for open decision 2 |
+| Unity Learn, camera views | [learn.unity.com](https://learn.unity.com/pathway/creative-core/unit/creative-core-cameras/tutorial/explore-camera-views?version=6.0) | Isometric views usually face 45 degrees and sit 35 degrees above the focus, with orthographic or perspective cameras. Context for the decided 45–50 degree default |
 | Isaiah 6:1–7 (ESV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Isaiah+6%3A1-7&version=ESV) | The seraphim |
 | Ezekiel 1:4–28 (ESV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Ezekiel+1%3A4-28&version=ESV) | The living creatures and the wheels |
 | Ezekiel 10 (ESV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Ezekiel+10&version=ESV) | The cherubim, their four faces and "the whirling wheels" |
 | Colossians 1:16 (ESV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Colossians+1%3A16&version=ESV) | Thrones among things created in heaven |
 | Revelation 4:6–8 and 12:7–9 (ESV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Revelation+12%3A7-9%3BRevelation+4%3A6-8&version=ESV) | The four living creatures, the sea of glass, and the war in heaven |
 | Ophanim on Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Ophanim) | "Ophanim" means wheels. Some Christian angelology identifies them with Thrones, and Jewish hierarchies keep the two apart |
+| Revelation 9:1–11, 12:3–4 and 13:1–2 (ESV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Revelation+9%3A1-11%3BRevelation+12%3A3-4%3BRevelation+13%3A1-2&version=ESV) | The locusts and Abaddon/Apollyon, the great red dragon, and the beast from the sea |
+| Job 40:15–24, Job 41 and Mark 5:1–13 (ESV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Job+40%3A15-24%3BJob+41%3A1-34%3BMark+5%3A1-13&version=ESV) | Behemoth, Leviathan and Legion |
+| Tobit 3:8 and Matthew 12:24 (NRSVUE) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Tobit+3%3A8%3BMatthew+12%3A24&version=NRSVUE) | Asmodeus and Beelzebul by name |
+| The Lesser Key of Solomon on Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/The_Lesser_Key_of_Solomon) | The Ars Goetia's 72 spirits and their ranks, a source for named demons |
 | Deepwoken Mechanics | [deepwoken.fandom.com](https://deepwoken.fandom.com/wiki/Category:Mechanics) | Mechanics only |
+| Deepwoken Aspects, Oaths, Enchantments, Resonance, Mantras and Death | [Aspects](https://deepwoken.fandom.com/wiki/Aspects), [Oaths](https://deepwoken.fandom.com/wiki/Oaths), [Enchantments](https://deepwoken.fandom.com/wiki/Enchantments), [Resonance](https://deepwoken.fandom.com/wiki/Resonance), [Mantras](https://deepwoken.fandom.com/wiki/Mantras), [Death](https://deepwoken.fandom.com/wiki/Death) | The progression systems to reflavour, and how death, wipes and Knowledge work |
 
 ## Mechanics scope
 
@@ -425,12 +541,51 @@ systems.
 | Attunements and Mantras, with Ether | Elemental schools (flame, frost, thunder) that give your build an active ability | M5 |
 | Deep Shrines | Rare rooms that trade a stat for a stat | M5 |
 | Echoes (meta progress after a wipe) | Currency that survives death and unlocks starting options | M4 |
+| Aspects (chosen at character creation) | Angel-inspired races, each with an innate talent and a small attribute bonus | M3 |
+| Oaths | One sworn vow at a time, a unique talent with a set of abilities that progresses | M5 |
+| Enchantments | Upgrades placed on weapons and equipment | M5 |
+| Resonance | A personal ability that awakens from Progress earned by defeating bosses | M5 |
 | Out of scope | PvP, guilds, ships, bounties, servers, crafting, hunger and thirst | – |
+
+The last four rows are new, added at Dan's request. The rows above them are
+unchanged.
 
 In the open-map version, these keep their mechanics and take angel names in
 the game's text. A death is a fall and stained health is a dimmed halo.
 Shrines are altars, clearing a floor is sealing a breach, and Echoes are
-Graces. Deep Shrines are rare places on the map rather than rooms.
+Revelations: mostly knowledge, as described in
+[World and run structure](#world-and-run-structure). Deep Shrines are rare
+places on the map rather than rooms.
+
+## Character creation and progression
+
+Decided: a run starts like Deepwoken, with a character creation screen where
+you customise your angel and choose an Aspect. Every Deepwoken progression
+system Dan listed is in, each given angel and Heaven flavour. The flavour
+notes below are proposals.
+
+- **Aspects.** In Deepwoken, Aspects (formerly races) are chosen at
+  character creation and give innate talents and attribute bonuses. Here
+  they're kinds of lesser angel, for example a guardian, a messenger or a
+  warden of flame. Some Aspects are Revelations unlocked by earlier runs.
+- **Talents.** Cards drawn on level-up, as in Deepwoken. Here they're drawn
+  when a breach is sealed.
+- **Mantras.** Deepwoken's magic. Here they're hymns or psalms, the active
+  abilities of an attunement.
+- **Oaths.** In Deepwoken, a unique talent with abilities that progress, one
+  at a time, which can be broken at a shrine. Here they're vows sworn at an
+  altar, such as a vow to one choir of angels.
+- **Enchantments.** Upgrades for weapons and equipment. Here they're
+  blessings placed on a weapon at an altar.
+- **Deep Shrines.** Rare places on the map that trade a stat for a stat.
+- **Resonance.** In Deepwoken, a personal ability gained from Progress by
+  defeating bosses. Here it's a calling that awakens as you defeat Hell's
+  bosses.
+
+Some of these unlock as corruption rises, so the player grows to match
+Hell (see the corruption tiers in M4). The character creation screen is in
+M3, after the combat core and before the run. A detailed design proposal for
+these systems will be added next.
 
 ## Technical approach
 
@@ -481,8 +636,8 @@ Everything 3D lives in Blender under `tools/heaven-or-hell/` and is rendered
 by script, never by hand, so the look stays consistent and a change to the
 camera or bands can be re-rendered.
 
-- **One camera rig.** `rig.blend` holds the fixed camera (the angle and lens
-  from open decision 2), the key light used for the baked toon bands, the
+- **One camera rig.** `rig.blend` holds the fixed camera (orthographic,
+  about 45–50 degrees down along a diagonal, as verified in M1), the key light used for the baked toon bands, the
   ink outline settings and the render size. Every render uses it. Models
   turn under the camera to make facings, and the camera itself never moves.
 - **Eight facings for characters.** The hero, demons and most creatures are
@@ -519,6 +674,43 @@ camera or bands can be re-rendered.
 
   Each layer gets its emissive and normal passes.
 
+### Who makes the art
+
+Decided: nobody is hired and nothing is bought. The development agent makes
+the models, rigs and animations by scripting Blender's Python API, aiming
+for simple, chunky, bevelled, toon-shaded shapes in Death's Door's style.
+The work goes in this order:
+
+1. **Greybox.** Block out each chunk and actor from plain primitives, to
+   check scale, the camera, sorting and combat timing before any detail.
+2. **Scripted stylised models.** Build each model in code from bevelled
+   primitives, combined and slightly irregular, with flat toon materials.
+   The silhouette is designed first, because the outline, toon bands and
+   bloom carry most of the look.
+3. **A limited animation budget.** Rigs are generated armatures, and
+   animations are keyframed by script from a few poses each, with easing.
+   As starting assumptions: about 16 animations for the hero (the list in
+   [The real costs of pre-rendering](#the-real-costs-of-pre-rendering)),
+   about 6 for a common demon (idle, move, two attacks, hit, death), and
+   bosses budgeted one by one. Creatures that float or drift, such as
+   seraphim, ophanim and locust swarms, lean on procedural motion like
+   bobbing, wing beats and rotation instead of hand-made clips.
+4. **Modular kits.** Environment chunks are assembled from a small set of
+   generated kit pieces (floor tiles, steps, pillars, wall ends, arches,
+   altars), and related demons share rigs, parts and animations.
+
+The risk is fidelity: scripted models will look simpler than hand-made
+ones. The plan accepts that and leans on what scripts do well, which is
+consistency, clean silhouettes, toon shading, ink outlines and bloom, with
+ornament kept for focal pieces.
+
+Blender isn't installed on the development VM today. Python 3 with Pillow
+and NumPy is.
+So installing Blender headless is the first task in M1. If it can't be
+installed, the fallback is to generate the meshes, or the sprites directly,
+procedurally in Python with NumPy and Pillow, using the same camera angle,
+toon bands and passes.
+
 ### The real costs of pre-rendering
 
 These costs are why the pipeline is scripted. Each one gets a measurement
@@ -536,7 +728,8 @@ in M1.
   hero alone if everything is loaded at once. So frames are trimmed and
   packed, the normal pass can use half resolution, the emissive pass covers
   only frames that glow, and only the creatures in nearby regions are
-  loaded. Open decision 4 (desktop or mobile) sets the budget.
+  loaded. The target is desktop browsers, so M1 sets the budget from a
+  desktop GPU's limits.
 - **Depth sorting with no depth buffer.** Actors sort by their ground
   position through `z`. Anything an actor can walk behind has to be its own
   sprite with a base point, so environment chunks are split into layers. A
@@ -583,7 +776,12 @@ src/components/scenes/HeavenOrHell/
 ├── HeavenOrHell.ts     # Scene: load, camera, chunk streaming, loop, onDeactivate cleanup
 ├── rules.ts            # Pure combat and run rules: posture, parry, roll, falls, frame data
 ├── map.ts              # Fixed map of Heaven: regions, chunks, paths, landmarks (pure)
-├── invasion.ts         # Seeded invasion: breaches, corruption, camps, events (pure)
+├── invasion.ts         # Seeded invasion: breaches, corruption spread, camps, events (pure)
+├── corruption.ts       # Corruption level, tiers and what each tier unlocks or spawns (pure)
+├── character.ts        # Character creation, Aspects, Oaths, Enchantments, Resonance (pure)
+├── revelations.ts      # What survives a wipe: bestiary, lore, map knowledge, unlocks (pure)
+├── save.ts             # Continuous run save and Revelations in localStorage
+├── input.ts            # Mouse aim, left-click, F, hold F, Q, R, right-click, WASD
 ├── palette.ts          # Region bases, corruption blend, toon bands, glow roles (pure)
 ├── chunks.ts           # Loads and unloads chunk layers near the camera
 ├── lit.ts              # Normal-map lighting and emissive Material, region tint
@@ -594,10 +792,13 @@ src/components/scenes/HeavenOrHell/
 ├── art/atlas.ts        # Generated by tools/heaven-or-hell/pack_atlas.py
 └── sfx/, HeavenOrHell.mp3
 src/components/characters/player/<Hero>/   # one folder per character, per project rules
-src/components/creatures/<Creature>/       # demons and heavenly creatures alike
+src/components/creatures/<Creature>/       # demons and angels alike
 tools/heaven-or-hell/
 ├── source/             # reference images and .blend sources
 ├── rig.blend           # fixed camera, key light, outline and render settings
+├── greybox.py          # blocks out chunks and actors from primitives
+├── build_models.py     # scripted stylised models, kit pieces, rigs and animations
+├── procedural.py       # fallback if Blender can't be installed: meshes or sprites in NumPy
 ├── render_sprites.py   # renders colour, emissive, normal (and depth) passes
 ├── pack_atlas.py       # trims, packs atlases, writes atlas.ts and frame data
 └── references.md       # one line per reference: what to take from it
@@ -607,10 +808,12 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
 
 ### Testing
 
-- `rules.ts`, `map.ts`, `invasion.ts` and `palette.ts` import nothing from
-  Excalibur, so `node:test` covers the parry window, posture overflow, roll
-  i-frames, input buffering, the two-falls state, seeded invasions and the
-  palette's value limits, all deterministically.
+- `rules.ts`, `map.ts`, `invasion.ts`, `corruption.ts`, `character.ts`,
+  `revelations.ts` and `palette.ts` import nothing from Excalibur, so
+  `node:test` covers the parry window, posture overflow, roll i-frames,
+  input buffering, the two-falls state, seeded invasions, corruption tiers,
+  Aspect bonuses, what survives a wipe and the palette's value limits, all
+  deterministically.
 - **Fix this first:** `node --test test/street-rules.ts` fails today with
   `ERR_MODULE_NOT_FOUND` because `Street/level.ts` imports `./rules` without
   an extension, and Node 22's type stripping needs one. The fix is to use
@@ -638,18 +841,27 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
   every stray image adds ambiguity.
 - Add the Deepwoken wiki pages and one or two blog articles about its combat
   to `references.md`.
-- Answer open decisions 2, 3 and 4: the camera angle and lens, who makes the
-  models, and desktop or mobile.
 - **Progress:** 2 of the 4–5 visual references are covered: Death's Door and
   Little Scavenger (see [Art direction](#art-direction)). The engine, the
-  premise, the world structure, the palette and pixel art versus painted are
+  premise, the world structure, the palette, pixel art versus painted, the
+  creatures' allegiance, the roguelite structure, the camera default, who
+  makes the art, the controls apart from right-click, and the platform are
   settled. The Deepwoken wiki is linked, but the combat blog articles aren't
   collected yet, and `references.md` doesn't exist yet.
-- **Done when** there are at least 5 tagged references and open decisions
-  2, 3 and 4 are answered.
+- **Done when** there are at least 5 tagged references. The open decisions
+  each block a later milestone, not M0.
 
 ### M1: One lit area, pre-rendered
 
+- **First task: install Blender headless** on the development VM and run a
+  scripted render from the command line. If it can't be installed, switch to
+  the procedural Python fallback in
+  [Who makes the art](#who-makes-the-art) and adjust the rest of M1 to it.
+- **Verify the camera.** Compare a test render at the orthographic,
+  45–50 degree default against Death's Door's Steam screenshots: the pitch,
+  the diagonal, and whether vertical edges converge. Lock the angle in
+  `rig.blend` before any real asset.
+- `greybox.py` and the first `build_models.py` kit pieces.
 - The Blender pipeline end to end: `rig.blend`, `render_sprites.py` and
   `pack_atlas.py`, producing colour, emissive and normal passes and
   `art/atlas.ts`.
@@ -657,10 +869,10 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
   settings on leaving.
 - One chunk of Heaven as a greybox: bevelled stone kit pieces rendered at the
   fixed angle, split into ground, tall-piece and front layers, in the
-  default bone-grey base. Placeholder models are fine. The 2D packs in
-  `src/assets/` don't fit this look.
-- The hero as a placeholder model, rendered in 8 facings with idle and run,
-  walking in 8 directions. Sorted against pillars and walls by `z`, with the
+  default bone-grey base, then replaced by scripted kit pieces. The 2D packs
+  in `src/assets/` don't fit this look.
+- The hero as a scripted placeholder model, rendered in 8 facings with idle
+  and run, walking in 8 directions. Sorted against pillars and walls by `z`, with the
   depth-pass `Material` tried as the alternative.
 - Runtime lighting from normal maps in three bands, a gold outline on the
   hero, altars glowing white and gold, a breach glowing red, the bloom
@@ -673,12 +885,18 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
   - the measured texture memory and frame count for the hero are written
     down, with a projection for the full roster;
   - baked and runtime bands visibly match;
+  - the camera angle and lens are checked against the screenshots and
+    written down;
   - switching to another hash restores the screen settings.
 
 ### M2: The combat core
 
 - `rules.ts` covers the light attack chain with its flourish, block and
   posture, parry with its cooldown, and roll with i-frames.
+- `input.ts` maps the decided controls: WASD to move, the mouse to aim,
+  left-click for the light attack chain, F to parry, holding F to block and
+  Q to roll. A tap of F parries and a hold past a short threshold blocks,
+  as a starting value to tune.
 - One melee demon whose wind-ups can be read and parried, plus the HUD:
   health with its halo, posture and cooldown icons.
 - **Game-feel targets.** These are starting values to tune in play, not
@@ -714,12 +932,16 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
 
 ### M3: Depth of combat
 
-- Critical attacks, feints, Tempo and Vent.
+- Critical attacks on R, feints, Tempo and Vent. Right-click follows open
+  decision 1. Until it's decided, build the proposed resolution: a feint
+  during your own wind-up, a critical otherwise.
 - Two more demon types: a ranged one with telegraphed area attacks, and a
   heavy one with hyperarmor.
-- One corrupted heavenly creature as an elite, if open decision 1 goes that
-  way. A corrupted seraph is the cheapest, because it needs no new movement
-  rules.
+- One corrupted angel as an elite. A corrupted seraph is the cheapest,
+  because it needs no new movement rules.
+- **The character creation screen**, after the combat core and before the
+  run: customising your angel and choosing from a first set of angel
+  Aspects, each with an innate talent and a small attribute bonus.
 - Telegraphs follow the Little Scavenger feedback: shrinking timer circles
   on the ground, visible cooldowns and clear feedback when you take damage.
 - **Game-feel targets.** Again starting values to tune:
@@ -732,8 +954,9 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
     100 ms) and a bigger shake than a light hit.
   - *Hyperarmor:* the heavy demon flashes red on a hit that doesn't stagger
     it, so the player knows it landed.
-- **Done when** each enemy type has a unit-tested pattern, and a fight
-  against all three together is winnable with no damage taken.
+- **Done when** each enemy type has a unit-tested pattern, a fight against
+  all three together is winnable with no damage taken, and a character made
+  with each Aspect starts with that Aspect's talent and bonus.
 
 ### M4: The run
 
@@ -741,28 +964,49 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
   `chunks.ts` streams them in and out as the hero moves (see
   [Risks](#risks)).
 - `invasion.ts` seeds each run's breaches, corruption spread, demon camps
-  and events. Sealing a breach pushes back corruption and opens the next
-  region.
+  and events. Sealing a breach slows corruption and cleanses the ground
+  near it.
+- `corruption.ts` runs the run's clock: one level that rises with time and
+  with open breaches and never goes down, crossing tiers.
 - Two lives: the first fall dims the halo (stained health), and altars clear
-  the stain. A second fall casts you out and ends the run.
+  the stain. A second fall casts you out and wipes the run, and Heaven
+  resets entirely.
 - A talent draft of one card from three each time a breach is sealed.
-- Graces saved to `localStorage`, and the hub where they are spent (open
-  decision 6).
-- NPC dialogue with allied heavenly creatures, using `DialogueNPC` and
-  `ChatSystem`.
-- **Done when** a full run across three regions plus the invasion's leader
-  can be played start to finish, falls and being cast out behave as
-  designed, two seeds produce different invasions on the same map, and
-  Graces persist across a reload.
+- Revelations (bestiary entries, lore, map knowledge and small unlocks)
+  saved to `localStorage`, plus a continuous save of the run itself (open
+  decision 5). Where Revelations are read depends on the hub (open
+  decision 3).
+- NPC dialogue with allied angels, using `DialogueNPC` and `ChatSystem`.
+- **Corruption tiers (proposal).** A first sketch to tune in play. A
+  separate design proposal for corruption is coming and replaces this one.
+  The tier numbers, contents and order are all starting values.
+
+  | Tier | What Hell sends | What opens up for the player |
+  | --- | --- | --- |
+  | 0, the first breaches | Locusts and lesser demons | The combat core, the chosen Aspect and the talent draft |
+  | 1 | Legion as roaming packs, and stronger lesser demons | Attunements and their first Mantras |
+  | 2 | Corrupted angels as elites, and the first bosses, such as Behemoth | Oaths and Enchantments |
+  | 3 | Leviathan and the beast from the sea, and more bosses at once | Resonance and Deep Shrines |
+  | 4, the last tier | Abaddon at the head of the locusts, and then the dragon | Nothing new: everything the run has built is tested |
+
+  Whether defeating the dragon wins the run is open decision 4.
+- **Done when** a run can be played from character creation through at
+  least three corruption tiers, falls and being cast out behave as
+  designed, two seeds produce different invasions on the same map, closing
+  and reopening the tab resumes the run without undoing a fall, and
+  Revelations survive a wipe.
 
 ### M5: Builds and variety
 
 - Three attunements, each with one active ability and an Ether bar.
+- Oaths sworn at altars, Enchantments on weapons and equipment, and
+  Resonance awakened by boss kills, each unlocked at its corruption tier.
 - Deep Shrines as rare places on the map, more talents, and a second region
   with its own monochrome base.
-- More heavenly creatures from the roster, allied and corrupted.
-- **Done when** two runs with different attunements play noticeably
-  differently.
+- More demons and bosses from the roster, more allied angels, and more
+  corrupted angels.
+- **Done when** two runs with different Aspects, attunements and Oaths play
+  noticeably differently.
 
 ### M6: Polish and release
 
@@ -774,10 +1018,16 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
 
 ## Risks
 
-- **The art supply** is the real bottleneck, not the code. Pre-rendering
-  needs someone who can model, rig and animate in Blender and keep the
-  pipeline running (open decision 3). M1 can ship with greybox placeholders,
-  but the look depends on M0.
+- **Scripted art fidelity.** With no modeller, every model, rig and
+  animation is scripted, and may look simpler or stiffer than the
+  references. Keep shapes simple, design silhouettes first, let toon bands,
+  ink lines and bloom carry the look, and hold animation to the budget in
+  [Who makes the art](#who-makes-the-art). Judge it on M1 screenshots next
+  to the references.
+- **Blender may not install headless** on the development VM. That's why
+  it's M1's first task, with the procedural Python fallback ready if it
+  fails. The fallback is likely to look plainer and makes rigged animation
+  harder.
 - **Frame counts and texture memory.** High-resolution sprites in 8 facings,
   three passes each, add up fast (see
   [The real costs of pre-rendering](#the-real-costs-of-pre-rendering)).
@@ -790,15 +1040,27 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
   outline width changes in one place and not the other, sprites and runtime
   light stop matching. Keep one band table in `palette.ts`, export it to
   Blender, and re-render when it changes.
-- **The camera angle is locked in by every render.** Changing open decision 2
-  after M1 means re-rendering everything. Decide it before the first real
-  asset.
+- **The camera angle is locked in by every render.** Changing the angle or
+  lens after M1 means re-rendering everything. Verify the default against
+  the screenshots and lock it before the first real asset.
 - **Streaming a large map.** Excalibur has no built-in streaming. Chunks have
   to be loaded, added to the scene, removed and unloaded by `chunks.ts`, with
   `OffscreenSystem`'s viewport events as a trigger. Loading images while the
   hero runs can stutter, so chunks next to the current one load ahead of
   time, and textures for far chunks are released. The map's size (open
-  decision 5) decides how hard this is.
+  decision 2) decides how hard this is.
+- **Saving a long run.** A long permadeath run has to survive a closed tab
+  or a crash without letting a player undo a fall by reloading. The save
+  has to be continuous and small, and `localStorage` has a size limit, so
+  the save stores the seed and the changes, not the whole map.
+- **Boss render cost.** Behemoth, Leviathan and the dragon are large, so
+  their frames are large, and several can be on the map at higher tiers.
+  Budget each boss on its own, render large bosses in parts, and load them
+  only near the player.
+- **Corruption balance.** If corruption rises faster than the player can
+  grow, long runs become hopeless, and if slower, they lose tension. Tune
+  the rate in play in M4, and keep the rates as data in `corruption.ts` so
+  they can be tested and changed.
 - **Bloom cost.** A full-screen pass at full resolution every frame can drop
   the frame rate on low-end GPUs. Baked halos keep most of the glow out of
   the screen pass, and the screen pass can run at a lower resolution than
