@@ -5,7 +5,7 @@
  */
 
 import type { MetaState, Result, RunState, TongueId, VowId } from "./types";
-import { fail, ok } from "./types";
+import { fail, forwardFail, ok } from "./types";
 import { RELIQUARY_COST } from "./tuning";
 import { TONGUES } from "./tongues";
 import { learnTongueForAccount, roundHundredths, testimonyPayout } from "./meta";
@@ -61,7 +61,7 @@ export function settleMeta(run: RunState, meta: MetaState, reliquaryItemId?: str
 
 export function wipe(run: RunState, meta: MetaState, options: WipeOptions): Result<WipeResult> {
     const settled = settleMeta(run, meta, options.reliquaryItemId);
-    if (!settled.ok) return settled;
+    if (!settled.ok) return forwardFail(settled);
     const fresh = buildRun(run.character.creation, settled.value.meta, options.seed);
     return ok({ meta: settled.value.meta, payout: settled.value.payout, cause: wipeCause(run), fresh: fresh.ok ? fresh.value : null });
 }

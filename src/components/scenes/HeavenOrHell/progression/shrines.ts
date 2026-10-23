@@ -5,7 +5,7 @@
  */
 
 import type { AttributeId, BurdenId, Result, RunState } from "./types";
-import { fail, ok } from "./types";
+import { fail, forwardFail, ok } from "./types";
 import { ALL_ATTRIBUTES, attributeCap, isCoreOrArms } from "./attributes";
 import { CHOIRS } from "./choirs";
 import { TierUnlock, scaleCost, tierOf, tierUnlocks } from "./corruption";
@@ -146,7 +146,7 @@ export function useRefiningCleanse(run: RunState): Result<RunState> {
     const opened = open(run, "refining");
     if (!opened.ok) return opened;
     const cleansed = cleanseStain(run, "refiningShrine");
-    return cleansed.ok ? ok(cleansed.value.run) : cleansed;
+    return cleansed.ok ? ok(cleansed.value.run) : forwardFail(cleansed);
 }
 
 /** Only Gifts that were drawn can be traded, and not ones another held Gift depends on. */

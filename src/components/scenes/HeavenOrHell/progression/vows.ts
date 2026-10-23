@@ -6,7 +6,7 @@
  */
 
 import type { AttributeId, MetaState, Result, RunState, VowId } from "./types";
-import { fail, ok } from "./types";
+import { fail, forwardFail, ok } from "./types";
 import { ARMS_ATTRIBUTES, TONGUE_ATTRIBUTES } from "./attributes";
 import { tierOf, tierUnlocks } from "./corruption";
 import { GIFTS, vowGifts } from "./gifts";
@@ -163,7 +163,7 @@ export function canSwear(run: RunState, id: VowId, meta: MetaState, options: Swe
 /** Swears a Vow: grants its first Gift and its Hymn, and records the Witness. */
 export function swearVow(run: RunState, id: VowId, meta: MetaState, options: SwearOptions = {}): Result<RunState> {
     const check = canSwear(run, id, meta, options);
-    if (!check.ok) return check;
+    if (!check.ok) return forwardFail(check);
     const def = VOWS[id];
     let next = run;
     if (!def.quests.every((q) => run.quests.includes(q))) {

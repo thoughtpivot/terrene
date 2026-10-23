@@ -13,6 +13,14 @@ export function fail<T = never>(error: string): Result<T> {
     return { ok: false, error };
 }
 
+/**
+ * Re-types a failed result. The webpack build has no strictNullChecks, so
+ * `if (!r.ok) return r` doesn't narrow across different result types.
+ */
+export function forwardFail<T>(result: Result<unknown>): Result<T> {
+    return fail((result as { error: string }).error);
+}
+
 export type FormAttribute = "might" | "steadfast" | "swiftness";
 export type SpiritAttribute = "wisdom" | "faith" | "voice";
 export type ArmsAttribute = "heavyArms" | "mediumArms" | "lightArms";
