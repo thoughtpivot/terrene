@@ -13,7 +13,7 @@ import { createLitMaterial, LightField } from "./render/lighting.ts";
 import { CanvasGraphic, FogGraphic, vignetteCanvas } from "./render/overlay.ts";
 import { worldRect } from "./world/chunks.ts";
 import { Z } from "./world/collide.ts";
-import { StreamingDebug } from "./world/debug.ts";
+import { StreamingDebug, textureCount } from "./world/debug.ts";
 import { GRID, spawnPoint } from "./world/map.ts";
 import { ChunkStreamer } from "./world/streaming.ts";
 
@@ -193,7 +193,7 @@ export default class HeavenOrHell extends Scene {
         this.streamer = new ChunkStreamer(this, engine, GRID, { props: Resources.Props, floor: Resources.Floor }, this.lit, this.lights);
         const spawn = spawnPoint();
         const hero = new Auriel(spawn.x, spawn.y);
-        hero.light = this.lights.add({ x: spawn.x, y: spawn.y - 60, r: 300, color: LIGHT.halo, intensity: 0.75, flicker: 0.04 });
+        hero.light = this.lights.add({ x: spawn.x, y: spawn.y - 60, r: 280, color: LIGHT.halo, intensity: 0.55, flicker: 0.04 });
         this.hero = hero;
         this.add(hero);
         this.streamer.warm(spawn.x, spawn.y);
@@ -393,6 +393,8 @@ export default class HeavenOrHell extends Scene {
             hero: this.hero ? { x: this.hero.pos.x, y: this.hero.pos.y, facing: this.hero.facing, view: this.hero.rig.view } : null,
             loaded: this.streamer ? [...this.streamer.loaded.keys()] : [],
             actors: this.actors.length,
+            lights: this.lights.size,
+            textures: this.engineRef ? textureCount(this.engineRef) : -1,
             fps: this.fps,
             bloom: this.bloom ? { enabled: this.bloom.enabled, format: this.bloom.format } : null,
             debug: this.debug?.visible ?? false,

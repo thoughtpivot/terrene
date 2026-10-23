@@ -166,13 +166,19 @@ function templeChunk(cx: number, cy: number): Omit<ChunkDef, "key" | "colliders"
             if (seen.has(id)) continue;
             seen.add(id);
             const kind = kinds[k++ % kinds.length];
-            // leave the front and east corners open: the way in, and the way to the breach
-            if (!kind || (g[0] === ring && g[1] === ring) || (g[0] === ring && g[1] === -ring)) continue;
+            // leave corners open: the way in, the way to the breach, and the gate behind the altar
+            const corner = Math.abs(g[0]) === ring && Math.abs(g[1]) === ring && !(g[0] === -ring && g[1] === ring);
+            if (!kind || corner) continue;
             props.push({ kind, ...at(g[0], g[1]), flip: k % 3 === 0 });
         }
     }
 
-    props.push(...archWall(ox - 640, oy - 120));
+    // a broken gate behind the altar, with a brazier in its opening
+    props.push(...archWall(ox + 10, oy - 560));
+    const archFire = { x: ox + 45, y: oy - 470 };
+    props.push({ kind: "brazier", ...archFire });
+    lights.push(holyLight(archFire.x, archFire.y - 70, 420, 0.95));
+    emitters.push({ x: archFire.x, y: archFire.y - 70, kind: "motes", rate: 4 });
     props.push({ kind: "statue", ...at(-620, 40) });
     props.push({ kind: "statue", ...at(40, -640), flip: true });
     props.push({ kind: "rubble", ...at(-540, 420) });
@@ -181,12 +187,12 @@ function templeChunk(cx: number, cy: number): Omit<ChunkDef, "key" | "colliders"
     // Hell breaking in at the east edge
     const breach = { x: ox + 560, y: oy + 40 };
     decals.push({ kind: "breach", ...breach });
-    lights.push(hellLight(breach.x, breach.y, 560, 1.3));
+    lights.push(hellLight(breach.x, breach.y, 560, 1.5));
     emitters.push({ x: breach.x, y: breach.y, kind: "embers", rate: 26 });
     for (const [dx, dy, flip] of [[-120, -210, false], [210, -130, true], [130, 200, false], [330, 60, true]] as const) {
         props.push({ kind: "hell-spikes", x: breach.x + dx, y: breach.y + dy, flip });
     }
-    lights.push(hellLight(breach.x + 300, breach.y + 60, 260, 0.8));
+    lights.push(hellLight(breach.x + 300, breach.y + 60, 300, 0.8));
 
     return { cx, cy, dressed: true, corruption: 0.35, props, decals, lights, emitters };
 }
@@ -212,11 +218,11 @@ function plainChunk(cx: number, cy: number): Omit<ChunkDef, "key" | "colliders">
         const hellish = rand() < corruption;
         if (hellish) {
             props.push({ kind: "hell-spikes", ...spot, flip: rand() < 0.5 });
-            lights.push(hellLight(spot.x, spot.y - 30, 360, 1.0));
+            lights.push(hellLight(spot.x, spot.y - 30, 360, 0.85));
             emitters.push({ ...spot, kind: "embers", rate: 8 });
             if (corruption > 0.6 && rand() < 0.7) {
                 decals.push({ kind: "breach", x: spot.x + 40, y: spot.y + 150 });
-                lights.push(hellLight(spot.x + 40, spot.y + 150, 420, 1.1));
+                lights.push(hellLight(spot.x + 40, spot.y + 150, 420, 0.9));
             }
         } else {
             props.push({ kind: "brazier", ...spot });

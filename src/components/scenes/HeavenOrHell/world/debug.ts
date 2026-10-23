@@ -3,7 +3,10 @@
  * load and unload reach around the hero, the colliders, a minimap of the
  * grid and live counts of chunks, actors, lights and GPU textures.
  */
-import { Color, ExcaliburGraphicsContextWebGL, Font, FontUnit, Graphic, ScreenElement, Text, TextAlign, vec, Actor, type Engine, type ExcaliburGraphicsContext } from "excalibur";
+import {
+    Actor, Color, ExcaliburGraphicsContextWebGL, Font, FontUnit, Graphic, GraphicsGroup, Rectangle, ScreenElement, Text, TextAlign, vec,
+    type Engine, type ExcaliburGraphicsContext,
+} from "excalibur";
 import { FOOTPRINT_RATIO } from "../art/atlas.ts";
 import { chunkKey, chunkRect, LOAD_DISTANCE, UNLOAD_DISTANCE, worldRect } from "./chunks.ts";
 import { Z } from "./collide.ts";
@@ -26,14 +29,13 @@ export interface DebugSource {
     bloom: () => string;
 }
 
-function ellipse(ex: ExcaliburGraphicsContext, cx: number, cy: number, r: number, color: Color, thickness: number): void {
-    const steps = 72;
-    let px = cx + r;
+function ellipse(ex: ExcaliburGraphicsContext, cx: number, cy: number, rx: number, ry: number, color: Color, thickness: number, steps = 64): void {
+    let px = cx + rx;
     let py = cy;
     for (let i = 1; i <= steps; i++) {
         const a = (i / steps) * Math.PI * 2;
-        const x = cx + Math.cos(a) * r;
-        const y = cy + Math.sin(a) * r;
+        const x = cx + Math.cos(a) * rx;
+        const y = cy + Math.sin(a) * ry;
         ex.drawLine(vec(px, py), vec(x, y), color, thickness);
         px = x;
         py = y;
@@ -61,12 +63,14 @@ class WorldDebugGraphic extends Graphic {
                 ex.drawLine(vec(r.x, r.y + r.h), vec(r.x + r.w, r.y + r.h), color, t);
             }
         }
-        for (const c of s.colliders) {
-            ellipse(ex, c.x, c.y, c.rx, COLLIDER, 1.5);
-        }
         const h = this.src.hero();
-        ellipse(ex, h.x, h.y, LOAD_DISTANCE, REACH_IN, 3);
-        ellipse(ex, h.x, h.y, UNLOAD_DISTANCE, REACH_OUT, 3);
+        for (const c of s.colliders) {
+            if (Math.abs(c.x - h.x) > 900 || Math.abs(c.y - h.y) > 600) continue;
+            ellipse(ex, c.x, c.y, c.rx, c.ry, COLLIDER, 1.5, 20);
+        }
+        // streaming measures plain distance in world pixels, so the reach is a circle on screen
+        ellipse(ex, h.x, h.y, LOAD_DISTANCE, LOAD_DISTANCE, REACH_IN, 3);
+        ellipse(ex, h.x, h.y, UNLOAD_DISTANCE, UNLOAD_DISTANCE, REACH_OUT, 3);
     }
 
     clone(): WorldDebugGraphic {
@@ -135,9 +139,12 @@ export class StreamingDebug {
             text: "",
             font: new Font({ family: "monospace", size: 13, unit: FontUnit.Px, color: Color.fromHex("#E8E4D8"), textAlign: TextAlign.Left, shadow: { blur: 2, offset: vec(1, 1), color: Color.Black } }),
         });
-        this.readout = new ScreenElement({ x: 16, y: 16, z: Z.hud });
-        this.readout.graphics.use(this.text);
-        this.readout.graphics.anchor = vec(0, 0);
+        this.readout = new ScreenElement({ x: 12, y: 12, z: Z.hud });
+        const panel = new Rectangle({ width: 470, height: 196, color: Color.fromRGB(5, 6, 9, 0.82) });
+        this.readout.graphics.use(new GraphicsGroup({
+            useAnchor: false,
+            members: [{ graphic: panel, offset: vec(0, 0) }, { graphic: this.text, offset: vec(12, 10) }],
+        }));
     }
 
     get visible(): boolean {

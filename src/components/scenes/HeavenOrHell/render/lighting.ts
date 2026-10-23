@@ -71,19 +71,22 @@ void main() {
     float gy = lum(texture(u_graphic, v_uv + vec2(0.0, px.y))) - lum(texture(u_graphic, v_uv - vec2(0.0, px.y)));
     vec3 n = normalize(vec3(-gx * u_bump, -gy * u_bump, 1.0));
 
-    vec3 light = u_ambient;
+    vec3 light = vec3(0.0);
     for (int i = 0; i < ${MAX_LIGHTS}; i++) {
         if (i >= u_count) break;
         vec4 a = u_lights[i * 2];
         vec4 b = u_lights[i * 2 + 1];
         vec2 d = a.xy - v_world;
-        d.y /= u_ratio;
+        // below the light on screen is nearer ground; above it is as often a wall rising, so it reaches further up
+        d.y *= d.y < 0.0 ? 1.0 / u_ratio : 0.8;
         float t = clamp(1.0 - length(d) / a.z, 0.0, 1.0);
         float att = t * t;
         vec3 dir = normalize(vec3(d, 70.0));
         float facing = 0.45 + 0.55 * max(dot(n, dir), 0.0);
         light += b.rgb * (a.w * att * facing);
     }
+    // where pools overlap, roll off instead of burning the stone to white
+    light = u_ambient + light * 1.2 / (1.0 + light * 0.45);
 
     // toon: pull the light toward a few flat steps without hard aliasing
     float m = max(light.r, max(light.g, light.b));
