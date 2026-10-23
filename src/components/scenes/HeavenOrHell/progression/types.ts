@@ -93,6 +93,7 @@ export type TrumpetRarity = "Normal" | "Cracked" | "Archangel" | "Abyssal";
 export type TrumpetId = "coalOfTheAltar" | "wheelWithinAWheel" | "firmamentDome" | "noiseOfGreatWaters" | "michaelsCharge" | "keyOfThePit";
 export type ShrineId = "scales" | "refining" | "joinedWings" | "partedWings" | "lots" | "mouth";
 export type CorruptionTier = 0 | 1 | 2 | 3 | 4 | 5;
+export type DifficultyId = "stillWaters" | "narrowWay" | "furnaceOfAffliction" | "sonOfTheMorning";
 export type StainSourceId =
     | "demonHeart"
     | "brandAccepted"
@@ -152,6 +153,7 @@ export interface CreationInput {
     /** Points placed at creation, not counting the Choir's +3/+2. */
     allocation: Partial<Attributes>;
     penances: PenanceId[];
+    difficulty: DifficultyId;
 }
 
 export interface Character {
@@ -233,6 +235,7 @@ export type RunStatus = "alive" | "castOut" | "fallen";
 
 export interface RunState {
     seed: number;
+    difficulty: DifficultyId;
     rng: number;
     status: RunStatus;
     character: Character;

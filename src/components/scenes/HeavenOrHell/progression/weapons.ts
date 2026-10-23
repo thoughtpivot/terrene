@@ -4,7 +4,7 @@
  */
 
 import type { ArmsAttribute, Item, RunState, StartingWeaponId, WeaponId } from "./types";
-import { WEAPON_DROP_CHANCE } from "./tuning";
+import { WEAPON_DROP_CHANCE, difficultyDef } from "./tuning";
 import { tierOf, tierScaling } from "./corruption";
 import { rollChance, rollWeighted } from "./rng";
 
@@ -45,9 +45,9 @@ export function weaponDropTable(run: RunState): { item: WeaponId; weight: number
         .map((id) => ({ item: id, weight: WEAPONS[id].dropWeight }));
 }
 
-/** The item a weapon would be at the current tier. */
+/** The item a weapon would be at the current tier and difficulty. */
 export function weaponItem(run: RunState, id: WeaponId): Omit<Item, "id"> {
-    return { slot: "weapon", weapon: id, tier: tierScaling(tierOf(run)).weaponTier, anointing: null, soulbound: false };
+    return { slot: "weapon", weapon: id, tier: tierScaling(tierOf(run)).weaponTier + difficultyDef(run.difficulty).lootTierBonus, anointing: null, soulbound: false };
 }
 
 /** A seeded drop roll. Returns the weapon (not yet added to the inventory) or null. */

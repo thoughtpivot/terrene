@@ -1,14 +1,14 @@
 import {
     Attributes,
-    CORRUPTION_POINTS_PER_HOUR,
-    CORRUPTION_POINTS_PER_TIER,
     CreationInput,
+    DifficultyId,
     MetaState,
     Result,
     RunState,
     buildRun,
     defaultAppearance,
     freshMeta,
+    secondsPerTier,
     seedRng,
 } from "../src/components/scenes/HeavenOrHell/progression/index.ts";
 
@@ -26,6 +26,7 @@ export function baseInput(over: Partial<CreationInput> = {}): CreationInput {
         appearance: defaultAppearance(choir),
         allocation: { seraphFire: 10, faith: 5, mediumArms: 5, steadfast: 5 },
         penances: [],
+        difficulty: "narrowWay",
         ...over,
     };
 }
@@ -48,12 +49,12 @@ export function makeRun(over: Partial<CreationInput> = {}, meta: MetaState = fre
     return unwrap(buildRun(baseInput(over), meta, seed));
 }
 
-export function tierSeconds(tier: number): number {
-    return ((tier * CORRUPTION_POINTS_PER_TIER) / CORRUPTION_POINTS_PER_HOUR) * 3600;
+export function tierSeconds(tier: number, difficulty: DifficultyId = "narrowWay"): number {
+    return tier * secondsPerTier(difficulty);
 }
 
 export function atTier(run: RunState, tier: number): RunState {
-    return { ...run, elapsedSeconds: tierSeconds(tier) };
+    return { ...run, elapsedSeconds: tierSeconds(tier, run.difficulty) };
 }
 
 export function withAttrs(run: RunState, attrs: Partial<Attributes>): RunState {

@@ -6,7 +6,7 @@
 
 import type { CleanseId, Result, RunState, StainSourceId, TongueId } from "./types";
 import { fail, ok } from "./types";
-import { STAIN_AMOUNTS } from "./tuning";
+import { STAIN_AMOUNTS, difficultyDef } from "./tuning";
 import { WATCHER_KIN_STAIN_MULT } from "./choirs";
 import { scaleCost, tierOf } from "./corruption";
 
@@ -64,8 +64,9 @@ export const STAIN_THRESHOLDS: readonly StainThreshold[] = [
 
 export const CRACKED_HALO_SANCTITY_MULT = 0.9;
 
+/** Watcher-kin's flaw times the difficulty's Stain rate. */
 export function stainGainMultiplier(run: RunState): number {
-    return run.character.choir === "watcherKin" ? WATCHER_KIN_STAIN_MULT : 1;
+    return (run.character.choir === "watcherKin" ? WATCHER_KIN_STAIN_MULT : 1) * difficultyDef(run.difficulty).stainGainMult;
 }
 
 /** Adds Stain from a source (or a raw amount). Reaching 100 is the Fall. */

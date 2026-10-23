@@ -1,6 +1,7 @@
 /**
  * Character creation, in order: Choir, Tongues (up to two, or Wordless), Arms,
- * Boons and Burdens, Origin, Appearance, then the Testimony shop and Penances.
+ * Boons and Burdens, Origin, Appearance, the Testimony shop and Penances, and
+ * last the run's difficulty, which sets the corruption pace and enemy scaling.
  * Points: 15 free, plus the Choir's +3/+2. Wordless gets 10 more free points;
  * Tongue-takers get 10 points that must go into their Tongues.
  */
@@ -17,9 +18,9 @@ import { appearanceErrors } from "./appearance";
 import { PENANCES, upgradeValue } from "./meta";
 import { emptySlots } from "./hymns";
 import { seedRng } from "./rng";
-import { STARTING_FEATHERS, TONGUE_BOUND_CREATION_POINTS } from "./tuning";
+import { DIFFICULTIES, STARTING_FEATHERS, TONGUE_BOUND_CREATION_POINTS } from "./tuning";
 
-export const CREATION_STEPS = ["choir", "tongues", "arms", "boonsAndBurdens", "origin", "appearance", "testimonyAndPenances"] as const;
+export const CREATION_STEPS = ["choir", "tongues", "arms", "boonsAndBurdens", "origin", "appearance", "testimonyAndPenances", "difficulty"] as const;
 export type CreationStep = (typeof CREATION_STEPS)[number];
 
 export interface CreationBudget {
@@ -49,9 +50,9 @@ function stepIndex(step: CreationStep): number {
 /**
  * Returns every rule the input breaks, as error codes. With `upTo`, only the
  * steps up to and including that one are checked, so a UI can validate as it goes.
- * Attribute allocation is checked with the last step.
+ * Attribute allocation is checked with the Testimony and Penances step.
  */
-export function validateCreation(input: CreationInput, meta: MetaState, upTo: CreationStep = "testimonyAndPenances"): string[] {
+export function validateCreation(input: CreationInput, meta: MetaState, upTo: CreationStep = "difficulty"): string[] {
     const errors: string[] = [];
     const last = stepIndex(upTo);
     const choir = CHOIRS[input.choir];
@@ -95,6 +96,9 @@ export function validateCreation(input: CreationInput, meta: MetaState, upTo: Cr
     if (new Set(input.penances).size !== input.penances.length) errors.push("penances:duplicate");
     if (input.penances.some((p: PenanceId) => !PENANCES[p])) errors.push("penances:unknown");
     errors.push(...allocationErrors(input));
+    if (last < stepIndex("difficulty")) return errors;
+
+    if (!DIFFICULTIES.some((d) => d.id === input.difficulty)) errors.push("difficulty:unknown");
     return errors;
 }
 
@@ -146,6 +150,7 @@ export function buildRun(input: CreationInput, meta: MetaState, seed: number): R
     const startingStain = variant?.startingStain ?? 0;
     return ok({
         seed,
+        difficulty: input.difficulty,
         rng: seedRng(seed),
         status: "alive",
         character: {

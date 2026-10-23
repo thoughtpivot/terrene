@@ -7,10 +7,14 @@
 import type { MetaState, Result, RunState } from "./types";
 import { fail, ok } from "./types";
 import { freshMeta } from "./meta";
+import { DEFAULT_DIFFICULTY, DIFFICULTIES, difficultyDef } from "./tuning";
 
 export const SAVE_KEY = "heaven-or-hell-progression";
 export const SAVE_FORMAT = "heaven-or-hell-progression";
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
+
+/** Version 1 runs had no difficulty and a fixed 100 minutes per tier. */
+export const V1_MINUTES_PER_TIER = 100;
 
 export interface SaveFile {
     format: typeof SAVE_FORMAT;
@@ -20,7 +24,27 @@ export interface SaveFile {
 }
 
 /** Upgrades older saves one version at a time. Index n migrates version n to n + 1. */
-const MIGRATIONS: ((save: Record<string, unknown>) => Record<string, unknown>)[] = [];
+const MIGRATIONS: ((save: Record<string, unknown>) => Record<string, unknown>)[] = [migrateV1ToV2];
+
+/** Gives old runs the default difficulty and rescales their clock so they keep the same corruption level. */
+function migrateV1ToV2(save: Record<string, unknown>): Record<string, unknown> {
+    if (!isObject(save.run)) return { ...save, version: 2 };
+    const run = save.run;
+    const character = isObject(run.character) ? run.character : {};
+    const creation = isObject(character.creation) ? character.creation : {};
+    const elapsed = typeof run.elapsedSeconds === "number" ? run.elapsedSeconds : 0;
+    const scale = difficultyDef(DEFAULT_DIFFICULTY).minutesPerTier / V1_MINUTES_PER_TIER;
+    return {
+        ...save,
+        version: 2,
+        run: {
+            ...run,
+            difficulty: DEFAULT_DIFFICULTY,
+            elapsedSeconds: elapsed * scale,
+            character: { ...character, creation: { ...creation, difficulty: DEFAULT_DIFFICULTY } },
+        },
+    };
+}
 
 export function serializeSave(meta: MetaState, run: RunState | null): string {
     const file: SaveFile = { format: SAVE_FORMAT, version: SAVE_VERSION, meta, run };
@@ -39,6 +63,7 @@ function runShapeError(run: Record<string, unknown>): string | null {
     for (const key of RUN_ARRAYS) if (!Array.isArray(run[key])) return `run.${key}`;
     if (!isObject(run.character) || !isObject((run.character as Record<string, unknown>).attributes)) return "run.character";
     if (run.status !== "alive" && run.status !== "castOut" && run.status !== "fallen") return "run.status";
+    if (!DIFFICULTIES.some((d) => d.id === run.difficulty)) return "run.difficulty";
     return null;
 }
 

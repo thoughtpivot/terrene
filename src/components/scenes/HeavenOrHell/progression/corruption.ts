@@ -1,13 +1,14 @@
 /**
  * World Corruption, the run's clock. Heaven decays at its own steady rate:
- * the level depends only on elapsed play time. Sealing a breach never lowers
+ * the level depends only on elapsed play time and the run's difficulty,
+ * which sets the minutes per tier. Sealing a breach never lowers
  * it; it freezes that region's local tier. There is no cap on player strength
  * per tier. Each tier scales enemies, loot and costs, and unlocks systems.
  */
 
-import type { CorruptionTier, Result, RunState } from "./types";
+import type { CorruptionTier, DifficultyId, Result, RunState } from "./types";
 import { fail, ok } from "./types";
-import { CORRUPTION_POINTS_PER_HOUR, CORRUPTION_POINTS_PER_TIER, TIER_SCALING, TierScaling } from "./tuning";
+import { CORRUPTION_POINTS_PER_TIER, DEFAULT_DIFFICULTY, TIER_SCALING, TierScaling, difficultyDef } from "./tuning";
 import { MAX_ASCENSION } from "./attributes";
 
 export const MAX_TIER: CorruptionTier = 5;
@@ -94,24 +95,33 @@ export const TIERS: Record<CorruptionTier, TierDef> = {
     },
 };
 
-export function corruptionPoints(elapsedSeconds: number): number {
-    return (Math.max(0, elapsedSeconds) / 3600) * CORRUPTION_POINTS_PER_HOUR;
+/** Seconds of play per tier at a difficulty. */
+export function secondsPerTier(difficulty: DifficultyId = DEFAULT_DIFFICULTY): number {
+    return difficultyDef(difficulty).minutesPerTier * 60;
 }
 
-export function tierAt(elapsedSeconds: number): CorruptionTier {
-    return Math.min(MAX_TIER, Math.floor(corruptionPoints(elapsedSeconds) / CORRUPTION_POINTS_PER_TIER)) as CorruptionTier;
+export function corruptionPoints(elapsedSeconds: number, difficulty: DifficultyId = DEFAULT_DIFFICULTY): number {
+    return (Math.max(0, elapsedSeconds) / secondsPerTier(difficulty)) * CORRUPTION_POINTS_PER_TIER;
 }
 
-export function tierOf(run: Pick<RunState, "elapsedSeconds">): CorruptionTier {
-    return tierAt(run.elapsedSeconds);
+export function tierAt(elapsedSeconds: number, difficulty: DifficultyId = DEFAULT_DIFFICULTY): CorruptionTier {
+    return Math.min(MAX_TIER, Math.floor(Math.max(0, elapsedSeconds) / secondsPerTier(difficulty))) as CorruptionTier;
+}
+
+export function tierOf(run: Pick<RunState, "elapsedSeconds" | "difficulty">): CorruptionTier {
+    return tierAt(run.elapsedSeconds, run.difficulty);
 }
 
 /** Seconds of play until the next tier, or null at the last tier. */
-export function secondsToNextTier(elapsedSeconds: number): number | null {
-    const tier = tierAt(elapsedSeconds);
+export function secondsToNextTier(elapsedSeconds: number, difficulty: DifficultyId = DEFAULT_DIFFICULTY): number | null {
+    const tier = tierAt(elapsedSeconds, difficulty);
     if (tier >= MAX_TIER) return null;
-    const target = ((tier + 1) * CORRUPTION_POINTS_PER_TIER * 3600) / CORRUPTION_POINTS_PER_HOUR;
-    return Math.max(0, target - elapsedSeconds);
+    return Math.max(0, (tier + 1) * secondsPerTier(difficulty) - elapsedSeconds);
+}
+
+/** Minutes of play from kindling to the last tier at a difficulty. */
+export function minutesToLastTier(difficulty: DifficultyId): number {
+    return difficultyDef(difficulty).minutesPerTier * MAX_TIER;
 }
 
 /** Advances the clock. Time only moves forward. */

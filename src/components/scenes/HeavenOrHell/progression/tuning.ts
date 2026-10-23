@@ -6,7 +6,7 @@
  * shrine prices from the doc) live next to the rules that use them.
  */
 
-import type { CorruptionTier, GiftRarity, TrumpetRarity } from "./types";
+import type { CorruptionTier, DifficultyId, GiftRarity, TrumpetRarity } from "./types";
 
 /** Points that Tongue-takers must place in their Tongues, so every build reaches 330. */
 export const TONGUE_BOUND_CREATION_POINTS = 10;
@@ -60,9 +60,80 @@ export const STAIN_AMOUNTS = {
     forbiddenVow: 10,
 };
 
-/** Corruption points gained per hour of play, and points per tier. Tier 5 at 500 points. */
-export const CORRUPTION_POINTS_PER_HOUR = 60;
+/** Corruption points per tier. Tier 5 at 500 points. The pace comes from the difficulty. */
 export const CORRUPTION_POINTS_PER_TIER = 100;
+
+export interface DifficultyDef {
+    id: DifficultyId;
+    name: string;
+    subtitle: string;
+    epigraph: { text: string; ref: string };
+    /** Picker accent, from white Heaven to red Hell. */
+    accent: "white" | "gold" | "orange" | "red";
+    /** Minutes of play per Corruption Tier. Shorter means a shorter, easier run. */
+    minutesPerTier: number;
+    /** Multiplies the tier's enemy scaling. */
+    enemy: { hp: number; posture: number; damage: number; aggression: number };
+    stainGainMult: number;
+    /** Added to the tier's weapon and loot tier. */
+    lootTierBonus: number;
+}
+
+/** Ordered easiest to hardest. Son of the Morning keeps the original 100-minute pace. */
+export const DIFFICULTIES: readonly DifficultyDef[] = [
+    {
+        id: "stillWaters",
+        name: "Still Waters",
+        subtitle: "A short watch, gently kept",
+        epigraph: { text: "He maketh me to lie down in green pastures: he leadeth me beside the still waters.", ref: "Psalm 23:2" },
+        accent: "white",
+        minutesPerTier: 40,
+        enemy: { hp: 0.7, posture: 0.8, damage: 0.7, aggression: 0.8 },
+        stainGainMult: 0.75,
+        lootTierBonus: 0,
+    },
+    {
+        id: "narrowWay",
+        name: "The Narrow Way",
+        subtitle: "The road as it was meant to be walked",
+        epigraph: { text: "Strait is the gate, and narrow is the way, which leadeth unto life, and few there be that find it.", ref: "Matthew 7:14" },
+        accent: "gold",
+        minutesPerTier: 60,
+        enemy: { hp: 1, posture: 1, damage: 1, aggression: 1 },
+        stainGainMult: 1,
+        lootTierBonus: 0,
+    },
+    {
+        id: "furnaceOfAffliction",
+        name: "The Furnace of Affliction",
+        subtitle: "A longer siege, refined by fire",
+        epigraph: { text: "Behold, I have refined thee, but not with silver; I have chosen thee in the furnace of affliction.", ref: "Isaiah 48:10" },
+        accent: "orange",
+        minutesPerTier: 80,
+        enemy: { hp: 1.25, posture: 1.15, damage: 1.2, aggression: 1.15 },
+        stainGainMult: 1.15,
+        lootTierBonus: 1,
+    },
+    {
+        id: "sonOfTheMorning",
+        name: "Son of the Morning",
+        subtitle: "The longest war, against the fallen star",
+        epigraph: { text: "How art thou fallen from heaven, O Lucifer, son of the morning!", ref: "Isaiah 14:12" },
+        accent: "red",
+        minutesPerTier: 100,
+        enemy: { hp: 1.5, posture: 1.3, damage: 1.4, aggression: 1.3 },
+        stainGainMult: 1.3,
+        lootTierBonus: 1,
+    },
+];
+
+export const DEFAULT_DIFFICULTY: DifficultyId = "narrowWay";
+
+export function difficultyDef(id: DifficultyId): DifficultyDef {
+    const def = DIFFICULTIES.find((d) => d.id === id);
+    if (!def) throw new Error(`unknown difficulty ${id}`);
+    return def;
+}
 
 export interface TierScaling {
     enemyHp: number;

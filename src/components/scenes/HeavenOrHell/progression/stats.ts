@@ -16,7 +16,7 @@ import { HYMNS, equippedHymns, hymnGraceCost, hymnLevelCap, hymnShape } from "./
 import { stainEffects } from "./stain";
 import { tierOf, tierScaling } from "./corruption";
 import { vowConsequences } from "./vows";
-import { TRUMPET_PROGRESS_MAX } from "./tuning";
+import { TRUMPET_PROGRESS_MAX, difficultyDef } from "./tuning";
 
 export const OUTCRY_FERVOUR = 40;
 
@@ -162,8 +162,14 @@ export function deriveCombatStats(run: RunState): CombatStats {
     };
 }
 
-/** Enemy multipliers for the current tier, for combat to apply to spawned foes. */
+/** Enemy multipliers for the current tier and difficulty, for combat to apply to spawned foes. */
 export function enemyScaling(run: RunState): { hp: number; posture: number; damage: number; aggression: number } {
     const s = tierScaling(tierOf(run));
-    return { hp: s.enemyHp, posture: s.enemyPosture, damage: s.enemyDamage, aggression: s.enemyAggression };
+    const d = difficultyDef(run.difficulty).enemy;
+    return { hp: s.enemyHp * d.hp, posture: s.enemyPosture * d.posture, damage: s.enemyDamage * d.damage, aggression: s.enemyAggression * d.aggression };
+}
+
+/** Weapon and loot tier for drops: the corruption tier's, plus the difficulty's bonus. */
+export function lootTier(run: RunState): number {
+    return tierScaling(tierOf(run)).lootTier + difficultyDef(run.difficulty).lootTierBonus;
 }
