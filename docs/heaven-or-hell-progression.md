@@ -23,6 +23,9 @@ It's the companion to [heaven-or-hell-plan.md](./heaven-or-hell-plan.md), which 
 9. **Boons and Burdens** is the name for Deepwoken's Boons and Flaws.
 10. **Currencies are confirmed.** Visions are spent within a run and lost on a wipe. Testimony and Remembrance carry over. Grace is the mana for Hymns.
 11. **Four run difficulties, chosen at creation.** Easier difficulties make a run shorter and easier; harder ones make it longer and harsher. The difficulty sets the corruption pace (minutes per Corruption Tier, with the hardest keeping 100) and multiplies enemy health, posture, damage and aggression (section 1, step 8, and section 10).
+12. **Goetic names.** Goetic spirits keep their real Ars Goetia names, shown with a rank title underneath: "Bael, King of the Pit", "Focalor, Duke of the Pit" (section 10).
+13. **Allied angels can fall.** Allies roam the map, fight beside you and die easily. A dead or overwhelmed ally can be corrupted into a Fallen Angel, the lowest common enemy, through a quick fall animation that never pauses play. Named corrupted angels stay the elite and boss tier.
+14. **Scripture is quoted from the KJV,** with Tobit from the KJV's Apocrypha.
 
 ## Glossary
 
@@ -76,7 +79,9 @@ It's the companion to [heaven-or-hell-plan.md](./heaven-or-hell-plan.md), which 
 | Critical | Critical | R: one heavy attack per weapon, with its own cooldown. It can't be feinted |
 | Air dash | – | A short wing-beat dash with its own cooldown and no i-frames, separate from the roll |
 | Weapon tier | – | Plain, Tempered, Hallowed, Exalted or Glorious, from weakest to strongest |
-| World Corruption | – | The run's clock. It rises at a steady rate and crosses Tiers 0 to 5 |
+| World Corruption | – | The run's clock. It rises at a steady rate set by the difficulty (one tier every 40, 60, 80 or 100 minutes), and crosses Tiers 0 to 5 |
+| Fallen Angel | – | An allied angel that died or was overwhelmed and was corrupted: the lowest common enemy. Not the same as a Fallen variant, which is your own Choir at 50 Stain |
+| "<Rank> of the Pit" | – | The title shown under a Goetic spirit's real name, using its Ars Goetia rank: "Bael, King of the Pit" |
 | Breach | – | A wound where Hell pushes in. Open breaches speed up their region's corruption |
 | Struck down | Death | Your HP hitting zero. The first time dims your halo, and the second casts you out |
 | Dimmed halo | Stained health | The mark of your first time struck down. Part of your health can't be healed until you pray at an altar or Ascend |
@@ -401,7 +406,7 @@ Across the eight Choirs, Wisdom and Faith each total 8 points, Steadfast and Voi
 
 ### Banneret (an echo of the Principalities)
 
-**Lore.** The Principalities are traditionally guardians of peoples and groups. The Bannerets carry that care. They fight best with other angels around them and lose heart alone. In a solo game, their allies are Heaven's own: the allied angel NPCs who fight at the breaches.
+**Lore.** The Principalities are traditionally guardians of peoples and groups. The Bannerets carry that care. They fight best with other angels around them and lose heart alone. In a solo game, their allies are Heaven's own: the allied angel NPCs who roam the map and fight at the breaches. Those allies are fragile, and one that dies or is overwhelmed can fall and turn on you (see the plan's [Fallen Angels](./heaven-or-hell-plan.md#fallen-angels-the-common-tier)).
 
 **Look.** A banner-cloth hanging from the wings and a lantern-shaped halo. The body is dark linen-grey, and the lantern glows gold.
 
@@ -658,15 +663,15 @@ Pressing C sounds your **Trumpet** (Revelation 9:1, "the fifth angel sounded"). 
 1. *Thy Sin Purged* (Normal): heals allies in an area and purges their ailments ("thine iniquity is taken away, and thy sin purged," Isaiah 6:6–7).
 2. *Wheel within a Wheel* (Normal): an eye-wheel orbits you and deflects projectiles (Ezekiel 1:16–18).
 3. *Terrible Crystal* (Normal): a brief crystal dome that blocks attacks (Ezekiel 1:22).
-4. *Voice of the Almighty* (Cracked): a huge wing-roar that stuns, but each use costs 40 Sanctity, like Deepwoken's Mania downside ("as the noise of great waters, as the voice of the Almighty," Ezekiel 1:24).
+4. *Voice of the Almighty* (Cracked): a huge wing-roar that stuns, but each use costs 40 Sanctity, like Deepwoken's Mania downside ("like the noise of great waters, as the voice of the Almighty," Ezekiel 1:24).
 5. *Michael's Charge* (Archangel): teleport and strike a marked foe (Revelation 12:7).
-6. *The Pit Opened* (Abyssal): smoke that "darkened the sun" and a locust swarm. Each use costs 10% of your max HP as Ash, a Wither-like effect, and adds 5 Stain (Revelation 9:2–3).
+6. *The Pit Opened* (Abyssal): smoke by which "the sun and the air were darkened," and a locust swarm. Each use costs 10% of your max HP as Ash, a Wither-like effect, and adds 5 Stain (Revelation 9:2–3).
 
 ## 10. Corruption tiers: the power curve
 
 This system is new and has no Deepwoken equivalent. **World Corruption** is the run's clock.
 
-**How it rises (decided).** Heaven decays at its own rate, driven by time. World Corruption rises at a steady, designed rate, and nothing the player does lowers it. **The pace depends on the run's difficulty** (section 1, step 8): a new tier begins every 40 minutes of play on Still Waters, 60 on The Narrow Way, 80 on The Furnace of Affliction and 100 on Son of the Morning. So Tier 5 arrives 3 h 20 min, 5 h, 6 h 40 min or 8 h 20 min into a run. The difficulty also multiplies the enemy numbers in the table below. *This reading of Dan's "decays at its own rate" is an interpretation that Dan can adjust.*
+**How it rises (decided).** Heaven decays at its own rate, driven by time. World Corruption rises at a steady, designed rate, and nothing the player does lowers it. **The pace depends on the run's difficulty** (section 1, step 8): a new tier begins every 40 minutes of play on Still Waters, 60 on The Narrow Way, 80 on The Furnace of Affliction and 100 on Son of the Morning. So Tier 5 arrives 3 h 20 min, 5 h, 6 h 40 min or 8 h 20 min into a run. Each pace is a tuning constant, `minutesPerTier` on the difficulty's entry in `DIFFICULTIES` in `progression/tuning.ts`, with `CORRUPTION_POINTS_PER_TIER` at 100. The difficulty also multiplies the enemy numbers in the table below. *This reading of Dan's "decays at its own rate" is an interpretation that Dan can adjust.*
 
 **What breaches do.** Breaches don't change the world's tier, but they change their own region:
 - Each region has a local corruption level that follows the world tier.
@@ -717,7 +722,7 @@ Every number is a starting value to tune. Enemy numbers are multipliers on each 
 ### Tier 0: The Calm Courts
 
 - **Map:** a few small breaches.
-- **Enemies:** imps, locust scouts and Goetic **Knights**. The enemy ranks use the Ars Goetia's titles: Knight, President, Count, Marquis, Duke, Prince, King. The read traits are mostly gullible, so this is where you learn to feint (section 14). A Knight captain guards the first breach as a mini-boss.
+- **Enemies:** imps, locust scouts, **Fallen Angels** (allies who fell, the lowest common, gullible readers) and Goetic **Knights**. The enemy ranks use the Ars Goetia's titles: Knight, President, Earl, Marquis, Duke, Prince, King. Goetic spirits keep their real names, shown with their rank underneath as "<Rank> of the Pit", for example "Bael, King of the Pit" (decided). The read traits are mostly gullible, so this is where you learn to feint (section 14). A Knight captain guards the first breach as a mini-boss.
 - **Weapons and loot:** Plain weapons, with the odd Tempered drop. No named weapons yet.
 - **Progression:** the base rates. Gift hands have 4 cards and no mutually exclusive picks.
 - **Unlocks:** the 4 base Tongues, Hymns, Gifts, and the Shrines of Refining and Joined Wings.
@@ -725,7 +730,7 @@ Every number is a starting value to tune. Enemy numbers are multipliers on each 
 ### Tier 1: Smoke from the Pit (Revelation 9:2)
 
 - **Map:** fog creeps over the Outer Courts.
-- **Enemies:** Presidents and Counts (for example Malphas, Halphas, Furfur), who are wary readers. **Legion** appears as a roaming elite whose bodies share one adaptive memory. First world boss: the vanguard of Abaddon.
+- **Enemies:** Presidents and Earls (for example Malphas, President of the Pit, and Halphas and Furfur, Earls of the Pit), who are wary readers. **Legion** appears as a roaming elite whose bodies share one adaptive memory. First world boss: the vanguard of Abaddon.
 - **Weapons and loot:** Tempered becomes common, and Hallowed starts to drop. The first named weapon can appear: the **Spear of the Host**, earned through the Host of the Gate.
 - **Progression:** experience per Ascension rises by 15%. Gift hands have 4 to 5 cards.
 - **Rewards:** first boss kills pay 3 Visions.
@@ -984,8 +989,8 @@ Every enemy has one read trait. Each trait's numbers can shift by enemy type, an
 
 | Trait | Read delay | Commit chance | How it handles feints | Examples |
 | --- | --- | --- | --- | --- |
-| Gullible | 0.10 s | 80% | Almost always commits, always falls for a feint, and never learns | Imps, locust scouts, Goetic Knights |
-| Wary | 0.25 s | 35% | Waits until late in your wind-up, so only a late feint baits it. If it sees a feint without committing, it attacks into your recovery 50% of the time | Presidents, Counts, crowned locusts, Leviathan |
+| Gullible | 0.10 s | 80% | Almost always commits, always falls for a feint, and never learns | Imps, locust scouts, Fallen Angels, Goetic Knights |
+| Wary | 0.25 s | 35% | Waits until late in your wind-up, so only a late feint baits it. If it sees a feint without committing, it attacks into your recovery 50% of the time | Presidents, Earls, crowned locusts, Leviathan |
 | Adaptive | 0.15 s | 60%, falling as it learns | Learns your feint habits (see below) | Legion, corrupted angels, Goetic Kings, Abaddon, the dragon, the beasts |
 | Unreading | – | 0% | Never reacts to wind-ups, so feints do nothing. Break it with posture or Hymns instead | Locust swarms, Behemoth |
 
@@ -1041,6 +1046,7 @@ The world questions that affect progression (the map's size, the hub, how a run 
 - https://deepwoken.fandom.com/wiki/Boons_and_Flaws
 - https://en.wikipedia.org/wiki/Christian_angelology (the nine choirs and the Pseudo-Dionysian hierarchy)
 - https://en.wikipedia.org/wiki/The_Lesser_Key_of_Solomon (the 72 Ars Goetia spirits and their ranks)
+- https://en.wikipedia.org/wiki/List_of_demons_in_the_Ars_Goetia (each spirit's rank, for the "<Rank> of the Pit" titles)
 - https://www.biblegateway.com/passage/?search=Isaiah%206&version=KJV
 - https://www.biblegateway.com/passage/?search=Ezekiel%201&version=KJV
 - https://www.biblegateway.com/passage/?search=Ezekiel%2010&version=KJV

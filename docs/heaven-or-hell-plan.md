@@ -244,6 +244,36 @@ named weapons are found or earned as you grow stronger, gated by
 corruption tier and quests. The prototype is built around the basic sword,
 the baseline every other weapon is tuned against.
 
+**Goetic spirits keep their real names.** The spirits of the Ars Goetia
+keep their names, shown with a rank title underneath in the form
+"<Rank> of the Pit": Bael, King of the Pit; Focalor, Duke of the Pit;
+Andras, Marquis of the Pit. The rank is the one the Ars Goetia gives. See
+[Named demons](#hell-the-enemies).
+
+**Allied angels fight beside you, and they fall.** Allied angels roam the
+open map and fight alongside the player. They're fragile and die easily. A
+dead or overwhelmed ally can be corrupted into a **Fallen Angel**, the
+lowest enemy tier (a common). The corruption plays a quick fall animation
+that never pauses gameplay, then the Fallen Angel attacks. Named corrupted
+angels stay the elite and boss tier. See
+[Fallen Angels](#fallen-angels-the-common-tier).
+
+**The KJV for all scripture.** Every scripture quote uses the King James
+Version, with Tobit from the KJV's Apocrypha.
+
+**The music pulses on the 808.** On 808 hits in the score, and only those,
+the screen gives a subtle vibration whose size rises with the Corruption
+Tier (0 to 5), plus a glow and bloom pulse. It isn't screen shake: the
+camera shake stays reserved for hits and parries. There's no setting to
+turn it off yet, because settings come later. See
+[Beat pulse](#beat-pulse).
+
+**Corruption pace.** The old "about 2 hours per tier" is gone. Each
+difficulty's pace (40, 60, 80 or 100 minutes per tier) is a tuning
+constant, `minutesPerTier` in `progression/tuning.ts`, matching the
+progression code. The original single pace, 100 minutes (1 hour 40
+minutes), is kept by the hardest difficulty, Son of the Morning.
+
 ### Resolved since the first draft
 
 - **What "Heaven Or Hell" means in play.** Resolved by the premise: you
@@ -288,6 +318,13 @@ the baseline every other weapon is tuned against.
 - **How long a run lasts.** Resolved: the player picks one of four
   difficulties at creation, and it sets the corruption pace. Tier 5
   arrives after 3 h 20 min on the easiest and 8 h 20 min on the hardest.
+- **Goetic names.** Resolved: real Ars Goetia names, each with
+  "<Rank> of the Pit" underneath.
+- **Whether allied angels can die or fall.** Resolved: they roam, fight
+  beside you, die easily, and can be corrupted into common Fallen Angels.
+- **Scripture translation.** Resolved: the KJV for every quote.
+- **Music-reactive effects.** Resolved: a beat pulse on 808 hits only,
+  scaled by Corruption Tier, separate from combat screen shake.
 
 ### Not decided yet
 
@@ -399,9 +436,9 @@ for Dan to confirm, apart from where they restate those decisions.
 
 ## Creatures
 
-The creature designs start from the descriptions below. Scripture is quoted
-from the ESV, apart from Tobit and Matthew, which are quoted from the
-NRSVUE. Decided: the angels are allies, demons and creatures of Hell are the
+The creature designs start from the descriptions below. Decided: scripture
+is quoted from the King James Version, and Tobit from the KJV's Apocrypha.
+Decided: the angels are allies, demons and creatures of Hell are the
 main enemies, and corrupted angels are a smaller elite and boss tier. The
 role of each creature is a proposal.
 
@@ -416,31 +453,65 @@ progression doc win.
 
 | Creature | Description | Proposed role |
 | --- | --- | --- |
-| The player | A lesser angel. The premise echoes Revelation 12:7, where "war arose in heaven, Michael and his angels fighting against the dragon" | The hero |
-| Seraphim | Isaiah 6:2–7: "Each had six wings: with two he covered his face, and with two he covered his feet, and with two he flew." They call "Holy, holy, holy," and one carries "a burning coal that he had taken with tongs from the altar" | Allies who fight beside you at breaches, and altar keepers who clear a dimmed halo |
-| Cherubim (the living creatures) | Ezekiel 1:5–14: "a human likeness," "four faces," "four wings," "human hands" under the wings, legs "straight," feet like "a calf's foot," sparkling "like burnished bronze." Each "went straight forward, without turning," and they "darted to and fro, like the appearance of a flash of lightning." Ezekiel 10:14 lists the faces as a cherub's, a human's, a lion's and an eagle's | Guardians of gates and quest givers |
-| Ophanim (the wheels) | Ezekiel 1:15–21 and 10:9–13: "a wheel within a wheel," gleaming "like sparkling beryl," with rims "full of eyes all around." They move "in any of their four directions without turning" and are called "the whirling wheels." *Ophanim* is Hebrew for "wheels" | Sentinels that watch the map. Talking to one reveals nearby breaches, which is a natural source of map knowledge |
-| Thrones | Colossians 1:16 names "thrones or dominions or rulers or authorities" among things created "in heaven." Some Christian angelology treats Thrones as one of the choirs of angels and identifies them with the ophanim. Jewish angelic hierarchies keep the two apart | To be chosen: either the same creature as the ophanim, or a ruler class that grants Vows |
-| The four living creatures of Revelation | Revelation 4:6–8: "like a lion," "like an ox," "with the face of a man," and "like an eagle in flight," "each of them with six wings," "full of eyes all around and within" | Guardians of the Throne region and keepers of lore |
+| The player | A lesser angel. The premise echoes Revelation 12:7: "there was war in heaven: Michael and his angels fought against the dragon" | The hero |
+| Seraphim | Isaiah 6:2–7: "each one had six wings; with twain he covered his face, and with twain he covered his feet, and with twain he did fly." They cry "Holy, holy, holy," and one has "a live coal in his hand, which he had taken with the tongs from off the altar" | Allies who fight beside you at breaches, and altar keepers who clear a dimmed halo |
+| Cherubim (the living creatures) | Ezekiel 1:5–14: "the likeness of a man," "four faces," "four wings," "the hands of a man under their wings," "straight feet," "the sole of a calf's foot," and they "sparkled like the colour of burnished brass." They "went every one straight forward" and "turned not when they went," and they "ran and returned as the appearance of a flash of lightning." Ezekiel 10:14 lists "the face of a cherub," "the face of a man," "the face of a lion" and "the face of an eagle" | Guardians of gates and quest givers |
+| Ophanim (the wheels) | Ezekiel 1:15–21 and 10:9–13: "a wheel in the middle of a wheel," "like unto the colour of a beryl," with rings "full of eyes round about them four." "They went upon their four sides: and they turned not when they went," and in Ezekiel 10:13 they are called "O wheel." *Ophanim* is Hebrew for "wheels" | Sentinels that watch the map. Talking to one reveals nearby breaches, which is a natural source of map knowledge |
+| Thrones | Colossians 1:16 names "thrones, or dominions, or principalities, or powers" among things created "in heaven." Some Christian angelology treats Thrones as one of the choirs of angels and identifies them with the ophanim. Jewish angelic hierarchies keep the two apart | To be chosen: either the same creature as the ophanim, or a ruler class that grants Vows |
+| The four living creatures of Revelation | Revelation 4:6–8: "four beasts full of eyes before and behind," "like a lion," "like a calf," "a face as a man" and "like a flying eagle," which "had each of them six wings about him; and they were full of eyes within" | Guardians of the Throne region and keepers of lore |
+| The Host | Revelation 12:7's "his angels": the rank and file, with no physical description in scripture (the bestiary's A8) | Allies who roam the open map in small bands and fight beside you. They're fragile, and a dead or overwhelmed one can fall (see [Fallen Angels](#fallen-angels-the-common-tier)) |
 
 ### Hell: the enemies
 
 | Creature | Description | Proposed role |
 | --- | --- | --- |
-| Locusts of the pit | Revelation 9:3–10: they rise from the smoke of "the bottomless pit," "like horses prepared for battle," with "crowns of gold," "human faces," "hair like women's hair," "teeth like lions' teeth," "breastplates like breastplates of iron," wings that sound "like the noise of many chariots," and "tails and stings like scorpions" | The common swarm enemy from the first tier. Their stings are the first orange telegraphs a player learns |
-| Abaddon (Apollyon) | Revelation 9:11: the locusts' king is "the angel of the bottomless pit," named Abaddon in Hebrew and Apollyon in Greek. The ESV notes that the names mean "destruction" and "destroyer" | A boss. As an angel of the pit, he sits in the corrupted-angel tier and leads the locust swarms |
-| Legion | Mark 5:2–13: a man "with an unclean spirit" lived "among the tombs" and "wrenched the chains apart." Asked his name, he answered, "My name is Legion, for we are many," and the spirits went into a herd of "about two thousand" pigs | An elite that splits into many bodies when hurt and possesses lesser demons |
-| Behemoth | Job 40:15–24: he "eats grass like an ox," "makes his tail stiff like a cedar," and "his bones are tubes of bronze, his limbs like bars of iron." He lies "in the shelter of the reeds and in the marsh." The ESV calls him "a large animal, exact identity uncertain" | A heavy boss with hyperarmor that charges across open regions |
-| Leviathan | Job 41: "his back is made of rows of shields," "out of his mouth go flaming torches," "out of his nostrils comes forth smoke," and "his breath kindles coals." "Though the sword reaches him, it does not avail." He "makes the deep boil like a pot" and is "king over all the sons of pride." The ESV calls him "a large sea animal, exact identity uncertain" | A boss of the Sea of Glass whose armour has to be broken before it takes damage |
-| The beast from the sea | Revelation 13:1–2: "with ten horns and seven heads, with ten diadems on its horns and blasphemous names on its heads," "like a leopard," with feet "like a bear's" and a mouth "like a lion's mouth." "The dragon gave his power" to it | A late boss |
-| The dragon | Revelation 12:3–9: "a great red dragon, with seven heads and ten horns, and on his heads seven diadems." "His tail swept down a third of the stars of heaven." He fought Michael's angels "and was thrown down" | The invasion's leader and the last-tier boss |
-| Named demons | Tobit 3:8 names "the wicked demon Asmodeus," and Matthew 12:24 names "Beelzebul, the ruler of the demons." The Ars Goetia, part of a 17th-century grimoire called the Lesser Key of Solomon, lists 72 spirits with ranks, such as King Bael, Duke Astaroth, King Asmodeus and King Belial | Ranked enemies using the Ars Goetia's titles, from Knights at the first corruption tier to Kings who roam as bosses (progression doc, section 10). They command camps and lead breaches. Their names and ranks come from these sources. The [bestiary](./heaven-or-hell-bestiary.md) quotes the Ars Goetia's descriptions of their appearance as a starting point for their designs |
+| Fallen Angels | No single verse. Revelation 12:9 says the dragon's "angels were cast out with him," and this game shows the same fall happening to allies during a run | The lowest enemy tier, a common: allied angels that died or were overwhelmed and were corrupted (see [Fallen Angels](#fallen-angels-the-common-tier)) |
+| Locusts of the pit | Revelation 9:3–10: they come out of the smoke of "the bottomless pit," "like unto horses prepared unto battle," with "crowns like gold," "the faces of men," "hair as the hair of women," teeth "as the teeth of lions," "breastplates of iron," wings that sound "as the sound of chariots of many horses running to battle," and "tails like unto scorpions, and there were stings in their tails" | The common swarm enemy from the first tier. Their stings are the first orange telegraphs a player learns |
+| Abaddon (Apollyon) | Revelation 9:11: the locusts have "a king over them, which is the angel of the bottomless pit, whose name in the Hebrew tongue is Abaddon, but in the Greek tongue hath his name Apollyon" | A boss. As an angel of the pit, he sits in the corrupted-angel tier and leads the locust swarms |
+| Legion | Mark 5:2–13: "a man with an unclean spirit" had "his dwelling among the tombs," and "the chains had been plucked asunder by him." Asked his name, he answered, "My name is Legion: for we are many," and the spirits entered a herd of swine, "about two thousand" | An elite that splits into many bodies when hurt and possesses lesser demons |
+| Behemoth | Job 40:15–24: he "eateth grass as an ox," "moveth his tail like a cedar," and "his bones are as strong pieces of brass; his bones are like bars of iron." He lies "in the covert of the reed, and fens" | A heavy boss with hyperarmor that charges across open regions |
+| Leviathan | Job 41: "his scales are his pride, shut up together as with a close seal," "out of his mouth go burning lamps," "out of his nostrils goeth smoke," and "his breath kindleth coals." "The sword of him that layeth at him cannot hold." He "maketh the deep to boil like a pot" and is "a king over all the children of pride" | A boss of the Sea of Glass whose armour has to be broken before it takes damage |
+| The beast from the sea | Revelation 13:1–2: "having seven heads and ten horns, and upon his horns ten crowns, and upon his heads the name of blasphemy," "like unto a leopard," with feet "as the feet of a bear" and a mouth "as the mouth of a lion," and "the dragon gave him his power" | A late boss |
+| The dragon | Revelation 12:3–9: "a great red dragon, having seven heads and ten horns, and seven crowns upon his heads." "His tail drew the third part of the stars of heaven." He fought Michael's angels and "was cast out" | The invasion's leader and the last-tier boss |
+| Named demons | Tobit 3:8 names "Asmodeus the evil spirit," and Matthew 12:24 names "Beelzebub the prince of the devils." The Ars Goetia, part of a 17th-century grimoire called the Lesser Key of Solomon, lists 72 spirits with ranks, such as King Bael, Duke Astaroth, King Asmodeus and King Belial | Ranked enemies using the Ars Goetia's titles, from Knights at the first corruption tier to Kings who roam as bosses (progression doc, section 10). They command camps and lead breaches. Decided: Goetic spirits keep their real names, shown with their rank underneath as "<Rank> of the Pit", for example "Bael, King of the Pit", "Focalor, Duke of the Pit" or "Andras, Marquis of the Pit". The [bestiary](./heaven-or-hell-bestiary.md) quotes the Ars Goetia's descriptions of their appearance as a starting point for their designs |
 | Lesser demons | No single source. Original designs, kept in the same shape language | The melee, ranged and heavy types of M2 and M3 |
 
 Behemoth and Leviathan appear in Job as creatures of God's making, not as
 demons. Casting them as Hell's is this game's choice. So is casting the
 beast and the dragon, who come to earth in Revelation, as invaders of
 Heaven.
+
+### Fallen Angels: the common tier
+
+Decided by Dan: allied angels roam the open map and fight alongside the
+player, they're fragile and die easily, and a dead or overwhelmed ally can
+be corrupted into a Fallen Angel, the lowest enemy tier. The details below
+are a proposal, and the numbers are starting values to tune:
+
+- **Who roams.** Small bands of one to three Host angels walk the map and
+  join any fight within about 12 metres. Seraphim, cherubim and ophanim
+  keep their posts at breaches, gates and lookouts.
+- **Fragile.** An allied angel has about a third of a common demon's HP and
+  little posture, so two or three demon hits kill it. Allies can't be
+  healed by the player in M4, so protecting them means fighting well.
+- **Dead or overwhelmed.** An ally is overwhelmed when its posture breaks
+  while two or more demons are attacking it. A dead or overwhelmed ally
+  falls with a chance that rises with the local Corruption Tier: 25% at
+  Tier 0, plus 15% per tier, reaching 100% at Tier 5. Otherwise it fades
+  into light and is gone.
+- **The fall never pauses play.** The corruption is a quick fall
+  animation, about 0.6 seconds as a starting value: the halo cracks and
+  drops, the gold rim floods red and the wings jerk down. It uses no
+  hit-stop, no `Engine.timescale` change, no camera move and no input
+  lock, and enemies and the player keep acting through it. Then the Fallen
+  Angel attacks the nearest target, the player or another ally.
+- **The lowest tier.** A Fallen Angel is a common, like the goat-demon: a
+  short parryable combo with orange wind-ups, a gullible read, and scaling
+  with tier like any other common. It uses the Host's puppet with red where
+  the ally had white and gold. Killing one gives no Stain.
+
+Named corrupted angels, such as Abaddon, stay the elite and boss tier
+described next.
 
 ### Corrupted angels: the elite and boss tier
 
@@ -604,7 +675,8 @@ light and colour.
   stays below 35% brightness, a brightness threshold separates them. Fog
   uses a near-black tint of the region's base hue and must never lift the
   shadows above the base, which rules out Little Scavenger's grey fog. Light
-  shafts are allowed as additive shapes over dark.
+  shafts are allowed as additive shapes over dark. Glow and bloom also
+  pulse on the music's 808 hits (see [Beat pulse](#beat-pulse)).
 - **Character readability.** Every actor reads in silhouette first. The hero
   gets a gold outline and a white rim light. Demons and corrupted creatures
   get a thin red rim, and related enemies share a shape, as Death's Door's
@@ -659,16 +731,18 @@ corruption can be animated.
 | Death's Door Artbook on Steam | [store.steampowered.com/app/1662730](https://store.steampowered.com/app/1662730/Deaths_Door_Artbook/) | A free 43-page PDF of concepts curated by Frits Olsen. It needs the base game and hasn't been reviewed yet |
 | Death's Door on Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Death%27s_Door_(video_game)) | Lists Unity as the engine |
 | Unity Learn, camera views | [learn.unity.com](https://learn.unity.com/pathway/creative-core/unit/creative-core-cameras/tutorial/explore-camera-views?version=6.0) | Isometric views usually face 45 degrees and sit 35 degrees above the focus, with orthographic or perspective cameras. Context for the decided 45–50 degree default |
-| Isaiah 6:1–7 (ESV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Isaiah+6%3A1-7&version=ESV) | The seraphim |
-| Ezekiel 1:4–28 (ESV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Ezekiel+1%3A4-28&version=ESV) | The living creatures and the wheels |
-| Ezekiel 10 (ESV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Ezekiel+10&version=ESV) | The cherubim, their four faces and "the whirling wheels" |
-| Colossians 1:16 (ESV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Colossians+1%3A16&version=ESV) | Thrones among things created in heaven |
-| Revelation 4:6–8 and 12:7–9 (ESV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Revelation+12%3A7-9%3BRevelation+4%3A6-8&version=ESV) | The four living creatures, the sea of glass, and the war in heaven |
+| Isaiah 6:1–7 (KJV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Isaiah+6%3A1-7&version=KJV) | The seraphim |
+| Ezekiel 1:4–28 (KJV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Ezekiel+1%3A4-28&version=KJV) | The living creatures and the wheels |
+| Ezekiel 10 (KJV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Ezekiel+10&version=KJV) | The cherubim, their four faces and the wheels called "O wheel" |
+| Colossians 1:16 (KJV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Colossians+1%3A16&version=KJV) | Thrones among things created in heaven |
+| Revelation 4:6–8 and 12:7–9 (KJV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Revelation+12%3A7-9%3BRevelation+4%3A6-8&version=KJV) | The four living creatures, the sea of glass, the war in heaven, and the dragon's angels cast out with him |
 | Ophanim on Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Ophanim) | "Ophanim" means wheels. Some Christian angelology identifies them with Thrones, and Jewish hierarchies keep the two apart |
-| Revelation 9:1–11, 12:3–4 and 13:1–2 (ESV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Revelation+9%3A1-11%3BRevelation+12%3A3-4%3BRevelation+13%3A1-2&version=ESV) | The locusts and Abaddon/Apollyon, the great red dragon, and the beast from the sea |
-| Job 40:15–24, Job 41 and Mark 5:1–13 (ESV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Job+40%3A15-24%3BJob+41%3A1-34%3BMark+5%3A1-13&version=ESV) | Behemoth, Leviathan and Legion |
-| Tobit 3:8 and Matthew 12:24 (NRSVUE) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Tobit+3%3A8%3BMatthew+12%3A24&version=NRSVUE) | Asmodeus and Beelzebul by name |
+| Revelation 9:1–11, 12:3–4 and 13:1–2 (KJV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Revelation+9%3A1-11%3BRevelation+12%3A3-4%3BRevelation+13%3A1-2&version=KJV) | The locusts and Abaddon/Apollyon, the great red dragon, and the beast from the sea |
+| Job 40:15–24, Job 41 and Mark 5:1–13 (KJV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Job+40%3A15-24%3BJob+41%3A1-34%3BMark+5%3A1-13&version=KJV) | Behemoth, Leviathan and Legion |
+| Matthew 12:24 (KJV) | [biblegateway.com](https://www.biblegateway.com/passage/?search=Matthew+12%3A24&version=KJV) | Beelzebub by name |
+| Tobit 3:8 (KJV Apocrypha) | [en.wikisource.org](https://en.wikisource.org/wiki/Bible_(King_James)/Tobit) | Asmodeus by name. Bible Gateway's KJV has no Apocrypha, so Tobit is quoted from Wikisource's King James text |
 | The Lesser Key of Solomon on Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/The_Lesser_Key_of_Solomon) | The Ars Goetia's 72 spirits and their ranks, a source for named demons |
+| List of demons in the Ars Goetia on Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/List_of_demons_in_the_Ars_Goetia) | Each spirit's rank (King, Duke, Prince, Marquis, Earl, President, Knight), used for the "<Rank> of the Pit" titles |
 | Deepwoken Mechanics | [deepwoken.fandom.com](https://deepwoken.fandom.com/wiki/Category:Mechanics) | Mechanics only |
 | Deepwoken Aspects, Oaths, Enchantments, Resonance, Mantras and Death | [Aspects](https://deepwoken.fandom.com/wiki/Aspects), [Oaths](https://deepwoken.fandom.com/wiki/Oaths), [Enchantments](https://deepwoken.fandom.com/wiki/Enchantments), [Resonance](https://deepwoken.fandom.com/wiki/Resonance), [Mantras](https://deepwoken.fandom.com/wiki/Mantras), [Death](https://deepwoken.fandom.com/wiki/Death) | The progression systems to reflavour, and how death, wipes and Knowledge work |
 
@@ -1042,6 +1116,32 @@ like true bloom, so it's a fallback only.
 Either way, bloom applies only to pixels above the bloom threshold, which
 the value structure keeps to light sources, actors and effects.
 
+### Beat pulse
+
+Decided by Dan: on 808 hits in the music, and only those, the screen gives
+a subtle vibration whose size rises with the Corruption Tier (0 to 5),
+plus a glow and bloom pulse. It isn't screen shake, and there's no setting
+to turn it off yet, because settings come later. The details are a
+proposal, and the numbers are starting values to tune:
+
+- **Where the beats come from.** The score is generated by a script
+  (M6), so the script also writes a beat map of each track's 808 hit
+  times. The scene compares the music's playback position with the beat
+  map every frame and fires a pulse as it passes each hit. Other drums,
+  bass lines and melody never trigger it.
+- **A vibration, not a shake.** The vibration is a small offset applied in
+  `bloom.ts`'s final composite pass, so the image moves but the camera and
+  every gameplay position stay still. `Camera.shake()` stays reserved for
+  hits and parries in combat, and the two never share a code path, so a
+  beat can't be mistaken for a hit. As starting values: 0.5 px at Tier 0,
+  rising by 0.5 px per tier to 3 px at Tier 5 (at 1080p), decaying over
+  about 100 ms.
+- **Glow and bloom pulse.** On the same hit, bloom strength and emissive
+  glow rise briefly, from +10% at Tier 0 to +35% at Tier 5, decaying over
+  about 150 ms.
+- **The same in the fallback.** If the bloom test fails, the offset and
+  the glow pulse move into the single-pass shader.
+
 ### Streaming the open map
 
 Excalibur has no streaming, so `streaming.ts` adds a region and chunk
@@ -1175,6 +1275,7 @@ src/components/scenes/HeavenOrHell/
 │   ├── stain.ts        # Stain, its thresholds and the Fall
 │   ├── corruption.ts   # Corruption level, tiers, unlocks and spawns
 │   ├── testimony.ts    # What survives a wipe: Testimony, Remembrance
+│   ├── tuning.ts       # Tuning constants: corruption pace, fall chance
 │   └── types.ts        # Character data and CombatStats, the boundary
 ├── map.ts              # Regions, chunks, paths, landmarks (pure)
 ├── invasion.ts         # Seeded breaches, spread, camps, events (pure)
@@ -1188,6 +1289,7 @@ src/components/scenes/HeavenOrHell/
 ├── input.ts            # Mouse aim, clicks, F, hold F, Q, R, WASD
 ├── lit.ts              # Lighting Material: bands, rim, tint, outline
 ├── bloom.ts            # Multi-pass bloom and grade PostProcessor
+├── beat.ts             # 808 beat map: tier-scaled vibration, glow pulse
 ├── darkness.ts         # Dark overlay and light holes, after HollowDark
 ├── fx.ts               # Hit sparks, embers, corruption particles
 ├── hud.ts              # Health and halo, posture, Fervour, Grace
@@ -1353,7 +1455,9 @@ the combat engine merged into the M1 scene, driving the hero's puppet.
     used only for the parry, if a whole-screen pause feels better.
   - *Camera shake:* translation only, through `Camera.shake()`, never
     rotation. Start at 2 px for 80 ms on a hit, 4 px for 120 ms on a parry
-    and 6 px for 200 ms on a guard break, at 1080p.
+    and 6 px for 200 ms on a guard break, at 1080p. Camera shake is
+    reserved for these combat moments. The music's
+    [beat pulse](#beat-pulse) is a separate effect.
   - *Readable wind-ups:* every enemy attack shows an orange telegraph from
     its first wind-up frame, and ordinary attacks wind up for at least
     300 ms.
@@ -1457,7 +1561,9 @@ scale and the save.
 - `progression/corruption.ts` runs the run's clock: World Corruption rises
   with time at a steady, designed rate, crossing tiers, and nothing lowers
   it. The pace comes from the run's difficulty: one tier every 40, 60, 80
-  or 100 minutes of play.
+  or 100 minutes of play. Each is a tuning constant, `minutesPerTier` on
+  the difficulty's entry in `DIFFICULTIES` in `progression/tuning.ts`, and
+  Son of the Morning keeps the original 100-minute pace.
 - **Corruption tiers.** The tiers are in section 10 of the
   [progression doc](./heaven-or-hell-progression.md#10-corruption-tiers-the-power-curve):
   six tiers, from Tier 0 (the Calm Courts) to Tier 5 (War in Heaven). Every
@@ -1479,6 +1585,12 @@ scale and the save.
   decision 4). The bestiary shows read traits from Studied. Where
   Remembrance is read depends on the hub (open decision 2).
 - NPC dialogue with allied angels, using `DialogueNPC` and `ChatSystem`.
+- **Roaming allies and Fallen Angels.** Bands of Host angels roam the map
+  and fight beside the player. They die easily, and a dead or overwhelmed
+  ally can fall into a Fallen Angel, the common enemy tier, through a quick
+  fall animation that never pauses play (see
+  [Fallen Angels](#fallen-angels-the-common-tier)). The fall chance by tier
+  lives in `progression/tuning.ts` with the other tuning constants.
 - **Done when** a run can be played from character creation through at
   least three corruption tiers, being struck down and cast out behave as
   designed, two seeds produce different invasions on the same map, closing
@@ -1510,7 +1622,8 @@ scale and the save.
 
 - An original score and sound effects, built by a TypeScript script in
   `tools/heaven-or-hell/`, taking its approach from
-  `tools/oka-world/compose_music.py`.
+  `tools/oka-world/compose_music.py`. The script also writes each track's
+  808 beat map, and the [beat pulse](#beat-pulse) is built on it.
 - The title and chapter cards, `docs/heaven-or-hell.md`, and a README entry.
 - The image generator's terms checked for use in a published game.
 - **Done when** the GitHub Pages build serves `/#heavenorhell` at
@@ -1597,7 +1710,17 @@ scale and the save.
   can drop on slower GPUs.
 - **White and red readability.** White allies, the gold hero and white
   altars can blur together, and red corruption can hide red danger. Check
-  each in M1 and M3 screenshots.
+  each in M1 and M3 screenshots. Fallen Angels add another case: an ally
+  that turns red mid-fight must read as an enemy at once.
+- **Beat pulse with no off switch.** Until settings exist, the 808
+  vibration can't be turned off, which can bother players sensitive to
+  motion, and at Tier 5 it competes with combat shake. Keep it small,
+  keep it in the composite pass rather than the camera, and add a setting
+  when settings arrive.
+- **Allies that die too easily.** If allies fall too often, every band of
+  angels becomes a band of Fallen Angels and the map tilts toward Hell
+  faster than the corruption pace intends. Tune ally HP and the fall
+  chance by tier in M4 play, and keep both in `progression/tuning.ts`.
 - **Combat feel** is hard to judge from tests alone. Each combat milestone
   needs a manual play session and a recording, not only green tests.
 - **Engine pin.** Every API used must exist in ExcaliburJS 0.32.x, and the

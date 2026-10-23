@@ -6,14 +6,14 @@ A proposal, and the companion to [heaven-or-hell-plan.md](./heaven-or-hell-plan.
 
 Working bestiary for the sprites, enemies and allied NPCs of *Heaven Or Hell*. You play a lesser angel, one of **the Tenth**, defending Heaven (the open map) against Hell's invasion. Angels are allies. Most enemies are demons and Hell-beasts drawn from scripture or long tradition, and a smaller elite and boss tier are corrupted angels.
 
-Every scripture quote below was copied from a page actually retrieved during research (mostly Bible Gateway, KJV, which that site marks as public domain). Every tradition quote comes from a retrieved public-domain text (Mathers' *Goetia* and Charles' *1 Enoch* on sacred-texts.com). Section 5 lists all the sources.
+Every scripture quote below is in the King James Version (decided by Dan) and was checked against a retrieved KJV text (Bible Gateway's KJV, which that site marks as public domain, and the Project Gutenberg KJV; Tobit against Wikisource's KJV Apocrypha). Every tradition quote comes from a retrieved public-domain text (Mathers' *Goetia* and Charles' *1 Enoch* on sacred-texts.com). Section 5 lists all the sources.
 
 Contents:
 
 1. Principles (what "biblically accurate" means here, labels, art rules, combat legend)
 2. Bestiary
    - 2A. Ally angels (8 entries, plus the list of figures reserved for special quests)
-   - 2B. Enemies (35 entries: demons, Hell beasts, corrupted angels and bosses)
+   - 2B. Enemies (36 entries: Fallen Angels, demons, Hell beasts, corrupted angels and bosses)
    - 2C. Goetia quick reference (20 spirits)
    - 2D. Art-historical reference board
 3. Tier table (Corruption Tiers 0 to 5)
@@ -40,8 +40,8 @@ For this game, "biblically accurate" means:
 
 | Label | Meaning |
 | --- | --- |
-| **[Scripture]** | Protestant/Catholic canon; quoted with verse references (KJV unless noted) |
-| **[Deuterocanon]** | Tobit (Catholic/Orthodox canon, Protestant Apocrypha); quoted from NRSVUE |
+| **[Scripture]** | Protestant/Catholic canon; quoted with verse references, always from the KJV (decided) |
+| **[Deuterocanon]** | Tobit (Catholic/Orthodox canon, Protestant Apocrypha); quoted from the KJV's Apocrypha |
 | **[Enochic tradition]** | 1 Enoch (canonical only in the Ethiopian Orthodox Church); quoted from R. H. Charles' translation |
 | **[Goetia tradition]** | *Ars Goetia*, the first book of the *Lesser Key of Solomon*, a 17th-century grimoire; quoted from Mathers' translation (1904 edition) |
 | **[Later tradition]** | Pseudo-Dionysius, rabbinic or medieval demonology, the *Dictionnaire Infernal*, art history |
@@ -106,7 +106,9 @@ Every false gold has a **tell**, so the glow language stays fair: the edges flic
 
 ## 2A. ALLY ANGELS
 
-Angels are allies and NPCs. They do not take the enemy combat slots, so each entry lists an **ally role** (support behaviours, quests, world functions) instead of attacks. Some can act as sparring partners in training, so a sparring read trait is given for those.
+Angels are allies and NPCs, so each entry lists an **ally role** (support behaviours, quests, world functions) instead of attacks. Some can act as sparring partners in training, so a sparring read trait is given for those.
+
+**Decided by Dan:** allied angels roam the open map and fight alongside the player. They are fragile and die easily, and a dead or overwhelmed ally can be corrupted into a **Fallen Angel** (E36), the lowest, common enemy tier. Only the Host (A8) roams; the seraphim, cherubim and ophanim keep their posts. The plan's [Fallen Angels](./heaven-or-hell-plan.md#fallen-angels-the-common-tier) section has the rules and starting values.
 
 **Michael is reserved for special quests.** He has no entry, sprite or prompt here. His name appears only where the plan already uses it: the Vow of Michael's Host, the *Michael's Charge* Trumpet and Revelation 12:7.
 
@@ -244,17 +246,19 @@ Angels are allies and NPCs. They do not take the enemy combat slots, so each ent
   - *Scale:* M+ (1.3× player).
   - *Glow map:* Gold armour rims, a white-gold spearhead, and a halo **ring seen from above** (an ellipse on the ground plane reads better from this camera than a vertical disc). When they shield a lane, their spread wings join into one gold band.
   - *Puppet parts (16):* head, helm crest, torso, cape (2 segments), wing L and R (2 segments each), arm L and R (upper arm and forearm with hand), spear, legs ×2, halo ellipse.
-  - *Animations:* idle (wings breathe), walk, flight, spear thrust, shield the lane (wings spread into a wall of light), kneel, wounded (if Dan allows; see section 6).
-- **Ally role:** **The rank and file.** They hold breaches beside the player and the seraphim, and they are the NPC ranks behind the Host of the Gate and the Vow of Michael's Host in the progression doc. In the Red Dragon fight (E35) a line of them spreads its wings into a gold lane that shields the player from the falling stars. They never land the decisive blow; the dragon falls to the player's parries and criticals. *Sparring read trait:* wary.
+  - *Animations:* idle (wings breathe), walk, flight, spear thrust, shield the lane (wings spread into a wall of light), kneel, hit, death (fades into light), and **fall** (about 0.6 s as a starting value: the halo cracks and drops, the gold rims flood red and the wings jerk down; it never pauses play, and the rig then becomes E36).
+- **Ally role:** **The rank and file.** Bands of one to three roam the open map and join nearby fights. They are fragile: two or three demon hits kill one, and a dead or overwhelmed soldier may fall (E36). They hold breaches beside the player and the seraphim, and they are the NPC ranks behind the Host of the Gate and the Vow of Michael's Host in the progression doc. In the Red Dragon fight (E35) a line of them spreads its wings into a gold lane that shields the player from the falling stars. They never land the decisive blow; the dragon falls to the player's parries and criticals. *Sparring read trait:* wary.
 - **DRAFT AI IMAGE PROMPT:** "A rank-and-file soldier angel of Heaven's host: a tall man-like angel with a calm plain face, white linen under plain plate armour, two great raised wings, a long spear held diagonally, a short cape, a flat halo ring of light above the head. Fixed orthographic camera 45–50 degrees down on a diagonal, three-quarter top-down view, full body, isolated. Death's Door-inspired chunky bevelled forms, toon shading, thick dark ink outlines, grave steadfast mood. Near-black monochrome armour and feathers; only emissive white and gold on armour rims, spearhead and halo. Flat pure magenta #FF00FF background, no ground, no shadow, no magenta or pink in the figure, high resolution sprite source."
 
-**Corrupted echoes.** The plan's corrupted seraph, cherub and ophan (the elite and boss tier) reuse the A1–A3 rigs, with red where the ally has white, following Death's Door's echo rule. They need no new sprite briefs, only recoloured glow layers and red telegraphs.
+**Corrupted echoes.** The Fallen Angel (E36, common) reuses the A8 rig. The plan's corrupted seraph, cherub and ophan (the elite and boss tier) reuse the A1–A3 rigs, with red where the ally has white, following Death's Door's echo rule. They need no new sprite briefs, only recoloured glow layers and red telegraphs.
 
 ---
 
 ## 2B. ENEMIES
 
-Thirty-five entries, kept in their draft order (roughly by escalation). Each entry's **First tier** line follows section 10 of the progression doc, and section 3 gives the tier-by-tier view. Three entries contain variants (Malphas/Halphas, Focalor/Vepar/Forneus, and the three Beasts of the Great Sea), so the roster gives **40 distinct sprites**. Corrupted angels are marked **(Corrupted angel)**.
+Thirty-six entries, kept in their draft order (roughly by escalation), with the Fallen Angel added last as E36 so the earlier numbers stay stable. Each entry's **First tier** line follows section 10 of the progression doc, and section 3 gives the tier-by-tier view. Three entries contain variants (Malphas/Halphas, Focalor/Vepar/Forneus, and the three Beasts of the Great Sea), so the roster gives **40 distinct sprites**, plus the Fallen Angel, which recolours the Host's rig (A8). Named corrupted angels are marked **(Corrupted angel)**.
+
+**Goetic names (decided by Dan).** Goetic spirits keep their real *Ars Goetia* names, shown with a rank title underneath in the form "*<Rank> of the Pit*": King, Duke, Prince, Marquis, President, Earl or Knight. Each Goetic entry has a **Name plate** line. Where the Goetia gives two ranks, the first is shown.
 
 Every prompt uses the same Hell style tail, written out in full so each prompt can be pasted on its own.
 
@@ -281,8 +285,8 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
 
 ### E2. Se'ir, the Goat-Demon (basic melee)
 
-- **Source [Scripture]:** Leviticus 17:7 (NRSVUE): "so that they may no longer offer their sacrifices for goat-demons, to whom they prostitute themselves." Isaiah 34:14 (NRSVUE): "goat-demons shall call to each other". Isaiah 13:21 (KJV): "owls shall dwell there, and satyrs shall dance there." (KJV renders the Hebrew *se'irim* as "devils" in Leviticus 17:7 and "satyr" in Isaiah. The "goat-demon" reading comes from NRSVUE.)
-- **Visual:** A shaggy, goat-headed biped of the waste places, with ram-curled horns, a long goat muzzle, digitigrade legs on hooves, matted hair, and a crude hooked blade or shepherd's crook. They "call to each other", so they hunt in packs and bleat signals.
+- **Source [Scripture]:** Leviticus 17:7 (KJV): "they shall no more offer their sacrifices unto devils, after whom they have gone a whoring." Isaiah 34:14 (KJV): "the satyr shall cry to his fellow". Isaiah 13:21 (KJV): "owls shall dwell there, and satyrs shall dance there." (The Hebrew word behind the KJV's "devils" and "satyr" is *se'irim*, literally "hairy ones" or goats. Modern translations such as the NRSVUE render it "goat-demons"; that reading is noted here but not quoted.)
+- **Visual:** A shaggy, goat-headed biped of the waste places, with ram-curled horns, a long goat muzzle, digitigrade legs on hooves, matted hair, and a crude hooked blade or shepherd's crook. "The satyr shall cry to his fellow", so they hunt in packs and bleat signals.
 - **SPRITE BRIEF**
   - *Silhouette:* Horns curl out wide (the key read from above), a hunched back, a forward muzzle, a hooked blade held low. Simple and readable. **This is the template humanoid rig** for many later demons.
   - *Scale:* M (1.0–1.1×).
@@ -294,7 +298,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   1. *Hook slash*: parryable, 0.5 s orange blade flash, Med posture. Two-hit string at Tier 3+.
   2. *Overhead chop*: parryable, a 0.8 s slower orange flash, High posture; a good parry teaching tool (delayed timing).
   3. *Horn charge*: **unparryable red**, 1.0 s (it paws the ground, horns go red), then a straight-line charge; roll sideways. On a miss it stumbles (critical window).
-  4. *Bleat*: no damage; calls nearby Se'irim to converge (Isaiah 34:14 "call to each other").
+  4. *Bleat*: no damage; calls nearby Se'irim to converge (Isaiah 34:14, "the satyr shall cry to his fellow").
 - **AI read trait:** Gullible (it bites feints and swings into them), which makes it the ideal first feint lesson.
 - **DRAFT AI IMAGE PROMPT:** "A se'ir goat-demon of the wilderness: a hunched shaggy biped with a goat's head, long muzzle and huge curling ram horns, matted hair over its shoulders, digitigrade goat legs on cloven hooves, a short tail, gripping a crude hooked iron blade low in one hand, slit-pupil eyes. Fixed orthographic camera 45–50 degrees down on a diagonal, three-quarter top-down view, full body, single isolated figure. Death's Door-inspired chunky bevelled forms, toon shading with hard value bands, thick dark ink outlines, dark menacing mood. Near-black monochrome base; only emissive glows are dim orange ember eyes and a faint orange edge on the blade. Flat pure magenta #FF00FF background, no ground, no cast shadow, no magenta or pink in the figure, glows orange-red not pink, high resolution game sprite source."
 
@@ -352,7 +356,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   - *Scale:* L (2.2×).
   - *Glow map:* Ember cracks; the helm grille glows **orange** on the wind-up; the whole crack network flares **red** during hyperarmour slams.
   - *Puppet parts (14):* helm/head, jaw-grille, torso (front plate), belly, pauldron L and R, upper arm L and R, forearm L and R, maul, thigh L and R, shin and foot L and R.
-  - *Animations:* idle (heavy breathing, grille steams), slow walk (screen micro-shake), wind-up (maul drags back), overhead slam, sweep, stomp, stagger (drops to one knee, the critical window), death (collapses into bronze shards and smoke).
+  - *Animations:* idle (heavy breathing, grille steams), slow walk (heavy footfall dust and a low thud; no screen shake, which is reserved for hits and parries), wind-up (maul drags back), overhead slam, sweep, stomp, stagger (drops to one knee, the critical window), death (collapses into bronze shards and smoke).
 - **Role:** Elite heavy. **First tier:** 1 (rare, one per zone), common at Tier 3.
 - **Attacks:**
   1. *Maul sweep*: parryable, 0.9 s orange grille glow, **High** posture. A parry staggers its arm but does not stop its next action.
@@ -375,13 +379,14 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   - *Glow map:* The sword is a **dim** pale-orange edge that flares orange on wind-ups; the teeth glint; venom spit glows red.
   - *Puppet parts:* Viper (8): head, jaw, 5 body segments, tail tip. Humanoid (13): head, jaw (teeth), horns ×2, torso, arms ×2 (2 segments each), sword, legs ×2 (2 segments each).
   - *Animations:* viper idle, slither, strike, spit; transform (sheds its skin and rises); humanoid idle, walk, slash combo, lunge, stagger, death.
+- **Name plate:** Botis, *President of the Pit* (the Ars Goetia makes him a President and an Earl; the first rank is shown).
 - **Role:** Elite (two-phase duellist). **First tier:** 1.
 - **Attacks:**
   1. *Viper strike*: parryable, 0.4 s fast orange glint, Low posture.
   2. *Venom spit*: unparryable red projectile, 0.8 s; leaves poison on the ground.
   3. *Bright sword 3-hit combo* (phase 2): parryable, orange each hit (0.5/0.3/0.7 s, mixed rhythm), Med posture. It teaches rhythm parrying.
   4. *Shed-and-strike*: at half health it dives underground and re-emerges in its humanoid form with a red-flash uppercut (unparryable).
-- **AI read trait:** Wary (Presidents and Counts are wary readers in the progression doc). It waits feints out and answers with a quick viper strike.
+- **AI read trait:** Wary (Presidents and Earls are wary readers in the progression doc). It waits feints out and answers with a quick viper strike.
 - **DRAFT AI IMAGE PROMPT:** "Botis, a demon of the Goetia, in his human shape: a gaunt sinewy humanoid with an unnaturally wide grin of great sharp teeth, two horns rising from his brow, a shed viper skin trailing from his shoulders like a cloak, carrying a bright sharp sword. Fixed orthographic camera 45–50 degrees down on a diagonal, three-quarter top-down view, full body, single isolated figure. Death's Door-inspired chunky bevelled forms, toon shading with hard value bands, thick dark ink outlines, dark menacing mood. Near-black monochrome base; only emissive glows are a dim orange sword edge and orange ember eyes. Flat pure magenta #FF00FF background, no ground, no cast shadow, no magenta or pink in the figure, glows orange-red not pink, high resolution game sprite source." *(Second prompt for phase 1: "an ugly thick-bodied black viper with a wedge head, coiled to strike...")*
 
 ---
@@ -396,7 +401,8 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   - *Glow map:* Ember eyes; the staff tip glows **orange** while raising a tower; tower windows go orange before firing and **red** at full charge.
   - *Puppet parts (12):* crow head (with beak hinge), hood, cloak ×2 wings, torso, arms ×2, staff, legs ×2 (bird-clawed feet); tower prop (3 parts: base, shaft, crown).
   - *Animations:* idle, hop-walk, flock-dash (dissolves into crows and reforms), raise tower (staff slam, the tower rises), caw-curse, stagger, death (bursts into crows).
-- **Role:** Elite summoner and controller. **First tier:** 1 (Malphas and the Halphas variant, both Presidents).
+- **Name plate:** Malphas, *President of the Pit*; the variant is Halphas, *Earl of the Pit*.
+- **Role:** Elite summoner and controller. **First tier:** 1 (Malphas a President, the Halphas variant an Earl).
 - **Attacks:**
   1. *Raise tower*: 1.5 s orange staff glow, then a spire erupts. The spire fires orange-telegraphed bolts (parryable, reflectable) every 3 s until destroyed. Towers carry their own posture; parried bolts damage them.
   2. *Staff jab*: parryable, 0.5 s, Low.
@@ -438,7 +444,8 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   - *Glow map:* Ember eyes; **when invisible only the eyes and an ember shimmer outline remain**. That is the fair tell. Orange jaw flash on the wind-up.
   - *Puppet parts (12):* head, jaw, neck, body, wings ×2 (2 segments each), legs ×4, tail.
   - *Animations:* idle (pants), run, vanish (fades to its eye-glow), reappear-pounce, bite, wing-buffet, stagger, death.
-- **Role:** Elite flanker. **First tier:** 1 (a President and Count).
+- **Name plate:** Glasya-Labolas, *President of the Pit* (a President and an Earl; the first rank is shown).
+- **Role:** Elite flanker. **First tier:** 1 (a President and Earl).
 - **Attacks:**
   1. *Bite*: parryable, 0.4 s, Med.
   2. *Invisible pounce*: parryable (orange eyes flare 0.6 s before the leap), High posture. The audio cue is a growl.
@@ -459,14 +466,15 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   - *Glow map:* Ember eyes; antlers charge **orange** (crackling) before a strike; red lightning circles mark impact; the tail is a constant low orange flame. **Phase 2 "Form of an Angel"**: the stag stands upright as a false angel with **fake gold** that gutters to red (a corrupted-angel tease).
   - *Puppet parts (13):* head, antler L and R, jaw, neck, body, legs ×4, tail (3 flame segments); phase-2 angel overlay (4 parts: torso, wings ×2, false halo).
   - *Animations:* idle (antlers spark), canter, rear-up wind-up, lightning call, antler charge, tail lash, stagger, transform-to-angel, death.
-- **Role:** Elite area controller (the first caster). **First tier:** 1 (a Count).
+- **Name plate:** Furfur, *Earl of the Pit*.
+- **Role:** Elite area controller (the first caster). **First tier:** 1 (an Earl).
 - **Attacks:**
   1. *Lightning call*: **unparryable red**, 1.2 s; three to five red circles near the player, then bolts.
   2. *Antler charge*: parryable, 0.8 s orange antlers, High posture.
   3. *Tail lash*: parryable, 0.5 s, Med; leaves a fire strip.
   4. *Liar's light* (phase 2): it mimics an ally angel's gold glow to bait the player, then strikes with red. Trains players to trust only true gold.
 - **Deceiver (section 1.3):** Before the fight, Furfur scatters **fake Vision motes** along a forest path to draw the player into its lightning circles. They flicker red at the edges.
-- **AI read trait:** Wary (a Count). "Never speaketh truth": its *Liar's light* does the deceiving.
+- **AI read trait:** Wary (an Earl). "Never speaketh truth": its *Liar's light* does the deceiving.
 - **DRAFT AI IMAGE PROMPT:** "Furfur, a demon of the Goetia: a great black hart stag with vast branching antlers crackling with lightning and a long comet-like tail of fire, rearing, storm energy around its hooves. Fixed orthographic camera 45–50 degrees down on a diagonal, three-quarter top-down view, full body, single isolated figure. Death's Door-inspired chunky bevelled forms, toon shading with hard value bands, thick dark ink outlines, dark menacing mood. Near-black monochrome base; only emissive glows are orange lightning on the antlers, an orange-red fiery tail and ember eyes. Flat pure magenta #FF00FF background, no ground, no cast shadow, no magenta or pink in the figure, glows orange-red not pink, high resolution game sprite source."
 
 ---
@@ -481,6 +489,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   - *Glow map:* Ember eyes; the throat glows **orange** (0.9 s) before fire breath; ember inside the wing feathers; *faint, hidden gold* in the chest (the remnant of a Domination) that brightens if spared.
   - *Puppet parts (15):* head, jaw, neck/ruff, body, wings ×2 (2 segments each), legs ×4, serpent tail (4 segments).
   - *Animations:* idle, lope, wind-up (inhale), fire breath, claw combo, wing-dash, tail whip, stagger, kneel (the spare option), death.
+- **Name plate:** Marchosias, *Marquis of the Pit*.
 - **Role:** Elite and optional mini-boss duel. **First tier:** 2.
 - **Attacks:**
   1. *Claw combo*: parryable, 2 hits (0.5/0.4 s), Med. "A strong fighter."
@@ -494,7 +503,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
 
 ### E12. Lilith, the Night-Creature
 
-- **Source [Scripture]:** Isaiah 34:14 (NRSVUE): "Wildcats shall meet with hyenas; goat-demons shall call to each other; there also Lilith shall repose and find a place to rest." KJV translates the same word as "the screech owl also shall rest there".
+- **Source [Scripture]:** Isaiah 34:14 (KJV): "The wild beasts of the desert shall also meet with the wild beasts of the island, and the satyr shall cry to his fellow; the screech owl also shall rest there, and find for herself a place of rest." The KJV's "screech owl" translates the Hebrew *lilith*, which modern translations such as the NRSVUE keep as the name Lilith (noted here, not quoted).
 - **Tradition [Later tradition]:** Lilith "does not appear in the Hebrew Bible or any other biblical source" except this word in Isaiah 34:14, whose meaning ranges "from a primordial she-demon to a night bird". She appears in Jewish incantation bowls and medieval folklore (Wikipedia, *Lilith*).
 - **Visual (our design follows the owl/night-creature reading):** A gaunt, owl-like night-hag of the ruins, with an owl's facial disc and huge eyes, long taloned bird-feet, and a tattered feather-shroud for a robe. **Not sexualised** (see section 6). She rests in ruins; she ambushes from perches.
 - **SPRITE BRIEF**
@@ -590,6 +599,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   - *Glow map:* The angel's wing edges are **dull gold cracked with red**; the sword is a pale edge that flares **orange** on the wind-up; the wolf's eyes are ember.
   - *Puppet parts (22):* Rider (12): raven head, beak hinge, torso, wings ×2 (2 segments each), arms ×2, sword, legs ×2 (hidden mostly). Wolf (10): head, jaw, neck, body, legs ×4, tail.
   - *Animations:* idle (wolf prowls), run, rider sword wind-up, mounted slash, wolf lunge-bite, "discord" caw, dismount (phase 2, the wolf and rider fight separately), stagger (the rider is unseated), death.
+- **Name plate:** Andras, *Marquis of the Pit*.
 - **Role:** Elite (mounted duel). **First tier:** 2 (a Marquis).
 - **Attacks:**
   1. *Mounted sword sweep*: parryable, 0.7 s orange, High.
@@ -601,7 +611,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
 
 ---
 
-### E17. Sabnock, the Lion-Headed Knight
+### E17. Sabnock, the Lion-Headed Soldier
 
 - **Source [Goetia tradition]:** Goetia no. 43 (Mathers): "appearing in the Form of an Armed Soldier with a Lion's Head, riding on a pale-coloured horse. His office is to build high Towers, Castles and Cities, and to furnish them with Armour ... Also he can afflict Men for many days with Wounds and with Sores rotten and full of Worms."
 - **Visual:** A heavily armoured knight with a lion's head and mane spilling from the gorget, on a pale (ash-grey) warhorse; tower-shield and flanged mace. **Glow note:** "pale-coloured" becomes a pallid grey, which stays monochrome.
@@ -611,6 +621,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   - *Glow map:* Ember lion eyes; the mace head flares **orange**; wound-rot debuff motes are red.
   - *Puppet parts (20):* lion head, jaw, mane, torso armour, shield, mace, arms ×2 (2 segments each); horse head, neck, body, legs ×4, tail.
   - *Animations:* idle, trot, shield-raise, mace wind-up, overhead smash, shield charge, roar, stagger, death.
+- **Name plate:** Sabnock, *Marquis of the Pit*.
 - **Role:** Elite heavy (mounted). **First tier:** 2 (a Marquis).
 - **Attacks:**
   1. *Mace smash*: parryable, 0.9 s orange, **Break** if blocked (parry or roll only).
@@ -633,6 +644,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   - *Glow map:* Each head has its own glow: the cat head's eyes go **orange** for melee, the toad head's throat goes **orange** for spit (reuse the E3 language), and the man head's crown turns **red** before the invisibility phase.
   - *Puppet parts (18):* man head (with jaw), crown, cat head (with jaw), toad head (with jaw and throat sac), central body, legs ×8 (2 segments each, or ×6 to save effort), Branded summon sprites.
   - *Animations:* idle (the heads bicker), skitter, cat swipe, toad spit, man's hoarse command, vanish (Invisible), reappear, head-loss (each head can be broken off), stagger, death.
+- **Name plate:** Bael, *King of the Pit*.
 - **Role:** Boss (a King roaming the Tier 3 map). **First tier:** 3.
 - **Attacks:**
   1. *Cat swipe*: parryable, 0.4 s, Med.
@@ -656,6 +668,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   - *Glow map:* The crown is red-orange (constant); trumpet bells glow **orange** before a sonic attack and **red** for the roar.
   - *Puppet parts (18 for the king and mount + 8 per musician):* rider head, crown, torso, arms ×2, sceptre, robe; dromedary head, neck, hump-body, legs ×4, tail; musician (body, head, arms ×2, instrument, legs ×2, cloak).
   - *Animations:* idle (the procession plays), march, roar (first-coming roar), sceptre wind-up, sonic blast, cymbal crash (musicians), dismount, stagger, death.
+- **Name plate:** Paimon, *King of the Pit*.
 - **Role:** Boss (a King roaming the Tier 3 map). **First tier:** 3.
 - **Attacks:**
   1. *Roar at his coming*: **unparryable red**, 1.2 s; a screen-wide posture-damage wave. Roll i-frames negate it.
@@ -670,7 +683,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
 
 ### E20. Asmodeus, the Three-Headed King (boss)
 
-- **Source [Deuterocanon]:** Tobit 3:8 (NRSVUE): "the wicked demon Asmodeus had killed each of them before they had been with her". Tobit 8:3: "The odor of the fish so repelled the demon that he fled to the remotest parts of Egypt."
+- **Source [Deuterocanon]:** Tobit 3:8 (KJV Apocrypha): "she had been married to seven husbands, whom Asmodeus the evil spirit had killed, before they had lain with her." Tobit 8:3: "The which smell when the evil spirit had smelled, he fled into the utmost parts of Egypt" (the smell is the smoke of the fish's heart and liver, 8:2; the rest of the verse names a reserved figure and is left out).
 - **Source [Goetia tradition]:** Goetia no. 32, "Asmoday" (Mathers): "He appeareth with Three Heads, whereof the first is like a Bull, the second like a Man, and the third like a Ram; he hath also the tail of a Serpent, and from his mouth issue Flames of Fire. His Feet are webbed like those of a Goose. He sitteth upon an Infernal Dragon, and beareth in his hand a Lance with a Banner."
 - **Visual (every clause used):** Three heads (bull, man, ram), a serpent tail, fire from the mouth, webbed goose-feet, riding an infernal dragon, carrying a lance with a banner.
 - **SPRITE BRIEF**
@@ -679,6 +692,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   - *Glow map:* The mouths glow orange before fire and red during it; the banner sigil is dull ember; the dragon mount's throat glows orange.
   - *Puppet parts (28):* rider: bull head, man head, ram head (each with a jaw), torso, arms ×2 (2 segments each), lance, banner (3-segment cloth rig), serpent tail (4 segments), goose-feet ×2; dragon: head, jaw, neck (3 segments), body, wings ×2, legs ×4, tail (4 segments).
   - *Animations:* idle, stride, lance charge, lance thrust combo, triple fire breath, dragon bite, tail sweep, dismount (phase 2: he fights on foot, goose-feet slapping), flee (if the fish-smoke item is used, Tobit 8:3), death.
+- **Name plate:** Asmodeus, *King of the Pit* (Mathers spells the Goetic name Asmoday; the game uses Tobit's spelling).
 - **Role:** Boss (a King roaming the Tier 3 map). **First tier:** 3.
 - **Attacks:**
   1. *Lance thrust combo*: parryable 3 hits, orange (0.6/0.5/0.8 s), High.
@@ -705,6 +719,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   - *Glow map:* Vepar's mouth goes **orange** before a bite; Focalor's wind-gust rings are orange (parry-reflect) and his drowning whirlpools red; Forneus's lure is a constant ember that goes **red** before its hyperarmour lunge.
   - *Puppet parts:* Vepar (9: head, jaw, torso, arms ×2, tail ×4); Focalor (13: head, kelp hair, torso, robe ×2, arms ×2, wings ×2 (2 segments each), legs ×2 dangling); Forneus (12: carapace, head, jaw, lure stalk, lure, claws ×2, legs ×6 (as 2 grouped sprites)).
   - *Animations (each):* idle, move (swim, hover or crawl), wind-up, attack, special, stagger, death.
+- **Name plates:** Focalor, *Duke of the Pit*; Vepar, *Duke of the Pit*; Forneus, *Marquis of the Pit*.
 - **Role:** Vepar common; Focalor elite; Forneus elite heavy. **First tier:** 2 (Focalor and Vepar, Dukes); Forneus, a Marquis, joins at 3.
 - **Attacks:**
   - Vepar: *lunge-bite from water* (parryable, 0.5 s); *drag under* (red grab, 1.0 s).
@@ -879,7 +894,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
 
 ### E29. Azazel, the Weapon-Teacher (Corrupted angel, boss)
 
-- **Source [Scripture]:** Leviticus 16:8, 10 (NRSVUE): "Aaron shall cast lots on the two goats ... the other lot for Azazel ... that it may be sent away into the wilderness to Azazel." (KJV translates the same word as "scapegoat".)
+- **Source [Scripture]:** Leviticus 16:8, 10 (KJV): "Aaron shall cast lots upon the two goats ... the other lot for the scapegoat." ... "to let him go for a scapegoat into the wilderness." (The KJV's "scapegoat" translates the Hebrew *azazel*, which modern translations such as the NRSVUE keep as the name Azazel; noted here, not quoted.)
 - **Source [Enochic tradition]:** 1 Enoch 8:1 (Charles): "Azâzêl taught men to make swords, and knives, and shields, and breastplates, and made known to them the metals of the earth and the art of working them". 1 Enoch 10:4–5: "Bind Azâzêl hand and foot, and cast him into the darkness: and make an opening in the desert ... And place upon him rough and jagged rocks, and cover him with darkness ... and cover his face that he may not see light."
 - **Visual (our design):** The Watcher who forged the first weapons. He wears a jagged-rock carapace (the rocks laid upon him), a **covered face** (a hood or iron mask, as in 10:5) and the horns of a wilderness goat (the Leviticus link). His wings are made of hammered blades. He carries an anvil-hammer and wields **every weapon type**, changing weapon each phase.
 - **SPRITE BRIEF**
@@ -933,6 +948,7 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
   - *Glow map:* They present **false white-gold** that switches to red when struck (a deliberate exception to the glow rule, flagged in section 6). The chariot's flame wheels are orange, red when charging.
   - *Puppet parts (24):* twin A and twin B (each: head, torso, wings ×2, arms ×2), chariot body, flame wheels ×2, yoke, flame trail.
   - *Animations:* idle (they speak in unison), glide, chariot charge, twin split (both leave the chariot and fight separately), mirrored strike, comely voice (charm), reveal (the gold cracks to red), stagger, death.
+- **Name plate:** Belial, *King of the Pit* (hidden while he is disguised as an ally).
 - **Role:** Boss (a King roaming the Tier 3 map; can appear disguised as an ally until revealed). **First tier:** 3.
 - **Attacks:**
   1. *Chariot charge*: red, 1.2 s, a line, with flame trails.
@@ -1033,36 +1049,55 @@ Every prompt uses the same Hell style tail, written out in full so each prompt c
 - **AI read trait:** Adaptive at both phases (progression doc). Optional callback [Game invention]: in the final fight it **counters the player's most-used action from the whole campaign**.
 - **DRAFT AI IMAGE PROMPT (Phase 1):** "The great red dragon of Revelation 12: a colossal dark crimson serpent-dragon with seven heads on long necks each wearing a dull crown, ten horns among the heads, vast tattered bat-like wings, a long coiling tail dragging a scatter of small white stars, eyes like burning coals. Fixed orthographic camera 45–50 degrees down on a diagonal, three-quarter top-down view, heads, wings and nearest coils isolated. Death's Door-inspired chunky bevelled forms, toon shading with hard value bands, thick dark ink outlines, apocalyptic menacing mood. Very dark crimson-black base; emissive glows are red-orange eyes and mouths, small white stars caught in the tail. Flat pure magenta #FF00FF background, no ground, no cast shadow, no magenta or pink in the figure, glows orange-red not pink, high resolution game sprite source." *(Phase 2: "a long low dark crimson serpent with torn wing stumps and broken heads, red lightning crackling along its spine, coiled to lunge".)*
 
+### E36. Fallen Angel (the common tier; a fallen ally of the Host)
+
+- **Source [Scripture]:** Revelation 12:9 (KJV): "he was cast out into the earth, and his angels were cast out with him." **[Game invention]:** an allied angel of the Host (A8) who dies or is overwhelmed in a fight can fall on the spot and turn on the player (decided by Dan; the rules are in the plan's [Fallen Angels](./heaven-or-hell-plan.md#fallen-angels-the-common-tier) section).
+- **Visual:** The A8 soldier after the fall: the same plain man-like angel, hunched, wings dragged low, the halo ring cracked and lying at its feet, red where the ally had white and gold. It must read as "one of ours, lost", not as a new monster.
+- **SPRITE BRIEF**
+  - *Silhouette:* The A8 silhouette with the wing V collapsed downward and the spear held low and forward. Telling it from a live ally at a glance comes from the drooped wings and the missing halo above the head.
+  - *Scale:* M+ (1.3× player, the A8 rig).
+  - *Glow map:* The A8 glow layers recoloured: dim ember rims and a dull red spearhead at idle, the spearhead **orange** before each parryable thrust. No white or gold survives.
+  - *Puppet parts:* none new. It reuses the A8 rig and swaps the glow layers, plus a cracked halo sprite left on the ground.
+  - *Animations:* the A8 **fall** (about 0.6 s as a starting value, played on the A8 rig; it never pauses play: no hit-stop, no timescale change, no camera move, no input lock), hunched idle, stalk, two-hit spear combo, stagger, death (crumbles to ash).
+- **Name plate:** Fallen Angel (no rank title; it is not a Goetic spirit).
+- **Role:** Common (the lowest enemy tier). **First tier:** 0, wherever an ally falls. The chance an ally falls rises with the local tier (the plan gives the starting values), so Fallen Angels grow common as Corruption rises. It scales with tier like any other common.
+- **Attacks:**
+  1. *Spear thrust*: parryable, orange, 0.5 s, Med.
+  2. *Two-hit spear combo*: parryable, orange (0.5/0.6 s), Low then Med.
+- **AI read trait:** Gullible (the progression doc lists Fallen Angels among the gullible readers).
+- **Reward:** Killing one gives no Stain (plan). It is a fallen friend, not a trophy.
+- **DRAFT AI IMAGE PROMPT:** none needed; it is a recolour of the A8 painting. If a separate painting is wanted later, use the A8 prompt with "hunched, wings dragged low, halo broken, glows dull red and orange instead of white and gold".
+
 ---
 
 ## 2C. Goetia quick reference (tradition, Mathers' translation)
 
-These are appearance descriptions only, quoted from Mathers' *Goetia* (sacred-texts.com). **Bold** names have full entries in 2B. The rest are a bench for later content or variants.
+These are appearance descriptions only, quoted from Mathers' *Goetia* (sacred-texts.com). **Bold** names have full entries in 2B. The rest are a bench for later content or variants. The rank column follows Wikipedia's list of the Goetia's demons; in game each spirit's real name is shown with "*<Rank> of the Pit*" underneath (decided by Dan), using the first rank where two are given. The game shows No. 32 as Asmodeus, Tobit's spelling.
 
-| No. | Spirit | Appearance (quoted) | Use |
-| --- | --- | --- | --- |
-| 1 | **Bael** | "sometimes like a Cat, sometimes like a Toad, and sometimes like a Man, and sometimes all these forms at once" | E18 |
-| 7 | Amon | "like a Wolf with a Serpents tail, vomiting out of his mouth flames of fire ... a Man with Dog's teeth beset in a head like a Raven" | Bench: Marchosias variant |
-| 9 | **Paimon** | "a Man sitting upon a Dromedary with a Crown most glorious upon his head. There goeth before him also an Host of Spirits, like Men with Trumpets" | E19 |
-| 17 | **Botis** | "an ugly Viper, then ... a Human shape with Great Teeth, and two Horns, carrying a bright and sharp Sword" | E6 |
-| 25 | **Glasya-Labolas** | "a Dog with Wings like a Gryphon" | E9 |
-| 26 | Bune | "a Dragon with three heads, one like a Dog, one like a Gryphon, and one like a Man ... causeth the Spirits which be under him to gather together upon your Sepulchres" | Bench: tomb-field elite |
-| 28 | Berith | "a Soldier with Red Clothing, riding upon a Red Horse, and having a Crown of Gold upon his head" | Bench: cavalry captain (note the red-horse overlap with Revelation 6:4) |
-| 29 | Astaroth | "an hurtful Angel riding on an Infernal Beast like a Dragon, and carrying in his right hand a Viper ... his Noisome Breath" | Bench: corrupted-angel rider |
-| 30 | **Forneus** | "a Great Sea-Monster" | E21 variant |
-| 32 | **Asmoday** | "Three Heads ... a Bull ... a Man ... a Ram; he hath also the tail of a Serpent ... Feet are webbed like those of a Goose. He sitteth upon an Infernal Dragon" | E20 |
-| 34 | **Furfur** | "an Hart with a Fiery Tail ... he will take upon himself the Form of an Angel" | E10 |
-| 35 | **Marchosias** | "a Wolf having Gryphon's Wings, and a Serpent's Tail, and Vomiting Fire" | E11 |
-| 36 | Stolas | "a Mighty Raven at first ... after he taketh the image of a Man" | Bench: scout |
-| 38 | **Halphas** | "a Stock-Dove ... to build up Towers, and to furnish them with Ammunition and Weapons" | E7 variant |
-| 39 | **Malphas** | "like a Crow ... can build Houses and High Towers" | E7 |
-| 41 | **Focalor** | "a Man with Gryphon's Wings ... to drown them in the Waters" | E21 |
-| 42 | **Vepar** | "like a Mermaid ... can cause the seas to be right stormy" | E21 variant |
-| 43 | **Sabnock** | "an Armed Soldier with a Lion's Head, riding on a pale-coloured horse" | E17 |
-| 59 | Orias | "a Lion, riding upon a Horse Mighty and Strong, with a Serpent's Tail; and he holdeth in his Right Hand two Great Serpents hissing" | Bench: Tier 4 cavalry elite |
-| 61 | Zagan | "a Bull with Gryphon's Wings" | Bench: heavy charger |
-| 63 | **Andras** | "an Angel with a Head like a Black Night Raven, riding upon a strong Black Wolf, and having a Sharp and Bright Sword" | E16 |
-| 68 | **Belial** | "Two Beautiful Angels sitting in a Chariot of Fire" | E31 |
+| No. | Spirit | Rank (name plate) | Appearance (quoted) | Use |
+| --- | --- | --- | --- | --- |
+| 1 | **Bael** | King | "sometimes like a Cat, sometimes like a Toad, and sometimes like a Man, and sometimes all these forms at once" | E18 |
+| 7 | Amon | Marquis | "like a Wolf with a Serpents tail, vomiting out of his mouth flames of fire ... a Man with Dog's teeth beset in a head like a Raven" | Bench: Marchosias variant |
+| 9 | **Paimon** | King | "a Man sitting upon a Dromedary with a Crown most glorious upon his head. There goeth before him also an Host of Spirits, like Men with Trumpets" | E19 |
+| 17 | **Botis** | President (and Earl) | "an ugly Viper, then ... a Human shape with Great Teeth, and two Horns, carrying a bright and sharp Sword" | E6 |
+| 25 | **Glasya-Labolas** | President (and Earl) | "a Dog with Wings like a Gryphon" | E9 |
+| 26 | Bune | Duke | "a Dragon with three heads, one like a Dog, one like a Gryphon, and one like a Man ... causeth the Spirits which be under him to gather together upon your Sepulchres" | Bench: tomb-field elite |
+| 28 | Berith | Duke | "a Soldier with Red Clothing, riding upon a Red Horse, and having a Crown of Gold upon his head" | Bench: cavalry captain (note the red-horse overlap with Revelation 6:4) |
+| 29 | Astaroth | Duke | "an hurtful Angel riding on an Infernal Beast like a Dragon, and carrying in his right hand a Viper ... his Noisome Breath" | Bench: corrupted-angel rider |
+| 30 | **Forneus** | Marquis | "a Great Sea-Monster" | E21 variant |
+| 32 | **Asmoday** | King | "Three Heads ... a Bull ... a Man ... a Ram; he hath also the tail of a Serpent ... Feet are webbed like those of a Goose. He sitteth upon an Infernal Dragon" | E20 |
+| 34 | **Furfur** | Earl | "an Hart with a Fiery Tail ... he will take upon himself the Form of an Angel" | E10 |
+| 35 | **Marchosias** | Marquis | "a Wolf having Gryphon's Wings, and a Serpent's Tail, and Vomiting Fire" | E11 |
+| 36 | Stolas | Prince | "a Mighty Raven at first ... after he taketh the image of a Man" | Bench: scout |
+| 38 | **Halphas** | Earl | "a Stock-Dove ... to build up Towers, and to furnish them with Ammunition and Weapons" | E7 variant |
+| 39 | **Malphas** | President | "like a Crow ... can build Houses and High Towers" | E7 |
+| 41 | **Focalor** | Duke | "a Man with Gryphon's Wings ... to drown them in the Waters" | E21 |
+| 42 | **Vepar** | Duke | "like a Mermaid ... can cause the seas to be right stormy" | E21 variant |
+| 43 | **Sabnock** | Marquis | "an Armed Soldier with a Lion's Head, riding on a pale-coloured horse" | E17 |
+| 59 | Orias | Marquis | "a Lion, riding upon a Horse Mighty and Strong, with a Serpent's Tail; and he holdeth in his Right Hand two Great Serpents hissing" | Bench: Tier 4 cavalry elite |
+| 61 | Zagan | King (and President) | "a Bull with Gryphon's Wings" | Bench: heavy charger |
+| 63 | **Andras** | Marquis | "an Angel with a Head like a Black Night Raven, riding upon a strong Black Wolf, and having a Sharp and Bright Sword" | E16 |
+| 68 | **Belial** | King | "Two Beautiful Angels sitting in a Chariot of Fire" | E31 |
 
 The *Observations* section adds that 72 spirits sit under four Kings of the cardinal points (Amaymon, Corson, Ziminay and Göap). That is a natural structure if Dan wants four Hell "fronts" invading Heaven's map from four directions.
 
@@ -1093,7 +1128,7 @@ Each tier adds new creatures. Earlier ones persist with escalation modifiers (se
 
 | Tier | Theme | Commons (new) | Elites (new) | Mini-bosses and bosses (new) | World events and allies |
 | --- | --- | --- | --- | --- | --- |
-| **0** | **The Calm Courts** | E1 Pit-Smoke Wisp (strays), E2 Se'ir goat-demon, E3 Frog-Spirit, E8 locust scouts, E15 the Branded (Knights' brands) | none | Knight captain (an E15 variant) guards the first breach | Cherub parry trainer (A2), seraphim at breaches and altars (A1), ophan sentinels (A3), Strangers (A7), the Host (A8) |
+| **0** | **The Calm Courts** | E36 Fallen Angels (wherever an ally falls), E1 Pit-Smoke Wisp (strays), E2 Se'ir goat-demon, E3 Frog-Spirit, E8 locust scouts, E15 the Branded (Knights' brands) | none | Knight captain (an E15 variant) guards the first breach | Cherub parry trainer (A2), seraphim at breaches and altars (A1), ophan sentinels (A3), Strangers (A7), the Host (A8) roaming in small, fragile bands |
 | **1** | **Smoke from the Pit** | E4 Legion-Swine; E1 becomes common | E5 Nephil Brute (rare), E6 Botis, E7 Malphas and Halphas, E9 Glasya-Labolas, E10 Furfur, **E13 Legion** (roaming) | Abaddon's vanguard, the first world boss (E14 preview) | The fifth trumpet opens the Pit (A6); the Linen Scribes' mark (A5) |
 | **2** | **The Locusts** | E8 locust swarms, E21 Vepar | Crowned locusts (E8, wary), E11 Marchosias, E12 Lilith, E16 Andras, E17 Sabnock, E21 Focalor | **E14 Abaddon/Apollyon** (boss) | Corrupted angels appear as rare elites, including the A1–A3 echoes |
 | **3** | **The Brands** | E15 now carry Kings' brands; E5 becomes common | E21 Forneus, E23 Lion, Bear and Leopard | **E18 Bael**, **E19 Paimon**, **E20 Asmodeus**, **E31 Belial** (Kings roaming as bosses); **E22 Leviathan** (stirs as a sea hazard, fought at the end of the tier) | Scribes scatter coals as an ally strike (A5) |
@@ -1109,7 +1144,7 @@ Each tier adds new creatures. Earlier ones persist with escalation modifiers (se
 | +3 | Read trait shifts one step toward Adaptive (Gullible becomes Wary, Wary becomes Adaptive) |
 | +4 | Elite variant: bigger, with an ember aura and a new unparryable attack |
 
-**Roster counts:** 8 ally entries; 35 enemy entries (40 distinct enemy sprites with variants). By entry role: 6 commons (E1, E2, E3, E4, E8, E15, plus Vepar inside E21), 15 elites (E5, E6, E7, E9, E10, E11, E12, E13, E16, E17, E21, E23, E25, E26, E32), 1 mini-boss (E24, plus the Knight captain variant of E15) and 13 bosses (E14, E18, E19, E20, E22, E27, E28, E29, E30, E31, E33, E34 and the final boss E35). **Corrupted angels:** Abaddon, Andras, the Watcher, the Four Loosed, Azazel and Belial, the Beast from the Earth as a mimic, the angel-form phases of Furfur and Marchosias, and the plan's corrupted seraph, cherub and ophan on the A1–A3 rigs. That keeps them a smaller elite and boss tier, as briefed.
+**Roster counts:** 8 ally entries; 36 enemy entries (40 distinct enemy sprites with variants, plus the Fallen Angel on the A8 rig). By entry role: 7 commons (E1, E2, E3, E4, E8, E15, E36, plus Vepar inside E21), 15 elites (E5, E6, E7, E9, E10, E11, E12, E13, E16, E17, E21, E23, E25, E26, E32), 1 mini-boss (E24, plus the Knight captain variant of E15) and 13 bosses (E14, E18, E19, E20, E22, E27, E28, E29, E30, E31, E33, E34 and the final boss E35). **Fallen Angels** (E36) are the common tier of corrupted angels. **Named corrupted angels:** Abaddon, Andras, the Watcher, the Four Loosed, Azazel and Belial, the Beast from the Earth as a mimic, the angel-form phases of Furfur and Marchosias, and the plan's corrupted seraph, cherub and ophan on the A1–A3 rigs. That keeps them a smaller elite and boss tier, as briefed.
 
 ---
 
@@ -1119,7 +1154,7 @@ Each tier adds new creatures. Earlier ones persist with escalation modifiers (se
 
 - **Why:** It is the cleanest **parry teacher**. Two parryable swings (a fast hook and a *delayed* overhead) teach timing, and one red horn-charge teaches "orange means parry, red means roll". Its **Gullible** read makes it the ideal first feint target.
 - **Cost:** 13 parts on a standard biped rig. **This rig becomes the template** for the Branded (E15), Botis phase 2 (E6) and Malphas (E7).
-- **Sourcing:** It is scriptural (Leviticus 17:7, Isaiah 34:14 NRSVUE "goat-demons") and also reads as the archetypal goat-horned demon players expect.
+- **Sourcing:** It is scriptural (the *se'irim* of Leviticus 17:7 and Isaiah 34:14, the KJV's "devils" and "satyr") and also reads as the archetypal goat-horned demon players expect.
 
 ### 2. E3 Unclean Frog-Spirit (ranged and area with telegraphs)
 
@@ -1153,9 +1188,9 @@ All pages below were retrieved during this research. Some passages on these page
 6. Revelation 13, 16:13–14; Daniel 7:2–8 (KJV): https://www.biblegateway.com/passage/?search=Revelation+13%3BRevelation+16%3A13-14%3BDaniel+7%3A2-8&version=KJV
 7. Job 41, 40:15–24; Isaiah 27:1; Psalm 74:14 (KJV): https://www.biblegateway.com/passage/?search=Job+41%3A1-34%3BIsaiah+27%3A1%3BPsalm+74%3A14%3BJob+40%3A15-24&version=KJV
 8. Mark 5:1–20; Matthew 12:24; 2 Kings 1:2–3; Leviticus 16:8–10, 17:7; Isaiah 34:14, 13:21 (KJV): https://www.biblegateway.com/passage/?search=Mark+5%3A1-20%3BMatthew+12%3A24%3B2+Kings+1%3A2-3%3BLeviticus+16%3A8-10%3BLeviticus+17%3A7%3BIsaiah+34%3A14%3BIsaiah+13%3A21&version=KJV
-9. Isaiah 34:14; Leviticus 17:7, 16:8–10 (NRSVUE): https://www.biblegateway.com/passage/?search=Isaiah+34%3A14%3BLeviticus+17%3A7%3BLeviticus+16%3A8-10&version=NRSVUE
+9. Isaiah 34:14; Leviticus 17:7, 16:8–10 (NRSVUE, for the translation notes on *se'irim*, *lilith* and *azazel* only; nothing is quoted from it): https://www.biblegateway.com/passage/?search=Isaiah+34%3A14%3BLeviticus+17%3A7%3BLeviticus+16%3A8-10&version=NRSVUE
 10. Genesis 3:1, 3:14, 6:4, 18:1–2, 19:1; Job 1:6–7; Zechariah 3:1–2; Luke 10:18; Isaiah 14:12–15; Ezekiel 28:12–17; Hebrews 13:2 (KJV): https://www.biblegateway.com/passage/?search=Genesis+3%3A1%3BGenesis+3%3A14%3BJob+1%3A6-7%3BZechariah+3%3A1-2%3BLuke+10%3A18%3BIsaiah+14%3A12-15%3BEzekiel+28%3A12-17%3BGenesis+6%3A4%3BGenesis+18%3A1-2%3BGenesis+19%3A1%3BHebrews+13%3A2&version=KJV
-11. Tobit 3:8, 8:2–3 (NRSVUE): https://www.biblegateway.com/passage/?search=Tobit+3%3A8%3BTobit+8%3A2-3&version=NRSVUE
+11. Tobit 3:8, 8:2–3 (KJV Apocrypha, Wikisource, because Bible Gateway's KJV has no Apocrypha): https://en.wikisource.org/wiki/Bible_(King_James)/Tobit
 12. Revelation 12:7–9, 6:1–8, 15:6–7, 19:20, 20:10 (KJV): https://www.biblegateway.com/passage/?search=Revelation+12%3A7-9%3BRevelation+6%3A1-8%3BRevelation+15%3A6-7%3BRevelation+19%3A20%3BRevelation+20%3A10&version=KJV
 
 **Tradition texts (sacred-texts.com):**
@@ -1183,11 +1218,12 @@ All pages below were retrieved during this research. Some passages on these page
 30. Wikipedia, "Beatus of Liébana": https://en.wikipedia.org/wiki/Beatus_of_Li%C3%A9bana
 31. Wikipedia, "Gustave Doré": https://en.wikipedia.org/wiki/Gustave_Dor%C3%A9
 32. Wikipedia, "The Garden of Earthly Delights": https://en.wikipedia.org/wiki/The_Garden_of_Earthly_Delights
+33. Wikipedia, "List of demons in the Ars Goetia" (ranks for the name plates): https://en.wikipedia.org/wiki/List_of_demons_in_the_Ars_Goetia
 
 **Style reference (Death's Door), retrieved as web-search excerpts:**
 
-33. Press Start, "We Spoke To The Team At Acid Nerve About The Stylish Looking Death's Door" (fixed isometric choice): https://press-start.com.au/features/2021/03/27/we-spoke-to-the-team-at-acid-nerve-about-the-stylish-looking-deaths-door/
-34. The Gemsbok, "The Pros and Cons of Death's Door" (clean lines, mostly fixed isometric perspective, diorama look): https://thegemsbok.com/art-reviews-and-articles/deaths-door-acid-nerve-review-pros-cons/
+34. Press Start, "We Spoke To The Team At Acid Nerve About The Stylish Looking Death's Door" (fixed isometric choice): https://press-start.com.au/features/2021/03/27/we-spoke-to-the-team-at-acid-nerve-about-the-stylish-looking-deaths-door/
+35. The Gemsbok, "The Pros and Cons of Death's Door" (clean lines, mostly fixed isometric perspective, diorama look): https://thegemsbok.com/art-reviews-and-articles/deaths-door-acid-nerve-review-pros-cons/
 
 ---
 
@@ -1207,11 +1243,11 @@ All pages below were retrieved during this research. Some passages on these page
 
 1. **The dragon's identity.** Revelation 12:9 identifies the dragon by name with a reserved figure. This bestiary calls it only "the Red Dragon" and "that old serpent" and gives it no other forms. Keep it that way until the special quests are planned, or tie the two together later?
 2. **Beings scripture does not call demonic.** Behemoth and Leviathan are created creatures in Job; the four angels of the Euphrates are "prepared" and loosed at a trumpet; the locusts act only as "it was given them"; Abaddon is "the angel of the bottomless pit". We framed them as **corrupted or goaded by Hell**, as the plan does. *Decided for Behemoth and Leviathan:* both are corrupted creatures and enemies (E28, E22). The rest stays open. Alternatives: (a) keep them neutral "judgement" forces the player survives rather than kills; (b) give Behemoth a *free* ending (already designed) and Marchosias a *spare* ending.
-3. **How much occult material.** The Goetia is a grimoire. Using its spirits' names and appearances is common in games, but some players are uncomfortable with it. Options: keep it as is (15 Goetic spirits featured across 12 entries), or rename them as "Kings of the Pit" with only lore-codex attributions.
+3. **How much occult material (decided by Dan).** Goetic spirits keep their real *Ars Goetia* names, shown with a rank title underneath in the form "*<Rank> of the Pit*" (for example Bael, *King of the Pit*). That covers 15 Goetic spirits featured across 12 entries. The real seals stay out (see the baseline).
 4. **Lilith.** She is a figure of Jewish folklore, and the Isaiah word may mean only a night bird. We use the owl/night-creature reading and **avoid the seductress trope entirely**. Confirm, or drop her and promote Stolas (raven) into the slot.
 5. **Belial's false gold and the Strangers.** This intentionally breaks the "gold equals ally" rule, as does the False Prophet's counterfeit gold. It is a powerful twist, but it muddies the glow language Dan set. Keep it (with a tell, gold that flickers to red at its edges), or keep gold sacrosanct? *Decided:* keep it. Deceivers may show false golden light, fake Vision pickups and a false angelic glow, always with the tell (section 1.3, 2 Corinthians 11:14).
-6. **Allied angels dying or falling.** Can allied NPC angels (the Host especially) be killed, or corrupted mid-campaign? This is strong drama, but it puts "angels suffering" on screen. Decide the limit.
-7. **Scripture licensing for in-game text.** The KJV is marked public domain on Bible Gateway, so use KJV for any quotations shown in the game. The NRSVUE quotes (goat-demons, Lilith, Azazel, Tobit) are for this document only; **check licensing before quoting NRSVUE or ESV in the shipped game.**
+6. **Allied angels dying or falling (decided by Dan).** Allied angels roam the open map, fight alongside the player, and are fragile. A dead or overwhelmed ally can be corrupted into a Fallen Angel (E36), the lowest enemy tier, through a quick fall animation that never pauses play. Named corrupted angels stay the elite and boss tier. Only the Host (A8) roams and falls; the seraphim, cherubim and ophanim keep their posts.
+7. **Scripture translation (decided by Dan).** Every scripture quote, in this document and in the game, is from the KJV, and Tobit from the KJV's Apocrypha. Bible Gateway marks the KJV as public domain. The NRSVUE is consulted only for the translation notes on *se'irim*, *lilith* and *azazel* (source 9), and nothing is quoted from it.
 8. **Art-history baggage.** Do not reproduce the Ottoman "turban" coding in Dürer's woodcuts, and do not reference Doré's *Wandering Jew*. Give Paimon's court an abstract-infernal costume, not real Middle-Eastern dress.
 9. **Naming Death's Door in prompts.** The prompts say "Death's Door-inspired" as briefed. For production and any public-facing material, consider swapping that for a purely descriptive style phrase (the prompts already include one) to avoid derivative-work concerns and to keep the look your own.
 10. **Red Dragon colour exception.** The dragon is the one creature with a deep crimson body rather than a near-black base, because it is literally "a great red dragon". Approve or veto the exception.
