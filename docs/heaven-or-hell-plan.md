@@ -114,7 +114,8 @@ of Hell as the Bible or tradition depicts them: the locusts of Revelation 9
 and their king Abaddon, the beast of Revelation 13, the dragon of
 Revelation 12, Leviathan and Behemoth from Job 40–41, Legion from Mark 5,
 and named demons from traditional demonology. A smaller tier of corrupted
-angels serves as elites and bosses. See [Creatures](#creatures).
+angels serves as elites and bosses. See [Creatures](#creatures) and the
+full roster in the [bestiary](./heaven-or-hell-bestiary.md).
 
 **Palette.** The red of Hell and the white of Heaven are the main clash.
 Both pop vividly, with bloom, against a dark, high-contrast monochrome base.
@@ -395,6 +396,13 @@ NRSVUE. Decided: the angels are allies, demons and creatures of Hell are the
 main enemies, and corrupted angels are a smaller elite and boss tier. The
 role of each creature is a proposal.
 
+The full roster lives in the companion
+[bestiary](./heaven-or-hell-bestiary.md): 8 ally entries and 35 enemy
+entries, each with a sprite brief, a draft AI image prompt and a first tier
+aligned with the progression doc. The tables below are the short version.
+The bestiary is a proposal too, and where it differs, this section and the
+progression doc win.
+
 ### Angels: allies and NPCs
 
 | Creature | Description | Proposed role |
@@ -417,7 +425,7 @@ role of each creature is a proposal.
 | Leviathan | Job 41: "his back is made of rows of shields," "out of his mouth go flaming torches," "out of his nostrils comes forth smoke," and "his breath kindles coals." "Though the sword reaches him, it does not avail." He "makes the deep boil like a pot" and is "king over all the sons of pride." The ESV calls him "a large sea animal, exact identity uncertain" | A boss of the Sea of Glass whose armour has to be broken before it takes damage |
 | The beast from the sea | Revelation 13:1–2: "with ten horns and seven heads, with ten diadems on its horns and blasphemous names on its heads," "like a leopard," with feet "like a bear's" and a mouth "like a lion's mouth." "The dragon gave his power" to it | A late boss |
 | The dragon | Revelation 12:3–9: "a great red dragon, with seven heads and ten horns, and on his heads seven diadems." "His tail swept down a third of the stars of heaven." He fought Michael's angels "and was thrown down" | The invasion's leader and the last-tier boss |
-| Named demons | Tobit 3:8 names "the wicked demon Asmodeus," and Matthew 12:24 names "Beelzebul, the ruler of the demons." The Ars Goetia, part of a 17th-century grimoire called the Lesser Key of Solomon, lists 72 spirits with ranks, such as King Bael, Duke Astaroth, King Asmodeus and King Belial | Ranked enemies using the Ars Goetia's titles, from Knights at the first corruption tier to Kings who roam as bosses (progression doc, section 10). They command camps and lead breaches. Their names and ranks come from these sources, but no descriptions of them have been gathered yet, so their designs are original |
+| Named demons | Tobit 3:8 names "the wicked demon Asmodeus," and Matthew 12:24 names "Beelzebul, the ruler of the demons." The Ars Goetia, part of a 17th-century grimoire called the Lesser Key of Solomon, lists 72 spirits with ranks, such as King Bael, Duke Astaroth, King Asmodeus and King Belial | Ranked enemies using the Ars Goetia's titles, from Knights at the first corruption tier to Kings who roam as bosses (progression doc, section 10). They command camps and lead breaches. Their names and ranks come from these sources. The [bestiary](./heaven-or-hell-bestiary.md) quotes the Ars Goetia's descriptions of their appearance as a starting point for their designs |
 | Lesser demons | No single source. Original designs, kept in the same shape language | The melee, ranged and heavy types of M2 and M3 |
 
 Behemoth and Leviathan appear in Job as creatures of God's making, not as
