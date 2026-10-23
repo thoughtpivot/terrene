@@ -5,7 +5,9 @@ import { HdScreen } from "./hd";
 import { HohHud } from "./hud";
 import { HALO_MARK_LABELS, haloState, tierView } from "./hudState";
 import { Ctx, FAMILY, drawBar, drawFrame, drawRule, font, inkText, rng, setSpacing } from "./paint";
-import { ChoirScreen, GiftHandScreen, KitScreen, UiScreen } from "./screens";
+import { CHOIR_PICKS, DIFFICULTY_OPTIONS } from "./creation";
+import { CreationScreen } from "./creationScreen";
+import { GiftHandScreen, KitScreen, UiScreen } from "./screens";
 import { MAX_CORRUPTION, MAX_STAIN, ROMAN, TIER_NAMES, UiTheme } from "./theme";
 import { CooldownInput, HotbarSlotData, HudValues, TabBar, UiWidget } from "./widgets";
 
@@ -13,7 +15,8 @@ export const HEAVEN_OR_HELL_UI_SCENE = "heavenorhellui";
 
 const VIEW_W = 1280;
 const VIEW_H = 720;
-const TABS = ["HUD", "Kit", "Gift Hand", "Choir"];
+const TABS = ["HUD", "Kit", "Gift Hand", "Creation"];
+const CREATION_TAB = 3;
 
 /** A stand-in for the world under the HUD: a dark floor and one light pool, tinted by corruption. */
 class Backdrop extends UiWidget {
@@ -236,8 +239,8 @@ class Controls extends UiWidget {
 }
 
 interface PreviewHook {
-    set(o: { corruption?: number; stain?: number; lives?: number; tab?: number; paused?: boolean; time?: number; sweep?: boolean }): void;
-    state(): { corruption: number; stain: number; lives: number; tab: number; paused: boolean; ready: boolean };
+    set(o: { corruption?: number; stain?: number; lives?: number; tab?: number; paused?: boolean; time?: number; sweep?: boolean; step?: number }): void;
+    state(): { corruption: number; stain: number; lives: number; tab: number; paused: boolean; ready: boolean; step: number };
 }
 
 const WEAPON: HotbarSlotData = { key: "1", name: "Sword", glyph: "sword" };
@@ -253,7 +256,7 @@ const HYMNS: Array<HotbarSlotData & { period: number; offset: number }> = [
 const DIALOGUE = [
     { speaker: "Altar-keeper", text: "Kneel, little flame. The Courts are quieter than they were, but not for long." },
     { speaker: "Altar-keeper", text: "Every tier the smoke climbs higher. Seal what breaches you can, and keep your halo whole." },
-    { speaker: "Ashael", text: "And if it cracks?" },
+    { speaker: "The Tenth", text: "And if it cracks?" },
     { speaker: "Altar-keeper", text: "Then pray it cracks slowly. I can mend a dimmed halo. I cannot mend a stained one." },
 ];
 
@@ -279,6 +282,7 @@ export default class UiPreview extends Scene {
     private controls: Controls | null = null;
     private tabBar: TabBar | null = null;
     private screens: UiScreen[] = [];
+    private creation!: CreationScreen;
     private help: ScreenElement | null = null;
     private subs: Subscription[] = [];
     private corruption = 0;
@@ -349,7 +353,15 @@ export default class UiPreview extends Scene {
         this.tabBar = new TabBar({ w: 440, tabs: TABS, seed: 9, z: 121 });
         this.tabBar.addTo(this);
         this.tabBar.onChange = (i) => this.setTab(i);
-        this.screens = [new KitScreen(this, VIEW_W, VIEW_H), new GiftHandScreen(this, VIEW_W, VIEW_H), new ChoirScreen(this, VIEW_W, VIEW_H)];
+        this.creation = new CreationScreen(this, VIEW_W, VIEW_H);
+        this.screens = [new KitScreen(this, VIEW_W, VIEW_H), new GiftHandScreen(this, VIEW_W, VIEW_H), this.creation];
+        this.creation.onComplete = (r) => {
+            const choir = CHOIR_PICKS.find((c) => c.id === r.choir)?.name ?? r.choir;
+            const road = DIFFICULTY_OPTIONS.find((d) => d.id === r.difficulty)?.name ?? r.difficulty;
+            console.log("🕊️ The Tenth is kindled", r);
+            this.setTab(0);
+            this.hud?.toast("The Tenth is kindled", `${choir} \u00b7 ${road}`, "grace");
+        };
         const pr = this.hd.pixelRatio;
         const text = new Text({
             text: "← →  corruption    ↑ ↓  stain    0–5  tier\nL  lives    H  hit    Space  dialogue\n[ ]  screens    P  pause    T  sweep",
@@ -437,6 +449,7 @@ export default class UiPreview extends Scene {
                 if (o.sweep !== undefined && this.controls) this.controls.sweeping = o.sweep;
                 if (o.time !== undefined) this.sim = o.time;
                 if (o.tab !== undefined) this.setTab(clamp(Math.floor(o.tab), 0, TABS.length - 1));
+                if (o.step !== undefined) this.creation?.setStep(o.step);
                 this.controls?.invalidate();
                 this.applyTheme();
             },
@@ -447,6 +460,7 @@ export default class UiPreview extends Scene {
                 tab: this.tab,
                 paused: this.controls?.paused ?? false,
                 ready: this.built,
+                step: this.creation?.state.step ?? 0,
             }),
         };
         (window as unknown as { __hohUi?: PreviewHook }).__hohUi = hook;
@@ -502,6 +516,19 @@ export default class UiPreview extends Scene {
         }
     }
 
+    /** Creation takes the arrows, Enter and Escape; returns whether the key was used. */
+    private creationKey(key: Keys): boolean {
+        const c = this.creation;
+        if (key === Keys.Left) c.move(-1, 0);
+        else if (key === Keys.Right) c.move(1, 0);
+        else if (key === Keys.Up) c.move(0, -1);
+        else if (key === Keys.Down) c.move(0, 1);
+        else if (key === Keys.Enter) c.goNext();
+        else if (key === Keys.Escape || key === Keys.Backspace) c.goBack();
+        else return false;
+        return true;
+    }
+
     private setLives(n: number): void {
         if (!this.controls) return;
         this.controls.lives = n;
@@ -511,6 +538,7 @@ export default class UiPreview extends Scene {
 
     private onKey(key: Keys): void {
         if (!this.controls || !this.hud) return;
+        if (this.tab === CREATION_TAB && this.creationKey(key)) return;
         const digit = ["Digit0", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5"].indexOf(key);
         if (digit >= 0) {
             this.corruption = digit;
@@ -542,11 +570,12 @@ export default class UiPreview extends Scene {
         const dt = Math.min(0.05, elapsed / 1000);
         const kb = engine.input.keyboard;
         let changed = false;
-        if (kb.isHeld(Keys.Left) || kb.isHeld(Keys.Right)) {
+        const arrowsFree = this.tab !== CREATION_TAB;
+        if (arrowsFree && (kb.isHeld(Keys.Left) || kb.isHeld(Keys.Right))) {
             this.corruption = clamp(this.corruption + (kb.isHeld(Keys.Right) ? 1 : -1) * 1.2 * dt, 0, MAX_CORRUPTION);
             changed = true;
         }
-        if (kb.isHeld(Keys.Up) || kb.isHeld(Keys.Down)) {
+        if (arrowsFree && (kb.isHeld(Keys.Up) || kb.isHeld(Keys.Down))) {
             this.stain = clamp(this.stain + (kb.isHeld(Keys.Up) ? 1 : -1) * 30 * dt, 0, MAX_STAIN);
             changed = true;
         }
@@ -607,7 +636,7 @@ export default class UiPreview extends Scene {
         const fervour = 16 + 74 * (0.5 - 0.5 * Math.cos(t * 0.55));
         const sanctity = 66 + 34 * Math.cos(t * 0.27);
         return {
-            name: "Ashael · Kindled",
+            name: "The Tenth · Kindled",
             hp,
             hpMax,
             hpCap,
