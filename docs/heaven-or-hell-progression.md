@@ -22,6 +22,7 @@ It's the companion to [heaven-or-hell-plan.md](./heaven-or-hell-plan.md), which 
 8. **Starting weapons are basic:** sword, spear, knife and mace. The Flaming Sword and the other named weapons are found or earned as you progress, gated by corruption tier and quests (section 13).
 9. **Boons and Burdens** is the name for Deepwoken's Boons and Flaws.
 10. **Currencies are confirmed.** Visions are spent within a run and lost on a wipe. Testimony and Remembrance carry over. Grace is the mana for Hymns.
+11. **Four run difficulties, chosen at creation.** Easier difficulties make a run shorter and easier; harder ones make it longer and harsher. The difficulty sets the corruption pace (minutes per Corruption Tier, with the hardest keeping 100) and multiplies enemy health, posture, damage and aggression (section 1, step 8, and section 10).
 
 ## Glossary
 
@@ -177,7 +178,19 @@ The steps follow Deepwoken's order:
    - **Robes:** linen (after "the man clothed with linen" in Ezekiel 10:2), sash, cowl.
    - **Marks:** small sigils specific to each Choir.
    - **Style note:** the body stays near-monochrome; only the halo, eyes and wing edges glow white and gold.
-7. **Testimony Shop and Penances.** Spend meta currency and turn on difficulty Penances (section 12). Then the angel "kindles" into the world.
+7. **Testimony Shop and Penances.** Spend meta currency and turn on difficulty Penances (section 12).
+8. **Difficulty.** Choose one of four difficulties for the run (table below). Then the angel "kindles" into the world. The difficulty is kept through a wipe, like the other creation choices, and can be changed only by starting a new character.
+
+**The four difficulties.** Each is listed in the picker with its name, a subtitle and a KJV epigraph. The difficulty sets how many minutes of play each Corruption Tier lasts, and so the length of the run. It also multiplies the enemy numbers in section 10, on top of the tier's own multipliers. Two optional levers come with it: a Stain gain rate, and a loot bonus that raises dropped weapons one weapon tier. Every number is a starting value to tune.
+
+| Difficulty | Subtitle | Epigraph (KJV) | Minutes per tier | Tier 5 at | Enemy HP / posture / damage / aggression | Stain gain | Loot |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **Still Waters** | A short watch, gently kept | "He leadeth me beside the still waters." (Psalm 23:2) | 40 | 3 h 20 min | ×0.70 / ×0.80 / ×0.70 / ×0.80 | ×0.75 | +0 |
+| **The Narrow Way** (default) | The road as it was meant to be walked | "Strait is the gate, and narrow is the way, which leadeth unto life, and few there be that find it." (Matthew 7:14) | 60 | 5 h | ×1.00 / ×1.00 / ×1.00 / ×1.00 | ×1.00 | +0 |
+| **The Furnace of Affliction** | A longer siege, refined by fire | "I have chosen thee in the furnace of affliction." (Isaiah 48:10) | 80 | 6 h 40 min | ×1.25 / ×1.15 / ×1.20 / ×1.15 | ×1.15 | +1 |
+| **Son of the Morning** | The longest war, against the fallen star | "How art thou fallen from heaven, O Lucifer, son of the morning!" (Isaiah 14:12) | 100 | 8 h 20 min | ×1.50 / ×1.30 / ×1.40 / ×1.30 | ×1.30 | +1 |
+
+Aggression shortens the time an enemy waits between attacks: at ×1.30, Tier 0's 1.6 s interval becomes about 1.2 s. The difficulty names may name Lucifer, but he is never a depicted character. Difficulty is separate from Penances: Penances are opt-in modifiers that raise the Testimony payout (section 12), while difficulty changes only pace, enemies, Stain gain and loot.
 
 **Starting attributes:** 15 free points plus the Choir's +5 (or +10 more free points if you chose Wordless). This matches Deepwoken.
 
@@ -653,7 +666,7 @@ Pressing C sounds your **Trumpet** (Revelation 9:1, "the fifth angel sounded"). 
 
 This system is new and has no Deepwoken equivalent. **World Corruption** is the run's clock.
 
-**How it rises (decided).** Heaven decays at its own rate, driven by time. World Corruption rises at a steady, designed rate, and nothing the player does lowers it. As starting values: an in-game day lasts about 30 minutes of play, and a new tier begins every four in-game days, so about every 2 hours, with Tier 5 arriving about 10 hours into a run. That pace depends on the plan's open question about how long a run lasts. *This reading of Dan's "decays at its own rate" is an interpretation that Dan can adjust.*
+**How it rises (decided).** Heaven decays at its own rate, driven by time. World Corruption rises at a steady, designed rate, and nothing the player does lowers it. **The pace depends on the run's difficulty** (section 1, step 8): a new tier begins every 40 minutes of play on Still Waters, 60 on The Narrow Way, 80 on The Furnace of Affliction and 100 on Son of the Morning. So Tier 5 arrives 3 h 20 min, 5 h, 6 h 40 min or 8 h 20 min into a run. The difficulty also multiplies the enemy numbers in the table below. *This reading of Dan's "decays at its own rate" is an interpretation that Dan can adjust.*
 
 **What breaches do.** Breaches don't change the world's tier, but they change their own region:
 - Each region has a local corruption level that follows the world tier.
@@ -669,7 +682,7 @@ So the choice in each region is between safety (seal it and fall behind on loot)
 
 ### Scaling at a glance
 
-Every number is a starting value to tune. Enemy numbers are multipliers on each enemy's Tier 0 values. Attack interval is how long an enemy waits between attack attempts.
+Every number is a starting value to tune. Enemy numbers are multipliers on each enemy's Tier 0 values, shown here at The Narrow Way; other difficulties multiply them again. Attack interval is how long an enemy waits between attack attempts.
 
 | Tier | Enemy HP | Enemy posture | Enemy damage | Attack interval | Experience per Ascension | Shrine costs | Visions per first boss kill | Ascension pace |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -1000,7 +1013,7 @@ Everything else in this doc is either decided (see [Decided by Dan](#decided-by-
 2. **Survival meters.** Should there be hunger and thirst, or only Sanctity? Lives are decided and stay as they are.
 3. **The nemesis (optional, later).** Should your fallen self return as an elite in your next run (section 11)?
 
-The world questions that affect progression (the map's size, the hub, how a run ends well, and how long a run lasts and how it's saved, which sets the corruption pace) are in the plan.
+The world questions that affect progression (the map's size, the hub, how a run ends well, and how it's saved) are in the plan. How long a run lasts is now set by the difficulty chosen at creation (section 1, step 8).
 
 ---
 

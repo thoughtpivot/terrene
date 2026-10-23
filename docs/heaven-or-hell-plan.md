@@ -151,7 +151,10 @@ challenge is to keep pace with it by growing stronger. Sealing a breach
 does not lower corruption. It slows the spread around that breach and
 protects the region and its rewards. *This reading of "decays at its own
 rate" is an interpretation that Dan can adjust.* Rising corruption still
-opens up more systems.
+opens up more systems. **The pace depends on the difficulty** chosen at
+character creation: a tier lasts 40, 60, 80 or 100 minutes of play, from
+the easiest difficulty to the hardest (see
+[Character creation and progression](#character-creation-and-progression)).
 
 **Every tier brings more.** Each tier brings harder enemies, stronger
 weapons (better loot, higher weapon tiers and rarer weapons dropping) and
@@ -225,7 +228,9 @@ Shrines of the Throne, and Resonance becomes Trumpets. Dan liked the Tenth
 lore hook, the Choirs, the angelic names and the biblically grounded
 content. Choirs are chosen freely at creation, not rolled, and rare Choir
 variants are unlocked through Testimony and Remembrance. Deepwoken's Boons
-and Flaws are called Boons and Burdens. See
+and Flaws are called Boons and Burdens. The last creation step picks one
+of four run difficulties: easier ones make a run shorter and easier,
+harder ones longer and harsher. See
 [Character creation and progression](#character-creation-and-progression).
 
 **Mechanics are unchanged, with additions.** None of the decisions above
@@ -280,6 +285,9 @@ the baseline every other weapon is tuned against.
 - **How many lives.** Resolved: two, as they are.
 - **Names.** Resolved: Visions, Testimony and Remembrance, Grace as the
   mana, and Boons and Burdens.
+- **How long a run lasts.** Resolved: the player picks one of four
+  difficulties at creation, and it sets the corruption pace. Tier 5
+  arrives after 3 h 20 min on the easiest and 8 h 20 min on the hardest.
 
 ### Not decided yet
 
@@ -295,11 +303,11 @@ Nothing blocks M1, M2 or M3.
 3. **How a run ends well.** Does a run have a victory, such as defeating the
    dragon at Tier 5, or does it only end when you're wiped or fall, with the
    score being how long Heaven held? [M4]
-4. **How long a run should last, and how it's saved.** A long run with
-   permadeath has to survive closing the tab. *Proposal:* the run saves
-   continuously to `localStorage`, so quitting never undoes a death. The
-   run's length also sets the corruption pace, proposed as one tier about
-   every 2 hours of play. [M4]
+4. **How a run is saved.** A long run with permadeath has to survive
+   closing the tab. *Proposal:* the run saves continuously to
+   `localStorage`, so quitting never undoes a death. The run's length is
+   no longer open: the difficulty chosen at creation sets the corruption
+   pace, from 40 to 100 minutes per tier. [M4]
 5. **Tone.** How literal should scripture be? The progression doc names
    Michael, Abaddon and the dragon, keeps the Throne offscreen, and quotes
    Isaiah 14:12 in the Fall scene. [M6, before the text is final]
@@ -343,6 +351,7 @@ for Dan to confirm, apart from where they restate those decisions.
   tested.
 - **Corruption is the run's clock (decided).** A single World Corruption
   level rises with time at a steady, designed rate, and nothing lowers it.
+  The rate is set by the run's difficulty (40 to 100 minutes per tier).
   There's no cap on the player's strength per tier: the challenge is to
   keep pace. Breaches act locally. An open breach pulls its region up to a
   tier ahead of the world, with harder enemies and better loot. Sealing it
@@ -738,7 +747,20 @@ lists what Dan has decided and proposes the rest. In short:
   Choirs are chosen freely.
 - Creation follows Deepwoken's order: Choir, Tongues, a basic weapon,
   Boons and Burdens, Origin, appearance, then the Testimony Shop and
-  Penances. Every Origin works solo.
+  Penances, and finally the run's difficulty. Every Origin works solo.
+- **Four difficulties** are chosen at creation and kept through a wipe.
+  Each sets the corruption pace and multiplies enemy health, posture,
+  damage and aggression on top of the tier's scaling. The two harder ones
+  also raise Stain gain and drop weapons one tier higher. The detail and
+  KJV epigraphs are in section 1 of the progression doc. Starting values:
+
+  | Difficulty | Minutes per tier | Tier 5 at | Enemy HP / posture / damage / aggression |
+  | --- | --- | --- | --- |
+  | Still Waters (Psalm 23:2) | 40 | 3 h 20 min | ×0.70 / ×0.80 / ×0.70 / ×0.80 |
+  | The Narrow Way (Matthew 7:14), the default | 60 | 5 h | ×1.00 / ×1.00 / ×1.00 / ×1.00 |
+  | The Furnace of Affliction (Isaiah 48:10) | 80 | 6 h 40 min | ×1.25 / ×1.15 / ×1.20 / ×1.15 |
+  | Son of the Morning (Isaiah 14:12) | 100 | 8 h 20 min | ×1.50 / ×1.30 / ×1.40 / ×1.30 |
+
 - In a run you Ascend, draw Gifts and Hymns, swear one Vow, anoint your
   gear, pay Visions at Shrines of the Throne, and earn a Trumpet from boss
   kills.
@@ -1397,7 +1419,7 @@ code in `progression/`. M3 integrates both into the scene, through the
   Choirs, each with +3 and +2 to two attributes, a signature passive, two
   innate Gifts and a flaw. Then a starter weapon: the sword, spear or knife.
   The full creation flow (Tongues, weapon, Boons and Burdens,
-  Origin, appearance) can follow in M4 and M5, as the systems behind it
+  Origin, appearance, difficulty) can follow in M4 and M5, as the systems behind it
   land.
 - Telegraphs follow the Little Scavenger feedback: shrinking timer circles
   on the ground, visible cooldowns and clear feedback when you take damage.
@@ -1434,8 +1456,8 @@ scale and the save.
   behind, protecting its altar, merchants and rewards.
 - `progression/corruption.ts` runs the run's clock: World Corruption rises
   with time at a steady, designed rate, crossing tiers, and nothing lowers
-  it. The starting pace is one tier about every 2 hours of play, which
-  depends on open decision 4.
+  it. The pace comes from the run's difficulty: one tier every 40, 60, 80
+  or 100 minutes of play.
 - **Corruption tiers.** The tiers are in section 10 of the
   [progression doc](./heaven-or-hell-progression.md#10-corruption-tiers-the-power-curve):
   six tiers, from Tier 0 (the Calm Courts) to Tier 5 (War in Heaven). Every
@@ -1561,9 +1583,9 @@ scale and the save.
 - **Corruption balance.** Corruption rises at its own rate with no cap on
   the player, so if it rises faster than a player can grow, long runs
   become hopeless, and if slower, they lose tension. Tune the rate against
-  the Ascension pace for each tier in play in M4, and keep the rates and
-  scaling tables as data in `progression/corruption.ts` so they can be
-  tested and changed.
+  the Ascension pace for each tier in play in M4, on every difficulty, and
+  keep the per-difficulty rates and the scaling tables as data in
+  `progression/tuning.ts` so they can be tested and changed.
 - **Feint AI that feels unfair or exploitable.** Gullible enemies can make
   feints feel like a cheat, and adaptive ones can feel like they read your
   mind. Every commitment needs a visible tell, adaptive memory must fade,
