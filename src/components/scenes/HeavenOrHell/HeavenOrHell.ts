@@ -270,7 +270,7 @@ export default class HeavenOrHell extends Scene {
             if (evt.key === Keys.G) this.debug?.toggle(this);
             if (evt.key === Keys.B && this.bloom) this.bloom.enabled = !this.bloom.enabled;
             const action = KEY_ACTIONS[evt.key];
-            if (action) hero.buffer.press(action, performance.now());
+            if (action) hero.buffer.press(action, this.time * 1000);
         }));
         const canvas = engine.canvas;
         const listen = (target: EventTarget, type: string, fn: EventListener) => {
@@ -286,7 +286,7 @@ export default class HeavenOrHell extends Scene {
         listen(canvas, "pointerdown", (e) => {
             track(e);
             const action = MOUSE_ACTIONS[(e as PointerEvent).button];
-            if (action) this.hero?.buffer.press(action, performance.now());
+            if (action) this.hero?.buffer.press(action, this.time * 1000);
         });
         listen(canvas, "pointerleave", () => {
             this.mouse = null;
@@ -333,7 +333,7 @@ export default class HeavenOrHell extends Scene {
         const intent = readIntent(raw, { x: hero.pos.x, y: hero.pos.y - 50 });
         const bounds = worldRect(GRID);
         const inset = { x: bounds.x + 120, y: bounds.y + 120, w: bounds.w - 240, h: bounds.h - 240 };
-        const result = hero.step(intent, performance.now(), dt, streamer.colliders, inset);
+        const result = hero.step(intent, this.time * 1000, dt, streamer.colliders, inset);
         if (result.dashed) this.camera.shake(3, 3, 120);
         streamer.update(hero.pos.x, hero.pos.y, dt);
 

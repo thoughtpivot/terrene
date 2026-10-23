@@ -135,7 +135,7 @@ export default class Auriel extends Actor {
         this.parts = this.rig.update(0, { vx: 0, vy: 0, dashing: false, aim: null, facing: this.facing });
     }
 
-    /** Advance one frame. `now` is in milliseconds, for the input buffer. */
+    /** Advance one frame. `now` is game time in milliseconds, the clock the input buffer runs on. */
     step(intent: Intent, now: number, dt: number, colliders: readonly Footprint[], bounds: Rect): StepResult {
         const move: Vec2 = { x: intent.move.x, y: intent.move.y * FOOTPRINT_RATIO };
         const aimGround = intent.aim ? { x: intent.aim.x, y: intent.aim.y * FOOTPRINT_RATIO } : null;

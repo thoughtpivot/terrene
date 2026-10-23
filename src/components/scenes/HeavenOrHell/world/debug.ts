@@ -66,7 +66,7 @@ class WorldDebugGraphic extends Graphic {
         const h = this.src.hero();
         for (const c of s.colliders) {
             if (Math.abs(c.x - h.x) > 900 || Math.abs(c.y - h.y) > 600) continue;
-            ellipse(ex, c.x, c.y, c.rx, c.ry, COLLIDER, 1.5, 20);
+            ellipse(ex, c.x, c.y, c.rx, c.ry, COLLIDER, 1.5, 14);
         }
         // streaming measures plain distance in world pixels, so the reach is a circle on screen
         ellipse(ex, h.x, h.y, LOAD_DISTANCE, LOAD_DISTANCE, REACH_IN, 3);
