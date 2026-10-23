@@ -606,6 +606,7 @@ export function drawHalo(ctx: Ctx, cx: number, cy: number, radius: number, halo:
         const sources = used.length ? used : [-Math.PI / 2];
         const span = (halo.red * Math.PI * 2) / sources.length / 2;
         ctx.save();
+        ctx.globalAlpha = 0.45 + 0.55 * bright;
         ctx.lineWidth = ringW + 0.5;
         ctx.shadowColor = css(redCore, 0.8 * flick);
         ctx.shadowBlur = 8;

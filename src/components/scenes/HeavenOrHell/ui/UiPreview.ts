@@ -4,7 +4,7 @@ import { FontSources, loadUiFonts, uiFont } from "./fonts";
 import { HdScreen } from "./hd";
 import { HohHud } from "./hud";
 import { HALO_MARK_LABELS, haloState, tierView } from "./hudState";
-import { Ctx, FAMILY, drawBar, drawFrame, drawRule, font, inkText, setSpacing } from "./paint";
+import { Ctx, FAMILY, drawBar, drawFrame, drawRule, font, inkText, rng, setSpacing } from "./paint";
 import { ChoirScreen, GiftHandScreen, KitScreen, UiScreen } from "./screens";
 import { MAX_CORRUPTION, MAX_STAIN, ROMAN, TIER_NAMES, UiTheme } from "./theme";
 import { CooldownInput, HotbarSlotData, HudValues, TabBar, UiWidget } from "./widgets";
@@ -55,29 +55,54 @@ class Backdrop extends UiWidget {
         pg.addColorStop(1, css(pool, 0));
         ctx.fillStyle = pg;
         ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-        if (t.cracks > 0) {
-            ctx.strokeStyle = css(hex("#ff4a24"), 0.35 * t.cracks);
-            ctx.shadowColor = css(hex("#ff2a10"), 0.8);
-            ctx.shadowBlur = 8;
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            const r = [0.13, 0.71, 0.42, 0.88, 0.27, 0.6, 0.35, 0.79];
-            let x = VIEW_W * 0.52;
-            let y = VIEW_H * 0.46;
-            ctx.moveTo(x, y);
-            for (let i = 0; i < r.length * t.cracks; i++) {
-                x += (r[i] - 0.45) * 90;
-                y += (r[(i + 3) % r.length] - 0.5) * 50;
-                ctx.lineTo(x, y);
-            }
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-        }
+        if (t.cracks > 0) this.fissure(ctx, t.cracks);
         const v = ctx.createRadialGradient(VIEW_W / 2, VIEW_H / 2, VIEW_H * 0.3, VIEW_W / 2, VIEW_H / 2, VIEW_W * 0.7);
         v.addColorStop(0, "rgba(0,0,0,0)");
         v.addColorStop(1, "rgba(0,0,0,0.75)");
         ctx.fillStyle = v;
         ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+    }
+
+    /** A breach in the floor: two jagged arms out of the light pool, forking, longer as the cracks deepen. */
+    private fissure(ctx: Ctx, amount: number): void {
+        const r = rng(19);
+        const cx = VIEW_W * 0.52;
+        const cy = VIEW_H * 0.46;
+        const arm = (dir: number, len: number, width: number, depth: number, x0: number, y0: number, angle: number) => {
+            const pts: Array<[number, number]> = [[x0, y0]];
+            let x = x0;
+            let y = y0;
+            let a = angle;
+            const steps = Math.max(2, Math.round(len / 14));
+            for (let i = 0; i < steps; i++) {
+                a += (r() - 0.5) * 0.9;
+                x += Math.cos(a) * 14 * dir;
+                y += Math.sin(a) * 7;
+                pts.push([x, y]);
+            }
+            for (let i = 1; i < pts.length; i++) {
+                const k = 1 - i / pts.length;
+                ctx.lineWidth = Math.max(0.4, width * k);
+                ctx.beginPath();
+                ctx.moveTo(pts[i - 1][0], pts[i - 1][1]);
+                ctx.lineTo(pts[i][0], pts[i][1]);
+                ctx.stroke();
+            }
+            if (depth > 0) {
+                for (let i = 2; i < pts.length - 1; i += 3) {
+                    if (r() < 0.6) arm(dir, len * 0.35, width * 0.5, depth - 1, pts[i][0], pts[i][1], a + (r() < 0.5 ? -0.8 : 0.8));
+                }
+            }
+        };
+        ctx.save();
+        ctx.lineCap = "round";
+        ctx.shadowColor = css(hex("#ff2a10"), 0.9);
+        ctx.shadowBlur = 10;
+        ctx.strokeStyle = css(hex("#ff5a28"), 0.25 + 0.4 * amount);
+        const len = 60 + 220 * amount;
+        arm(1, len, 2.6, 1, cx, cy, 0.15);
+        arm(-1, len * 0.8, 2.2, 1, cx, cy, -0.1);
+        ctx.restore();
     }
 }
 
