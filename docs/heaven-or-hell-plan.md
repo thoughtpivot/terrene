@@ -16,7 +16,17 @@ emissive and normal passes, and lit, bloomed and fogged in Excalibur.
 
 This plan turns the Granola notes "Heaven Or Hell" (Dan, October 23, 2026)
 and Dan's follow-up decisions into milestones that fit Terrene's existing
-scene, rules and test patterns.
+scene, rules and test patterns. Its companion,
+[heaven-or-hell-progression.md](./heaven-or-hell-progression.md), is the
+detailed proposal for character creation and progression.
+
+### Questions that block M1 or M2
+
+None right now. M1 (one lit area, pre-rendered) and M2 (the combat core with
+the Flaming Sword) can start on the decisions already made. The first
+milestone with an open blocker is M3, which waits on what right-click does
+and on how a Choir is chosen. The full list is in
+[Not decided yet](#not-decided-yet).
 
 ### What the notes decided
 
@@ -111,15 +121,21 @@ to do that you progress differently each run. When you're wiped, Heaven
 resets entirely. What you keep is small and mostly knowledge: each death
 teaches you something, such as a bestiary entry that reveals a demon's
 patterns and weaknesses, lore, map knowledge or a small unlock. It is not
-big stat creep. The meta progress is renamed from Graces to Revelations,
-because what carries over is what has been revealed to you.
+big stat creep. The meta progress is now split in two, following the
+progression proposal: **Testimony** is the currency, and **Remembrance** is
+the knowledge (bestiary, map memory and lore). Within a run, **Visions** is
+the shrine currency, like Deepwoken's Knowledge, and it's lost on a wipe.
+These replace the plan's earlier names, Graces and then Revelations. Dan
+can override the choice under open question 8 in
+[the progression proposal](./heaven-or-hell-progression.md#13-open-questions-for-dan).
 
 **Corruption is the clock.** While a run goes on, Hell's invasion slowly
 corrupts more and more of Heaven. The longer you last, the stronger the
 demons get and the more bosses spawn around the open map. As Heaven
 corrupts, more aspects and mechanics also open up, so the player can gain
-more and grow stronger to match. The tiers are sketched in M4 as a
-proposal, and a separate design proposal for them is coming.
+more and grow stronger to match. The tiers are proposed in section 10 of
+[the progression proposal](./heaven-or-hell-progression.md#10-corruption-tiers-the-power-curve)
+and summarised in M4.
 
 **Camera angle.** By default, copy Death's Door's look: a fixed camera about
 45–50 degrees down, looking along a diagonal, with one angle for the whole
@@ -145,13 +161,19 @@ is assumed to be WASD.
 character creation step where you customise your angel. Races, which
 Deepwoken calls Aspects, give different buffs and are all inspired by
 angels. Dan also wants Deepwoken's Mantras, Oaths, Talents, Enchantments,
-Aspects, Deep Shrines and Resonance, all given angel and Heaven flavour. See
+Aspects, Deep Shrines and Resonance, all given angel and Heaven flavour. The
+progression proposal renames them Choirs, Hymns, Vows, Gifts, Anointings
+and Shrines of the Throne, and Resonance becomes Trumpets. See
 [Character creation and progression](#character-creation-and-progression).
 
 **Mechanics are unchanged, with additions.** None of the decisions above
 change the Deepwoken mechanics already planned. Dan's request for the full
 set of progression systems adds Aspects, Oaths, Enchantments and Resonance
 to [Mechanics scope](#mechanics-scope).
+
+**The first weapon.** The prototype is built around the Flaming Sword, as
+section 12 of the progression proposal recommends. It's the baseline every
+other weapon is tuned against.
 
 ### Resolved since the first draft
 
@@ -177,23 +199,44 @@ to [Mechanics scope](#mechanics-scope).
 
 ### Not decided yet
 
-Each open decision blocks a specific milestone, marked in brackets.
+Each open decision blocks a specific milestone, marked in brackets. The
+progression proposal keeps its own list in
+[section 13](./heaven-or-hell-progression.md#13-open-questions-for-dan).
+Its questions are referred to here as P1 to P11. Only the ones that block
+a milestone are repeated here.
 
 1. **What right-click does.** Dan wants right-click to be a critical attack,
    and Deepwoken uses it to feint. *Proposed resolution:* right-click during
    your own attack's wind-up feints it, and at any other time it's a
-   critical attack, the same as R. [M3]
+   critical attack, the same as R. The options are set out in P1. [M3]
 2. **How big Heaven's map is.** The number of regions and their size set the
    art budget, the streaming work and how long a run can last. [M4]
 3. **Whether Heaven's map has a hub.** *Proposal:* a sanctuary region where
    allied NPCs talk and the bestiary and lore are read, which corruption
    reaches only at the last tier. [M4]
-4. **How a run ends well.** Corruption only rises, so does a run have a
-   victory, such as defeating the dragon at the last tier, or does it only
-   end when you're wiped, with the score being how long Heaven held? [M4]
+4. **How a run ends well.** Does a run have a victory, such as defeating the
+   dragon at the last tier, or does it only end when you're wiped, with the
+   score being how long Heaven held? This is the same as P6. [M4]
 5. **How long a run should last, and how it's saved.** A long run with
    permadeath has to survive closing the tab. *Proposal:* the run saves
    continuously to `localStorage`, so quitting never undoes a death. [M4]
+6. **Whether sealing a breach lowers corruption.** This plan says the level
+   never goes down, and sealing only slows it and cleanses the ground
+   nearby. The progression proposal lowers it a little on each seal. This is
+   P11, and neither rule is picked yet. [M4]
+7. **How a Choir is chosen.** Rolled at random like Deepwoken's Aspects, or
+   chosen freely. This is P2. [M3, the character creation screen]
+8. **Whether Ascension is capped by corruption tier.** If it is, growing
+   stronger means letting Heaven decay. This is P5. [M4]
+9. **What happens at Stain 100.** Either the run ends in the Fall, or it
+   continues as a fallen angel. This is P7. [M5]
+
+The progression proposal's other questions don't block a milestone yet:
+multiplayer (P3), the map on reset (P4, which this plan's fixed map and
+reseeded invasion answer as a proposal), naming (P8, with a choice already
+made for now), tone (P9), and survival meters and the number of lives (P10).
+Until P3 and P10 are answered, the mechanics table keeps PvP and hunger and
+thirst out of scope.
 
 ## Design pillars
 
@@ -227,34 +270,44 @@ for Dan to confirm, apart from where they restate those decisions.
   tested.
 - **Corruption is the run's clock.** A single corruption level rises with
   time in the run and with every breach left open. Sealing a breach slows it
-  and cleanses the ground nearby, but the level itself never goes down. Each
-  tier makes demons stronger and spawns more bosses across the map, and also
-  opens up new aspects and mechanics for the player. Tiers are sketched in
-  M4.
+  and cleanses the ground nearby. Whether sealing also lowers the level is
+  open decision 6. Each tier makes demons stronger and spawns more bosses
+  across the map, and also opens up new systems for the player. The tiers
+  are in section 10 of the progression proposal and summarised in M4.
 - **A run is long, and different every time.** There's more to do than one
-  run can finish: breaches, camps, bosses, quests from allied angels, Deep
-  Shrines and Oath trials. So two runs progress differently even on the
-  same map. Whether a run can be won is open decision 4.
-- **Two lives, in angel terms.** Your first fall dims your halo. That's
-  Deepwoken's stained health: the dimmed part of your health bar can't be
-  healed until you pray at an altar or level up. A second fall casts you
-  out, and the run ends. Deepwoken sends a drowned character to the Depths
-  for one last chance before wiping, and an angel equivalent could come
-  later.
-- **A wipe resets Heaven entirely.** The character, their build and every
-  change to the map are gone.
-- **Revelations survive the wipe.** What carries over is mostly knowledge:
+  run can finish: breaches, camps, bosses, quests from allied angels,
+  Shrines of the Throne and Vow trials. So two runs progress differently
+  even on the same map. Whether a run can be won is open decision 4.
+- **Two lives, in angel terms.** The first time you're struck down, your
+  halo dims. That's Deepwoken's stained health: the dimmed part of your
+  health bar can't be healed until you pray at an altar or Ascend. The
+  second time casts you out, and the run is wiped. Deepwoken sends a drowned
+  character to the Depths for one last chance before wiping. The angel
+  equivalent is the Throne's answer in the progression proposal: if your
+  Trumpet's Progress is full when your HP hits zero inside a breach, you're
+  healed instead of struck down, so you don't lose a life.
+- **Lives and Stain are separate.** Personal Stain, from 0 to 100, is the
+  corruption you choose to take on for power (progression proposal,
+  section 10). At 25 Stain your halo cracks, which is a different mark from
+  a halo dimmed by being struck down. Stain doesn't cost a life, and losing
+  a life doesn't add Stain. "The Fall" means only reaching 100 Stain.
+- **A wipe resets Heaven entirely.** The character, their build, their
+  Visions and every change to the map are gone.
+- **Testimony and Remembrance survive the wipe.** What carries over is
+  mostly knowledge, which is Remembrance:
   - *bestiary entries* that reveal a demon's patterns and weaknesses, filled
     in by fighting it and dying to it;
   - *lore* found in the world;
-  - *map knowledge*, such as marked altars, shortcuts and Deep Shrine sites;
-  - *small unlocks*, such as a cosmetic, an Aspect to choose at character
-    creation, or skipping a trial you've completed before.
+  - *map memory*, such as discovered landmarks, altars and shrine sites,
+    kept as faded ink on the next run's map.
 
-  There's no stat creep. Deepwoken itself keeps a small "Knowledge" currency
-  across a wipe, which can, for example, skip an Oath's progression that you
-  have already finished once. Revelations follow that idea, so the old
-  Echoes row becomes Revelations.
+  Testimony is a small currency earned from one-time Witnesses in a run. It
+  buys small unlocks, such as an Origin, a starter weapon or a rare Choir
+  variant, and a few small capped upgrades. That follows Deepwoken's Echoes,
+  which are earned on a wipe from one-time Triumphs. Deepwoken's
+  [Knowledge](https://deepwoken.fandom.com/wiki/Knowledge), by contrast, "is
+  bound to a character and is lost upon wiping," and Visions follow that.
+  There's no big stat creep.
 
 ## Creatures
 
@@ -272,7 +325,7 @@ role of each creature is a proposal.
 | Seraphim | Isaiah 6:2–7: "Each had six wings: with two he covered his face, and with two he covered his feet, and with two he flew." They call "Holy, holy, holy," and one carries "a burning coal that he had taken with tongs from the altar" | Allies who fight beside you at breaches, and altar keepers who clear a dimmed halo |
 | Cherubim (the living creatures) | Ezekiel 1:5–14: "a human likeness," "four faces," "four wings," "human hands" under the wings, legs "straight," feet like "a calf's foot," sparkling "like burnished bronze." Each "went straight forward, without turning," and they "darted to and fro, like the appearance of a flash of lightning." Ezekiel 10:14 lists the faces as a cherub's, a human's, a lion's and an eagle's | Guardians of gates and quest givers |
 | Ophanim (the wheels) | Ezekiel 1:15–21 and 10:9–13: "a wheel within a wheel," gleaming "like sparkling beryl," with rims "full of eyes all around." They move "in any of their four directions without turning" and are called "the whirling wheels." *Ophanim* is Hebrew for "wheels" | Sentinels that watch the map. Talking to one reveals nearby breaches, which is a natural source of map knowledge |
-| Thrones | Colossians 1:16 names "thrones or dominions or rulers or authorities" among things created "in heaven." Some Christian angelology treats Thrones as one of the choirs of angels and identifies them with the ophanim. Jewish angelic hierarchies keep the two apart | To be chosen: either the same creature as the ophanim, or a ruler class that grants Oaths |
+| Thrones | Colossians 1:16 names "thrones or dominions or rulers or authorities" among things created "in heaven." Some Christian angelology treats Thrones as one of the choirs of angels and identifies them with the ophanim. Jewish angelic hierarchies keep the two apart | To be chosen: either the same creature as the ophanim, or a ruler class that grants Vows |
 | The four living creatures of Revelation | Revelation 4:6–8: "like a lion," "like an ox," "with the face of a man," and "like an eagle in flight," "each of them with six wings," "full of eyes all around and within" | Guardians of the Throne region and keepers of lore |
 
 ### Hell: the enemies
@@ -286,7 +339,7 @@ role of each creature is a proposal.
 | Leviathan | Job 41: "his back is made of rows of shields," "out of his mouth go flaming torches," "out of his nostrils comes forth smoke," and "his breath kindles coals." "Though the sword reaches him, it does not avail." He "makes the deep boil like a pot" and is "king over all the sons of pride." The ESV calls him "a large sea animal, exact identity uncertain" | A boss of the Sea of Glass whose armour has to be broken before it takes damage |
 | The beast from the sea | Revelation 13:1–2: "with ten horns and seven heads, with ten diadems on its horns and blasphemous names on its heads," "like a leopard," with feet "like a bear's" and a mouth "like a lion's mouth." "The dragon gave his power" to it | A late boss |
 | The dragon | Revelation 12:3–9: "a great red dragon, with seven heads and ten horns, and on his heads seven diadems." "His tail swept down a third of the stars of heaven." He fought Michael's angels "and was thrown down" | The invasion's leader and the last-tier boss |
-| Named demons | Tobit 3:8 names "the wicked demon Asmodeus," and Matthew 12:24 names "Beelzebul, the ruler of the demons." The Ars Goetia, part of a 17th-century grimoire called the Lesser Key of Solomon, lists 72 spirits with ranks, such as King Bael, Duke Astaroth, King Asmodeus and King Belial | Lieutenants who command camps and lead breaches. Their names and ranks come from these sources, but no descriptions of them have been gathered yet, so their designs are original |
+| Named demons | Tobit 3:8 names "the wicked demon Asmodeus," and Matthew 12:24 names "Beelzebul, the ruler of the demons." The Ars Goetia, part of a 17th-century grimoire called the Lesser Key of Solomon, lists 72 spirits with ranks, such as King Bael, Duke Astaroth, King Asmodeus and King Belial | Ranked enemies using the Ars Goetia's titles, from Knights at the first corruption tier to Kings who roam as bosses (progression proposal, section 10). They command camps and lead breaches. Their names and ranks come from these sources, but no descriptions of them have been gathered yet, so their designs are original |
 | Lesser demons | No single source. Original designs, kept in the same shape language | The melee, ranged and heavy types of M2 and M3 |
 
 Behemoth and Leviathan appear in Job as creatures of God's making, not as
@@ -551,41 +604,56 @@ The last four rows are new, added at Dan's request. The rows above them are
 unchanged.
 
 In the open-map version, these keep their mechanics and take angel names in
-the game's text. A death is a fall and stained health is a dimmed halo.
-Shrines are altars, clearing a floor is sealing a breach, and Echoes are
-Revelations: mostly knowledge, as described in
-[World and run structure](#world-and-run-structure). Deep Shrines are rare
-places on the map rather than rooms.
+the game's text, from the
+[progression proposal](./heaven-or-hell-progression.md):
+
+| Deepwoken | Heaven Or Hell |
+| --- | --- |
+| Aspects | Choirs |
+| Attunements and Mantras | Tongues and Hymns |
+| Ether | Grace |
+| Tempo and Vent | Fervour and Outcry |
+| Sanity | Sanctity |
+| Power | Ascension |
+| Talents | Gifts |
+| Oaths | Vows |
+| Enchantments | Anointings |
+| Deep Shrines | Shrines of the Throne |
+| Knowledge (within a run) | Visions |
+| Resonance | Trumpets |
+| Echoes (after a wipe) | Testimony, plus Remembrance for knowledge |
+| Boons and Flaws | Boons and Burdens |
+
+A death is being struck down, and stained health is a dimmed halo. Altars
+stand in for ordinary shrines, and clearing a floor is sealing a breach.
+Shrines of the Throne are rare places on the map rather than rooms. Where a
+row's short description differs from the progression proposal, the
+proposal's detail wins. For example, Gifts come in hands of 4 to 5 cards on
+each Ascension, not one of three per floor.
 
 ## Character creation and progression
 
 Decided: a run starts like Deepwoken, with a character creation screen where
-you customise your angel and choose an Aspect. Every Deepwoken progression
-system Dan listed is in, each given angel and Heaven flavour. The flavour
-notes below are proposals.
+you customise your angel and choose a Choir. Every Deepwoken progression
+system Dan listed is in, each given angel and Heaven flavour. The detail is
+in [heaven-or-hell-progression.md](./heaven-or-hell-progression.md), a
+proposal for Dan. In short:
 
-- **Aspects.** In Deepwoken, Aspects (formerly races) are chosen at
-  character creation and give innate talents and attribute bonuses. Here
-  they're kinds of lesser angel, for example a guardian, a messenger or a
-  warden of flame. Some Aspects are Revelations unlocked by earlier runs.
-- **Talents.** Cards drawn on level-up, as in Deepwoken. Here they're drawn
-  when a breach is sealed.
-- **Mantras.** Deepwoken's magic. Here they're hymns or psalms, the active
-  abilities of an attunement.
-- **Oaths.** In Deepwoken, a unique talent with abilities that progress, one
-  at a time, which can be broken at a shrine. Here they're vows sworn at an
-  altar, such as a vow to one choir of angels.
-- **Enchantments.** Upgrades for weapons and equipment. Here they're
-  blessings placed on a weapon at an altar.
-- **Deep Shrines.** Rare places on the map that trade a stat for a stat.
-- **Resonance.** In Deepwoken, a personal ability gained from Progress by
-  defeating bosses. Here it's a calling that awakens as you defeat Hell's
-  bosses.
+- You are one of **the Tenth**, lesser angels kindled to refill Heaven's
+  choirs after the War in Heaven. Each Choir is an echo of a higher choir,
+  such as the Kindled (Seraphim) or the Wheelborn (Ophanim), with the same
+  +3 and +2 attribute bonuses as Deepwoken's Aspects.
+- Creation follows Deepwoken's order: Choir, Tongues, weapon, Boons and
+  Burdens, Origin, appearance, then the Testimony Shop and Penances.
+- In a run you Ascend, draw Gifts and Hymns, swear one Vow, anoint your
+  gear, pay Visions at Shrines of the Throne, and earn a Trumpet from boss
+  kills.
+- Corruption tiers open these systems over the run, from Tongues and Gifts
+  at tier 0 to Trumpets at tier 4. Personal Stain is a separate
+  risk-and-reward track.
 
-Some of these unlock as corruption rises, so the player grows to match
-Hell (see the corruption tiers in M4). The character creation screen is in
-M3, after the combat core and before the run. A detailed design proposal for
-these systems will be added next.
+The character creation screen is in M3, after the combat core and before
+the run.
 
 ## Technical approach
 
@@ -719,9 +787,9 @@ in M1.
 - **Frame count.** The figures here are arithmetic on assumed numbers, not
   measurements. Suppose the hero has 16 animations (idle, run, three light
   attacks, a critical, block, block hit, parry, parried, guard break, roll,
-  hit reaction, a fall and two casts) averaging 12 frames. That's about 190
-  frames per facing, or about 1,500 across 8 facings, for each pass. Every
-  enemy and creature adds its own set. Mirroring, short loops and sharing
+  hit reaction, being struck down and two casts) averaging 12 frames.
+  That's about 190 frames per facing, or about 1,500 across 8 facings, for
+  each pass. Every enemy and creature adds its own set. Mirroring, short loops and sharing
   animations between related enemies keep this down.
 - **Texture memory.** Again assumed: a 256x256 frame takes 256 KB on the GPU
   as uncompressed RGBA. At 1,500 frames that's about 375 MB per pass for the
@@ -774,13 +842,13 @@ thin, and the Oka World pipeline, where art is generated from `tools/`:
 ```
 src/components/scenes/HeavenOrHell/
 ├── HeavenOrHell.ts     # Scene: load, camera, chunk streaming, loop, onDeactivate cleanup
-├── rules.ts            # Pure combat and run rules: posture, parry, roll, falls, frame data
+├── rules.ts            # Pure combat and run rules: posture, parry, roll, lives, frame data
 ├── map.ts              # Fixed map of Heaven: regions, chunks, paths, landmarks (pure)
 ├── invasion.ts         # Seeded invasion: breaches, corruption spread, camps, events (pure)
 ├── corruption.ts       # Corruption level, tiers and what each tier unlocks or spawns (pure)
-├── character.ts        # Character creation, Aspects, Oaths, Enchantments, Resonance (pure)
-├── revelations.ts      # What survives a wipe: bestiary, lore, map knowledge, unlocks (pure)
-├── save.ts             # Continuous run save and Revelations in localStorage
+├── character.ts        # Creation, Choirs, Gifts, Vows, Anointings, Trumpets, Stain, Visions (pure)
+├── testimony.ts        # What survives a wipe: Testimony, Remembrance, unlocks (pure)
+├── save.ts             # Continuous run save, Testimony and Remembrance in localStorage
 ├── input.ts            # Mouse aim, left-click, F, hold F, Q, R, right-click, WASD
 ├── palette.ts          # Region bases, corruption blend, toon bands, glow roles (pure)
 ├── chunks.ts           # Loads and unloads chunk layers near the camera
@@ -788,7 +856,7 @@ src/components/scenes/HeavenOrHell/
 ├── bloom.ts            # Bloom and grade PostProcessors built on ScreenShader
 ├── darkness.ts         # Dark overlay and light holes, after HollowDark
 ├── fx.ts               # Hit sparks, embers, corruption particles
-├── hud.ts              # Health and halo, posture, tempo, cooldown icons
+├── hud.ts              # Health and halo, posture, Fervour, Grace, cooldown icons
 ├── art/atlas.ts        # Generated by tools/heaven-or-hell/pack_atlas.py
 └── sfx/, HeavenOrHell.mp3
 src/components/characters/player/<Hero>/   # one folder per character, per project rules
@@ -809,10 +877,10 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
 ### Testing
 
 - `rules.ts`, `map.ts`, `invasion.ts`, `corruption.ts`, `character.ts`,
-  `revelations.ts` and `palette.ts` import nothing from Excalibur, so
+  `testimony.ts` and `palette.ts` import nothing from Excalibur, so
   `node:test` covers the parry window, posture overflow, roll i-frames,
-  input buffering, the two-falls state, seeded invasions, corruption tiers,
-  Aspect bonuses, what survives a wipe and the palette's value limits, all
+  input buffering, the two-lives state, seeded invasions, corruption tiers,
+  Choir bonuses, Stain thresholds, what survives a wipe and the palette's value limits, all
   deterministically.
 - **Fix this first:** `node --test test/street-rules.ts` fails today with
   `ERR_MODULE_NOT_FOUND` because `Street/level.ts` imports `./rules` without
@@ -891,6 +959,12 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
 
 ### M2: The combat core
 
+- **The Flaming Sword is the first weapon**, as section 12 of the
+  [progression proposal](./heaven-or-hell-progression.md#12-starting-weapons)
+  recommends. It's a medium weapon with an even 3+1 chain and a forgiving
+  parry window. It's the baseline every other weapon is tuned against, and
+  it shows the white and gold bloom most clearly. Its critical, *Turning
+  Every Way*, comes in M3.
 - `rules.ts` covers the light attack chain with its flourish, block and
   posture, parry with its cooldown, and roll with i-frames.
 - `input.ts` maps the decided controls: WASD to move, the mouse to aim,
@@ -932,7 +1006,9 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
 
 ### M3: Depth of combat
 
-- Critical attacks on R, feints, Tempo and Vent. Right-click follows open
+- Critical attacks on R (starting with the Flaming Sword's *Turning Every
+  Way*), feints, and Fervour and Outcry (Deepwoken's Tempo and Vent).
+  Right-click follows open
   decision 1. Until it's decided, build the proposed resolution: a feint
   during your own wind-up, a critical otherwise.
 - Two more demon types: a ranged one with telegraphed area attacks, and a
@@ -940,8 +1016,11 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
 - One corrupted angel as an elite. A corrupted seraph is the cheapest,
   because it needs no new movement rules.
 - **The character creation screen**, after the combat core and before the
-  run: customising your angel and choosing from a first set of angel
-  Aspects, each with an innate talent and a small attribute bonus.
+  run: customising your angel and choosing a Choir, each with +3 and +2 to
+  two attributes, innate Gifts and a quirk. How a Choir is chosen is open
+  decision 7. The full creation flow (Tongues, weapon, Boons and Burdens,
+  Origin, appearance) can follow in M4 and M5, as the systems behind it
+  land.
 - Telegraphs follow the Little Scavenger feedback: shrinking timer circles
   on the ground, visible cooldowns and clear feedback when you take damage.
 - **Game-feel targets.** Again starting values to tune:
@@ -956,7 +1035,7 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
     it, so the player knows it landed.
 - **Done when** each enemy type has a unit-tested pattern, a fight against
   all three together is winnable with no damage taken, and a character made
-  with each Aspect starts with that Aspect's talent and bonus.
+  with each Choir starts with that Choir's bonuses and Gifts.
 
 ### M4: The run
 
@@ -967,45 +1046,44 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
   and events. Sealing a breach slows corruption and cleanses the ground
   near it.
 - `corruption.ts` runs the run's clock: one level that rises with time and
-  with open breaches and never goes down, crossing tiers.
-- Two lives: the first fall dims the halo (stained health), and altars clear
-  the stain. A second fall casts you out and wipes the run, and Heaven
-  resets entirely.
-- A talent draft of one card from three each time a breach is sealed.
-- Revelations (bestiary entries, lore, map knowledge and small unlocks)
-  saved to `localStorage`, plus a continuous save of the run itself (open
-  decision 5). Where Revelations are read depends on the hub (open
+  with open breaches, crossing tiers. Whether sealing a breach lowers it is
+  open decision 6.
+- **Corruption tiers.** The tiers are proposed in section 10 of the
+  [progression proposal](./heaven-or-hell-progression.md#10-corruption-tiers-the-power-curve):
+  six tiers, from Tier 0 (the Calm Courts) to Tier 5 (War in Heaven). Each
+  tier brings stronger demons, ranked by the Ars Goetia's titles, and more
+  bosses, ending with the red dragon and the beasts. Each tier also opens
+  systems for the player, from the base Tongues and Gifts at Tier 0 to the
+  endings at Tier 5. M4 builds the tier machinery and the first three
+  tiers. The proposal also caps Ascension by tier (open decision 8). Whether
+  Tier 5 ends the run is open decision 4.
+- Two lives: the first time you're struck down, your halo dims (stained
+  health), and altars clear it. The second time casts you out and wipes the
+  run, and Heaven resets entirely. This is separate from personal Stain.
+- Ascension, with Gift hands of 4 to 5 cards on each Ascension, and Visions
+  earned within the run.
+- Testimony and Remembrance (bestiary entries, map memory and lore) saved to
+  `localStorage`, plus a continuous save of the run itself (open
+  decision 5). Where Remembrance is read depends on the hub (open
   decision 3).
 - NPC dialogue with allied angels, using `DialogueNPC` and `ChatSystem`.
-- **Corruption tiers (proposal).** A first sketch to tune in play. A
-  separate design proposal for corruption is coming and replaces this one.
-  The tier numbers, contents and order are all starting values.
-
-  | Tier | What Hell sends | What opens up for the player |
-  | --- | --- | --- |
-  | 0, the first breaches | Locusts and lesser demons | The combat core, the chosen Aspect and the talent draft |
-  | 1 | Legion as roaming packs, and stronger lesser demons | Attunements and their first Mantras |
-  | 2 | Corrupted angels as elites, and the first bosses, such as Behemoth | Oaths and Enchantments |
-  | 3 | Leviathan and the beast from the sea, and more bosses at once | Resonance and Deep Shrines |
-  | 4, the last tier | Abaddon at the head of the locusts, and then the dragon | Nothing new: everything the run has built is tested |
-
-  Whether defeating the dragon wins the run is open decision 4.
 - **Done when** a run can be played from character creation through at
-  least three corruption tiers, falls and being cast out behave as
+  least three corruption tiers, being struck down and cast out behave as
   designed, two seeds produce different invasions on the same map, closing
-  and reopening the tab resumes the run without undoing a fall, and
-  Revelations survive a wipe.
+  and reopening the tab resumes the run without undoing a life lost, and
+  Testimony and Remembrance survive a wipe.
 
 ### M5: Builds and variety
 
-- Three attunements, each with one active ability and an Ether bar.
-- Oaths sworn at altars, Enchantments on weapons and equipment, and
-  Resonance awakened by boss kills, each unlocked at its corruption tier.
-- Deep Shrines as rare places on the map, more talents, and a second region
-  with its own monochrome base.
+- The four base Tongues, each with its first Hymns and a Grace bar.
+- Vows, Anointings, Trumpets and the Throne's answer, and personal Stain
+  with its thresholds (open decision 9 for Stain 100), each unlocked at its
+  corruption tier as the progression proposal sets out.
+- Shrines of the Throne as rare places on the map, paid with Visions, more
+  Gifts, and a second region with its own monochrome base.
 - More demons and bosses from the roster, more allied angels, and more
   corrupted angels.
-- **Done when** two runs with different Aspects, attunements and Oaths play
+- **Done when** two runs with different Choirs, Tongues and Vows play
   noticeably differently.
 
 ### M6: Polish and release
@@ -1050,7 +1128,7 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
   time, and textures for far chunks are released. The map's size (open
   decision 2) decides how hard this is.
 - **Saving a long run.** A long permadeath run has to survive a closed tab
-  or a crash without letting a player undo a fall by reloading. The save
+  or a crash without letting a player undo being struck down by reloading. The save
   has to be continuous and small, and `localStorage` has a size limit, so
   the save stores the seed and the changes, not the whole map.
 - **Boss render cost.** Behemoth, Leviathan and the dragon are large, so
