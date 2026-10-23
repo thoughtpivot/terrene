@@ -18,6 +18,7 @@ Welcome to the Terrene documentation! This directory contains comprehensive guid
 
 - **[oka-world.md](./oka-world.md)** - Oka World, the painted cave platformer and default scene: rules, code layout, physics and the art and music pipeline
 - **[oka-world-2.md](./oka-world-2.md)** - Oka World 2: The Hollow Beneath, the dark sequel that follows Oka World: shared scene config, dark variants, lighting and its pipeline
+- **[heaven-or-hell.md](./heaven-or-hell.md)** - Heaven Or Hell, the dark isometric action game: what M1 is, how to open it, controls and the streaming debug view
 
 ## Quick Links
 
