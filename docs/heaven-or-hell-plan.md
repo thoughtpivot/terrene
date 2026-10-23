@@ -41,11 +41,23 @@ specific milestone, marked in brackets.
 2. **Pixel art or painted art.** The notes say both "2D high-resolution" and
    "isometric pixel art." This plan assumes crisp pixel art drawn at 960x540
    with no smoothing. It does not use Oka World's antialiased HD mode. [M1]
+   *Partial answer:* neither style reference settles this. Little Scavenger
+   is 3D, so it's a reference for lighting and colour, not for projection or
+   rendering. Death's Door is also 3D, and its concept art is painted with an
+   ink line, not pixel art. See [Art direction](#art-direction).
 3. **Input scheme.** Deepwoken is mouse plus keyboard. Terrene's scenes are
    keyboard-first. This plan assumes keyboard-first, with the mouse for aiming
    as an option. [M2]
 4. **Where the art comes from.** The choices are bought packs, original art
    painted as source sheets (as Oka World does), or generated art. [M1]
+   *Partial answer:* the Death's Door concept sheets show a workable format
+   for source sheets: one isometric room per sheet, with props, a flat
+   elevation of each key piece and short notes on how it's used.
+5. **The isometric angle.** Both style references are 3D games with a fixed
+   high camera. A 2D game has to commit to one tile ratio, such as 2:1, and
+   draw every sprite at that angle. Death's Door uses a "classic isometric
+   angle" for its world and a straighter angle for its office hub, which
+   suggests a hub could break the rule on purpose. [M1]
 
 ## Design pillars
 
@@ -57,6 +69,150 @@ specific milestone, marked in brackets.
    environment stays close to black.
 4. **Small systems, kept separate.** Rules live in pure TypeScript and are
    tested without the engine, the way `Street/rules.ts` is.
+
+## Art direction
+
+This section combines two style references, Little Scavenger and Death's
+Door. Neither one matches the target exactly. Both are 3D games under a fixed
+high camera, and neither is near-black. So the plan takes lighting, colour
+and readability from them and keeps projection and value structure as its
+own rules.
+
+### What the references show
+
+**Little Scavenger** (Coderedstudio) is a 3D roguelite prototype. Its itch.io
+page tags it "3D" and "Pixel Art", and a player comment calls the look "a bit
+of PSX style graphics." It renders at low resolution under a fixed
+near-isometric camera. Its useful lessons are about light: glows that each
+have one job, bloom only on emissive objects, pooled light on a dark floor
+and edges that fall off to black. Its itch comments also flag what to fix:
+timed attacks "don't show their timers," and players asked for more feedback
+when they take damage.
+
+**Death's Door** (Acid Nerve, 2021) is a 3D isometric action-adventure made
+in Unity. Frits Olsen was art director, and Sarah Morris, whose portfolio
+page is the reference here, is credited for concept art. The team describes
+its look as "muted tones of dungeons with vivid splashes of light and
+colour," with naturally lit areas set against a "subtle toon shader" on the
+characters. The office hub, the Hall of Doors, is greyscale, while the world
+beyond the doors is in colour. The team chose the isometric view because it
+gives "a clearer view of two angles" and suits "detailed areas with
+verticality."
+
+Sarah Morris's Death's Door page shows 12 concept sheets with no captions.
+The notes are on the sheets themselves:
+
+- **Rooms are dioramas.** Each room is drawn from a high three-quarter angle
+  as a floating block with its outer edges cut away: the Fragment of Truth
+  chamber, the inside of a ship, Grandma's arena, and a secret garden. The
+  sheets are painted on a light grey board, so the cut edges don't fall off
+  to black.
+- **Shape language.** The stone is chunky, bevelled and slightly irregular,
+  with a dark ink line around each shape. Ornament gathers on the focal
+  objects, such as the doors, the bell tower and the iron gate, while floors
+  stay plain.
+- **Value and palette.** The environments sit in the mid values, in
+  desaturated greens, ochres, grey-blue stone and rust. The darkest values
+  are the recesses and the crow itself.
+- **Light is a few small sources.** Lanterns, cannon heaters and windows give
+  warm orange and red pools. Cool cyan or teal is kept for the uncanny: water
+  in the cracks of the Fragment of Truth chamber, the eye of Truth, and the
+  final boss door, noted as "glowing light in the center of the head." Other
+  accents are a green alchemy glow, a pink crystal, and a pale yellow glow
+  around the Spirit Crow against dark grey.
+- **Readability.** The crow is a small dark wedge with a white eye. It reads
+  by value against lighter floors, and the bell tower gate sheet gives it a
+  single red sword as its colour accent. The Graveyard Ghost notes say "Key
+  face to echo Golem design" and "Longer robes to echo Golem design," so
+  related enemies share shapes.
+- **Sheets are built to hand off.** Rooms come with prop breakouts, flat
+  elevations and practical notes, for example "Large anchor to frame the
+  doorway in the mountainside" and "Flowers can be really simple and just
+  change texture colour for variation."
+
+The game's own screenshots on Steam are brighter than the target. Measured
+on the 12 store screenshots, mean brightness runs from 53 to 144 out of 255,
+and the share of pixels darker than 40 runs from 1% to 31%. Death's Door is
+a muted mid-key game with dark pockets. It isn't a near-black one.
+
+A trailer artist rebuilt Death's Door's character toon shader to add a rim
+light and support for more than one light, because the original "only
+supported a single directional light source," and the trailer used "heavy
+use of post processing" and volumetrics. That describes the trailer, not the
+shipped game. It's still a useful hint: to push the look further, the
+artist's first addition was a rim light on the characters.
+
+### Rules for Heaven Or Hell
+
+These rules are this plan's proposal. They take the light and colour from
+the references and replace their value structure with the near-black target.
+
+- **Value structure.** The environment lives in the bottom 15% of
+  brightness. Floors in shadow sit around `#0B0C10` to `#16181F`, and lit
+  floor never rises above about 35% brightness. Pure black is kept for edges
+  and the void beyond the room. Only light sources, actors and effects go
+  above 60%.
+- **Where the light goes.** Each room has two to four small light sources.
+  Each makes a pool on the floor that falls off to the near-black base. The
+  room's outer edges fade to black, as in Little Scavenger. They are not cut
+  off on a grey board, as in the Death's Door sheets. One focal object per
+  room, such as a door, shrine or exit, gets the most ornament and the
+  brightest light, as Death's Door's doors do.
+- **One job per glow colour.** Cyan is the player: the hero's outline, their
+  attacks, parry flashes and anything the player can use. Orange is a
+  warning: enemy wind-ups, ground telegraphs and fire. Red is damage and
+  danger: hits taken, lethal areas, and hell floors. Warm light sources that
+  only light the room use a dim amber that doesn't compete with these three.
+  A fourth accent, such as green, pink or pale gold, is allowed once per
+  biome for something special, like a shrine or a boss, the way Death's Door
+  uses its pink crystal and gold Spirit Crow.
+- **Bloom, fog and lighting.** Bloom applies only to emissive pixels above
+  the threshold, never to the environment. Fog may tint the shadows but must
+  never lift them above the near-black base, which rules out Little
+  Scavenger's grey fog. Light shafts are allowed as additive shapes over
+  dark.
+- **Character readability.** Every actor reads in silhouette first. The hero
+  gets a bright cyan rim or outline, the 2D answer to Death's Door's rim-lit
+  toon shader. Enemies get a thin warm rim, and related enemies share a
+  shape, as the Ghost "echoes" the Golem. Each actor gets one strong colour
+  accent, like the crow's red sword.
+- **Environment shape language.** Use chunky bevelled stone blocks with a
+  dark line, plain floors, and ornament gathered on focal pieces. Draw rooms
+  as dioramas on a fixed isometric grid, with walls on the camera side cut
+  low or removed.
+- **UI palette.** UI panels are near-black and translucent, with a thin cyan
+  or amber line, never white boxes. Numbers and icons use the same glow roles
+  as the world. Telegraphs always show their timing, for example with
+  shrinking circles.
+- **Heaven and hell can be palette shifts.** Death's Door separates its hub
+  from its world with colour (greyscale against colour) and camera angle.
+  Heaven Or Hell can do the same between its floors, for example cold cyan
+  and pale gold for heaven against red and orange for hell, on the same
+  near-black base. This depends on open decision 1.
+
+### Borrow and avoid
+
+| Reference | Borrow | Avoid |
+| --- | --- | --- |
+| Little Scavenger | Glow colours with one job each. Bloom only on emissive objects. A bright outline on the player. Light shafts and pooled light on a dark floor. Edges that fall off to black. Coloured ground telegraphs and "!" alerts. Element combos | The low-resolution 3D pipeline and voxel props. Grey fog that lifts the blacks. Muddy olive and ochre mid-tones. White UI boxes. Telegraphs with no timer |
+| Death's Door | Rooms drawn as isometric dioramas. Chunky bevelled stone with a dark line. Ornament on focal objects, plain floors. Small warm light pools. Cyan kept for the uncanny. Related enemies sharing shapes. A rim light on characters. One colour accent per character. Concept sheets with breakouts and notes. Separating areas with colour | The mid-key values and desaturated greens and ochres, which are far too bright for near-black. Cut edges on a light board instead of falling off to black. The 3D toon-shaded pipeline itself |
+| Deepwoken wiki | Mechanics only (see Mechanics scope) | Its look, because the notes say it shouldn't look like Roblox |
+
+### References
+
+| Reference | Link | What to take from it |
+| --- | --- | --- |
+| Little Scavenger itch.io page | [coderedstudio.itch.io/little-scavenger](https://coderedstudio.itch.io/little-scavenger) | Glow, bloom, pooled light, telegraphs. The page tags it "3D", and player comments flag untimed telegraphs |
+| Little Scavenger creator video | [YouTube](https://youtu.be/OKOf6yrfg4Q) | The meeting's primary style reference |
+| Sarah Morris, Death's Door concept art | [braverobynart.com/deathsdoor](https://braverobynart.com/deathsdoor) | Diorama rooms, shape language, light sources, readability, sheet format |
+| Acid Nerve game credits | [acidnerve.com/game-credits](https://www.acidnerve.com/game-credits) | Who did what: Frits Olsen as art director, Sarah Morris on concept art, Juan Abad on 3D art |
+| Byteside interview with Acid Nerve | [byteside.com](https://www.byteside.com/2021/08/deaths-door-developer-acid-nerve-on-how-it-made-its-sword-wielding-crow-game/) | "Muted tones of dungeons with vivid splashes of light and colour," and a toon shader on the characters against naturally lit areas |
+| Press Start interview with Acid Nerve | [press-start.com.au](https://press-start.com.au/features/2021/03/27/we-spoke-to-the-team-at-acid-nerve-about-the-stylish-looking-deaths-door/) | Why isometric, and a different camera angle and colour for the hub |
+| Stevivor interview with Acid Nerve | [stevivor.com](https://stevivor.com/features/interviews/acid-nerve-talks-deaths-door-interview/) | The greyscale Hall of Doors as a contrast to the coloured world |
+| Kev Hayes, Death's Door trailer | [kevhayes.com/deaths-door](http://www.kevhayes.com/deaths-door) | A rim light added to the character toon shader, and heavy post-processing and volumetrics in the trailer |
+| Death's Door on Steam | [store.steampowered.com/app/894020](https://store.steampowered.com/app/894020/Deaths_Door/) | The 12 store screenshots used to measure how bright the game actually is |
+| Death's Door Artbook on Steam | [store.steampowered.com/app/1662730](https://store.steampowered.com/app/1662730/Deaths_Door_Artbook/) | A free 43-page PDF of concepts curated by Frits Olsen. It needs the base game and hasn't been reviewed yet |
+| Deepwoken Mechanics | [deepwoken.fandom.com](https://deepwoken.fandom.com/wiki/Category:Mechanics) | Mechanics only |
 
 ## Mechanics scope
 
@@ -161,8 +317,13 @@ docs/heaven-or-hell.md  # player-facing doc, written when M1 ships
   stray image adds ambiguity.
 - Add the Deepwoken wiki pages and one or two blog articles about its combat
   to `references.md`.
-- **Done when** there are at least 5 tagged references and open decisions 2
-  and 4 are answered.
+- **Progress:** 2 of the 4–5 visual references are covered: Little Scavenger
+  and Death's Door (see [Art direction](#art-direction)). Both are 3D, so at
+  least one of the remaining references should be true 2D isometric art, to
+  settle open decisions 2 and 5. The Deepwoken wiki is linked, but the combat
+  blog articles aren't collected yet, and `references.md` doesn't exist yet.
+- **Done when** there are at least 5 tagged references and open decisions 2,
+  4 and 5 are answered.
 
 ### M1: One lit room
 
